@@ -14,7 +14,6 @@ env:
 
 jobs:
   unit-test-python:
-    needs: function-app-scan
     runs-on: ubuntu-latest
     env:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
