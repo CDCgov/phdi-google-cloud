@@ -1,0 +1,28 @@
+name: Deploy Skylight
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy_dev:
+    name: Deploy to Skylight GCP Project
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform/vars/skylight
+    steps:
+      - name: Check Out Changes
+        uses: actions/checkout@v3
+
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v0"
+        with:
+          workload_identity_provider: ${{ secrets.SKYLIGHT_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SKYLIGHT_SERVICE_ACCOUNT_ID }}
+
+      - name: Deploy
+        uses: ./.github/actions/terraform-deploy
+        with:
+          env: skylight
