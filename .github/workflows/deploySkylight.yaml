@@ -11,6 +11,9 @@ jobs:
       run:
         shell: bash
         working-directory: ./terraform/vars/skylight
+    permissions:
+      contents: "read"
+      id-token: "write"
     steps:
       - name: Check Out Changes
         uses: actions/checkout@v3
