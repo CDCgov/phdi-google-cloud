@@ -1,8 +1,61 @@
-# CDCgov GitHub Organization Open Source Project Template
+# Public Health Data Infrastructure Google Cloud
 
-**Template for clearance: This project serves as a template to aid projects in starting up and moving through clearance procedures. To start, create a new repository and implement the required [open practices](open_practices.md), train on and agree to adhere to the organization's [rules of behavior](rules_of_behavior.md), and [send a request through the create repo form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUNk43NzMwODJTRzA4NFpCUk1RRU83RTFNVi4u) using language from this template as a Guide.**
+- [Public Health Data Infrastructure Google Cloud](#public-health-data-infrastructure-google-cloud)
+  - [Overview](#overview)
+    - [Structure and Organizations](#structure-and-organization)
+      - [Serverless Funtions](#serverless-functions)
+      - [Pipeline Orchestration](#pipeline-orchestration)
+      - [Infrastructure as Code](#infrastructure-as-code)
+      - [Continuous Integration and Continuous Deployment](#continuous-integration-and-continuous-deployment)
+    - [Target Users](#target-users)
+  - [Standard Notices](#standard-notices)
+    - [Public Domain Standard Notice](#public-domain-standard-notice)
+    - [License Standard Notice](#license-standard-notice)
+    - [Privacy Standard Notice](#privacy-standard-notice)
+    - [Contributing Standard Notice](#contributing-standard-notice)
+    - [Records Management Standard Notice](#records-management-standard-notice)
+    - [Related documents](#related-documents)
+    - [Additional Standard Notices](#additional-standard-notices)
 
 **General disclaimer** This repository was created for use by CDC programs to collaborate on public health related projects in support of the [CDC mission](https://www.cdc.gov/about/organization/mission.htm).  GitHub is not hosted by the CDC, but is a third party website used by CDC and its partners to share information and collaborate on software. CDC use of GitHub does not imply an endorsement of any one particular service, product, or enterprise. 
+
+
+## Overview
+
+The Public Health Data Infrastructure (PHDI) projects are part of the Pandemic-Ready Interoperability Modernization Effort (PRIME), a multi-year collaboration between CDC and the U.S. Digital Service (USDS) to strengthen data quality and information technology systems in state and local health departments. Under the PRIME umberalla the PHDI project seeks to develop tools, often reffered to as Building Blocks, that State, Tribal, Local, and Territorial public health agencies (STLTs) can use to better handel the public health data they recieve. The purpose of this repository is to implement the Building Blocks devloped from the [PHDI SDK](https://github.com/CDCgov/phdi-sdk) on Google Cloud Platform (GCP). This will allow users to easily begin using these Building Blocks in their own GCP environment.
+
+### Structure and Organization
+
+There are primarily four major components to this repository.
+
+#### Serverless Functions
+
+The PHDI Building Blocks are implemented as Google Cloud Functions. Google Cloud Functions are GCP's version of serverless functions, similar to Lamabda in Amazon Web Services (AWS) and Azure Functions in Mircosoft Azure. Severless function provide a relatively simple way to run services with modest runtime duration, memory, and compute requirements in the cloud. Since they are serverless, GCP abstracts all aspects of the underlying infrastructure allowing us to simply write and excute our Building Blocks without worrying about the computers they run on. The `cloud-functions` directory contains Python source code for Google Cloud Functions that implement Building Blocks from the PHDI SDK.
+
+#### Pipeline Orchestration
+
+Since the Building Blocks are designed to be composable users may want to chain serveral together into pipelines. We use the Google Workflow resource to define processes that require the use of multiple Building Blocks. These workflows are defined using YAML configuration files found in the `worklows` directory.
+
+#### Infrastructure as Code
+
+Every resource required to use the Building Blocks and pipelines implemented in this respostory are defined using Terraform. This makes it simple for users to deploy all of the functionality provided in this repository to their own GCP environments. The Terraform code can be found in the `terraform` directory.
+
+#### Continuous Integration and Continuous Deployment
+
+In order to ensure high code quality and reliability we have implemented a Continuous Integation (CI) pipeline consisting of a suite of tests all new contributions must pass before they are merged into `main`. We have also built a Continuous Deployment (CD) pipeline that automatically deploys the code in the repositiory to linked GCP environments when changes are made. The combined CI/CD pipeline is implemented with GitHub Actions in the `.github` directory. 
+
+### Target Users
+
+Target users of this system include:
+
+- Public Health Departments
+  - Epidemiologists who rely on health data to take regular actions
+  - Senior stakeholders who make executive decisions using aggregate health data
+  - IT teams who have to support epidemiologists and external stakeholders integrating with the PHD
+  - PHDs may include state, county, city, and tribal organizations
+- CDC
+  - Employees and contractors working on CDC projects with access to a GCP environment and interest in using PHDI Building Blocks
+
 
 ## Access Request, Repo Creation Request
 
@@ -17,11 +70,9 @@
 * [Contribution Notice](CONTRIBUTING.md)
 * [Code of Conduct](code-of-conduct.md)
 
-## Overview
-
-Describe the purpose of your project. Add additional sections as necessary to help collaborators and potential collaborators understand and use your project.
+## Standard Notices
   
-## Public Domain Standard Notice
+### Public Domain Standard Notice
 This repository constitutes a work of the United States Government and is not
 subject to domestic copyright protection under 17 USC § 105. This repository is in
 the public domain within the United States, and copyright and related rights in
@@ -30,7 +81,7 @@ All contributions to this repository will be released under the CC0 dedication. 
 submitting a pull request you are agreeing to comply with this waiver of
 copyright interest.
 
-## License Standard Notice
+### License Standard Notice
 The repository utilizes code licensed under the terms of the Apache Software
 License and therefore is licensed under ASL v2 or later.
 
@@ -47,14 +98,14 @@ program. If not, see http://www.apache.org/licenses/LICENSE-2.0.html
 
 The source code forked from other open source projects will inherit its license.
 
-## Privacy Standard Notice
+### Privacy Standard Notice
 This repository contains only non-sensitive, publicly available data and
 information. All material and community participation is covered by the
 [Disclaimer](https://github.com/CDCgov/template/blob/master/DISCLAIMER.md)
 and [Code of Conduct](https://github.com/CDCgov/template/blob/master/code-of-conduct.md).
 For more information about CDC's privacy policy, please visit [http://www.cdc.gov/other/privacy.html](https://www.cdc.gov/other/privacy.html).
 
-## Contributing Standard Notice
+### Contributing Standard Notice
 Anyone is encouraged to contribute to the repository by [forking](https://help.github.com/articles/fork-a-repo)
 and submitting a pull request. (If you are new to GitHub, you might start with a
 [basic tutorial](https://help.github.com/articles/set-up-git).) By contributing
@@ -66,12 +117,12 @@ later.
 All comments, messages, pull requests, and other submissions received through
 CDC including this GitHub page may be subject to applicable federal law, including but not limited to the Federal Records Act, and may be archived. Learn more at [http://www.cdc.gov/other/privacy.html](http://www.cdc.gov/other/privacy.html).
 
-## Records Management Standard Notice
+### Records Management Standard Notice
 This repository is not a source of government records, but is a copy to increase
 collaboration and collaborative potential. All government records will be
 published through the [CDC web site](http://www.cdc.gov).
 
-## Additional Standard Notices
+### Additional Standard Notices
 Please refer to [CDC's Template Repository](https://github.com/CDCgov/template)
 for more information about [contributing to this repository](https://github.com/CDCgov/template/blob/master/CONTRIBUTING.md),
 [public domain notices and disclaimers](https://github.com/CDCgov/template/blob/master/DISCLAIMER.md),
