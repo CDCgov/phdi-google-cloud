@@ -22,7 +22,7 @@
 
 ## Overview
 
-The Public Health Data Infrastructure (PHDI) projects are part of the Pandemic-Ready Interoperability Modernization Effort (PRIME), a multi-year collaboration between CDC and the U.S. Digital Service (USDS) to strengthen data quality and information technology systems in state and local health departments. Under the PRIME umberalla the PHDI project seeks to develop tools, often reffered to as Building Blocks, that State, Tribal, Local, and Territorial public health agencies (STLTs) can use to better handel the public health data they recieve. The purpose of this repository is to implement the Building Blocks devloped from the [PHDI SDK](https://github.com/CDCgov/phdi-sdk) on Google Cloud Platform (GCP). This will allow users to easily begin using these Building Blocks in their own GCP environment.
+The Public Health Data Infrastructure (PHDI) projects are part of the Pandemic-Ready Interoperability Modernization Effort (PRIME), a multi-year collaboration between CDC and the U.S. Digital Service (USDS) to strengthen data quality and information technology systems in state and local health departments. Under the PRIME umberalla the PHDI project seeks to develop tools, often reffered to as Building Blocks, that State, Tribal, Local, and Territorial public health agencies (STLTs) can use to better handle the public health data they recieve. The purpose of this repository is to implement the Building Blocks devloped from the [PHDI SDK](https://github.com/CDCgov/phdi-sdk) on Google Cloud Platform (GCP). This will allow users to easily begin using these Building Blocks in their own GCP environment.
 
 ### Structure and Organization
 
