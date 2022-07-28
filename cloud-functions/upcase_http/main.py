@@ -1,25 +1,44 @@
-from flask import escape
+from flask import escape, Request
 import functions_framework
+from google.cloud import storage
+
 
 @functions_framework.http
 def upcase_http(request):
-    """Simple HTTP Cloud Function that returns the upper case version of any string 
-    it is passed.
-    Args:
-        request (flask.Request): The request object.
-        <https://flask.palletsprojects.com/en/1.1.x/api/#incoming-request-data>
-    Returns:
-        The response text, or any set of values that can be turned into a
-        Response object using `make_response`
-        <https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response>.
     """
+    A Simple HTTP Cloud Function that reads a file from a GCP bucket specified in the
+    request, shifts the contents to upper case, and writes a new file with the up cased
+    contents. Ultimately this function is trivial and intended for learning purposes.
+
+    :param request: A request POSTed to this function containing a file name along with
+    the name of the GCP bucket where the file is stored.
+    """
+    # Step 1: Parse filename, bucket, and project from name from request.
     request_json = request.get_json(silent=True)
     request_args = request.args
 
-    if request_json and 'string' in request_json:
-        string = request_json['string']
-    elif request_args and 'string' in request_args:
-        string = request_args['string']
-    else:
-        string = ""
-    return escape(string).upper()
+    file_identifiers = {"filename": "", "bucket_name": "", "project": ""}
+
+    for identifier in file_identifiers:
+        if request_json and identifier in file_identifiers:
+            file_identifiers[identifier] = request_json[identifier]
+        elif request_args and identifier in file_identifiers:
+            file_identifiers[identifier] = request_args[identifier]
+
+    # Step 2: Ensure we have a file name and a bucket name otherwise do not proceed.
+    if "" in file_identifiers.values():
+        return "Please provide both a file name and a bucket name."
+
+    # Step 3: Read file.
+    storage_client = storage.Client(file_identifiers["project"])
+    bucket = storage_client.get_bucket(file_identifiers["bucket_name"])
+    blob = bucket.blob(file_identifiers["filename"])
+    file_contents = blob.download_as_text(encoding="utf-8")
+
+    # Step 4: Write upcase file
+    upcase_filename = "upcase_" + file_identifiers["filename"]
+    upcase_file = bucket.blob(upcase_filename)
+    upcase_contents = file_contents.upper()
+    upcase_file.upload_from_string(upcase_contents)
+
+    return f"Read {file_identifiers['filename']} from {file_identifiers['bucket_name']} and created {upcase_filename}."  # noqa
