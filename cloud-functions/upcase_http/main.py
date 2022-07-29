@@ -17,7 +17,7 @@ def upcase_http(request):
     request_json = request.get_json(silent=True)
     request_args = request.args
 
-    file_identifiers = {"filename": "", "bucket_name": "", "project": ""}
+    file_identifiers = {"filename": "", "bucket_name": ""}
 
     for identifier in file_identifiers:
         if request_json and identifier in file_identifiers:
@@ -30,7 +30,7 @@ def upcase_http(request):
         return "Please provide both a file name and a bucket name."
 
     # Step 3: Read file.
-    storage_client = storage.Client(file_identifiers["project"])
+    storage_client = storage.Client()
     bucket = storage_client.get_bucket(file_identifiers["bucket_name"])
     blob = bucket.blob(file_identifiers["filename"])
     file_contents = blob.download_as_text(encoding="utf-8")
