@@ -15,4 +15,9 @@ module "cloud-functions" {
   upcase_source_zip        = module.storage.upcase_source_zip
 }
 
+module "google-workflows" {
+  source          = "../../modules/google-workflows"
+  workflow_service_account = "577891603445-compute@developer.gserviceaccount.com"
+  toybucket = module.storage.toybucket
+}
 
