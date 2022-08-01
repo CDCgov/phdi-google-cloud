@@ -15,4 +15,3 @@ module "cloud-functions" {
   upcase_source_zip        = module.storage.upcase_source_zip
 }
 
-
