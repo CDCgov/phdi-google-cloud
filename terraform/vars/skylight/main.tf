@@ -1,4 +1,3 @@
-
 provider "google" {
   project = "phdi-357418"
   region  = "us-west1"

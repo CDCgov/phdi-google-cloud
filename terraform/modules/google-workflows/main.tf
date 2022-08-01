@@ -1,8 +1,3 @@
-#resource "google_service_account" "workflow_service_account" {
-#  account_id   = var.workflow_service_account
-#  display_name = "workflow_service_account"
-#}
-
 resource "google_workflows_workflow" "workflow-1" {
   name          = "workflow-1"
   region        = "us-west1"
