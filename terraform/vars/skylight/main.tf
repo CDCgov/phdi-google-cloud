@@ -15,9 +15,9 @@ module "cloud-functions" {
 }
 
 module "google-workflows" {
-  source          = "../../modules/google-workflows"
+  source                   = "../../modules/google-workflows"
   workflow_service_account = "577891603445-compute@developer.gserviceaccount.com"
-  toybucket = module.storage.toybucket
+  toybucket                = module.storage.toybucket
 }
 
 module "network" {
