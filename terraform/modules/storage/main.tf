@@ -44,7 +44,7 @@ resource "google_storage_bucket" "functions" {
 data "archive_file" "upcase_source" {
   type        = "zip"
   source_dir  = "../../../cloud-functions/upcase_http"
-  output_path = "/tmp/upcase_function.zip"
+  output_path = "../../../cloud-functions/upcase_function.zip"
 }
 
 # Add source code zip to the Cloud Function's bucket
