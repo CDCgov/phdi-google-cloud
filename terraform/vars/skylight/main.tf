@@ -9,6 +9,9 @@ module "storage" {
   source = "../../modules/storage"
 }
 
-module "network" {
-  source = "../../modules/network"
+module "cloud-functions" {
+  source                   = "../../modules/cloud-functions"
+  functions_storage_bucket = module.storage.functions_storage_bucket
+  upcase_source_zip        = module.storage.upcase_source_zip
 }
+
