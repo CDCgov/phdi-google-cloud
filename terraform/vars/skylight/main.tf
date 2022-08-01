@@ -9,6 +9,7 @@ module "storage" {
   source = "../../modules/storage"
 }
 
+<<<<<<< HEAD
 module "cloud-functions" {
   source                   = "../../modules/cloud-functions"
   functions_storage_bucket = module.storage.functions_storage_bucket
@@ -21,3 +22,8 @@ module "google-workflows" {
   toybucket = module.storage.toybucket
 }
 
+=======
+module "network" {
+  source = "../../modules/network"
+}
+>>>>>>> main
