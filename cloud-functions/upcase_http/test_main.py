@@ -14,5 +14,6 @@ def test_upcase_http(patched_storage):
     )
 
     assert (
-        upcase_http(request) == "Read myfile from mybucket and created upcase_myfile."
+        upcase_http(request)
+        == "Read myfile from mybucket and created upcase_myfile."
     )  # noqa
