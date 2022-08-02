@@ -9,3 +9,4 @@ output "upcase_source_zip" {
 output "toybucket" {
   value = google_storage_bucket.toybucket.name
 }
+
