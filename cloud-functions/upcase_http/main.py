@@ -5,12 +5,12 @@ from google.cloud import storage
 @functions_framework.http
 def upcase_http(request):
     """
-    A Simple HTTP Cloud Function that reads a file from a GCP bucket specified 
-    in the request, shifts the contents to upper case, and writes a new file 
-    with the up cased contents. Ultimately this function is trivial and 
+    A Simple HTTP Cloud Function that reads a file from a GCP bucket specified
+    in the request, shifts the contents to upper case, and writes a new file
+    with the up cased contents. Ultimately this function is trivial and
     intended for learning purposes.
 
-    :param request: A request POSTed to this function containing a file name 
+    :param request: A request POSTed to this function containing a file name
     along withthe name of the GCP bucket where the file is stored.
     """
     # Step 1: Parse filename, bucket, and project from name from request.
