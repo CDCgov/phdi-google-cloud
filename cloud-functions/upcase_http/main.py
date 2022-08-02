@@ -1,4 +1,3 @@
-from flask import escape, Request
 import functions_framework
 from google.cloud import storage
 
