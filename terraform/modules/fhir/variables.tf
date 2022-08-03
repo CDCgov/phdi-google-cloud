@@ -6,7 +6,7 @@ variable "region" {
 
 variable "time_zone" {
   type = string
-  description = "The default timezone used by this dataset. Must be a either a valid IANA time zone name or empty, which defaults to UTC. This is used for parsing times in resources (e.g., HL7 messages) where no explicit timezone is specified."
+  description = "The default timezone used by this dataset. Must be a either a valid IANA time zone name or empty, which defaults to UTC."
   default = "UTC"
 }
 
@@ -18,7 +18,7 @@ variable "dataset_name" {
 
 variable "fhirstore_name" {
   type = string
-  description = "The resource name for the FhirStore. ** Changing this property may recreate the FHIR store (removing all data) **"
+  description = "The resource name for the FhirStore."
   default = "PHDI_FHIRSTORE"
 }
 
