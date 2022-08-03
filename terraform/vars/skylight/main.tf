@@ -24,3 +24,6 @@ module "network" {
   source = "../../modules/network"
 }
 
+module "fhir" {
+  source = "../../modules/fhir"
+}
