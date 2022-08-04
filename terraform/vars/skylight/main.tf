@@ -28,9 +28,7 @@ module "fhir" {
   source         = "../../modules/fhir"
   region         = "us-west1"
   time_zone      = "UTC"
-  dataset_name   = "PHDI_DATASET-${time_static.current_date.unix}"
-  fhirstore_name = "PHDI_FHIRSTORE-${time_static.current_date.year}"
+  dataset_name   = "PHDI_DATASET"
+  fhirstore_name = "PHDI_FHIRSTORE"
   fhir_version   = "R4"
 }
-
-resource "time_static" "current_date" {}
