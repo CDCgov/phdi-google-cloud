@@ -81,12 +81,17 @@ The team uses VSCode as its IDE, but other options (e.g. IntelliJ, Eclipse, PyCh
 At a high level, we follow the guide [here](https://cloud.google.com/functions/docs/how-to) for developing Python runtime Cloud Functions. Please note that this guide also provides documentation for Cloud Functions using other runtimes beyond Python so make sure to read carefully.
 
 #### Cloud Function Directory Structure
-'''
+
+All Cloud Functions live in the [cloud-functions](https://github.com/CDCgov/phdi-google-cloud/tree/main/cloud-functions) directory. The tree below shows a generalized example for a generic Cloud Functions called `myfunction`. 
+
+```bash
 cloud-functions/
-├── myfunction/
-    ├── main.py
-    ├── requirements.txt
-'''
+   ├── requirements_dev.txt
+   └── upcase_http/
+       ├── main.py
+       ├── requirements.txt
+       └── test_upcase_http.py
+```
 
 #### Testing
 
