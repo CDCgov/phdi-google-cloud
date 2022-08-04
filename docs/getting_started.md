@@ -1,6 +1,6 @@
 # Getting Started
 
-This is a guide for getting started as user and/or developer with the PRIME PHDI Google Cloud project. You'll find resources on how to setup a local development environment, how we do deployments, and more.
+This is a guide for getting started as a user and/or developer with the PRIME PHDI Google Cloud project. You'll find resources on how to setup a local development environment, how we do deployments, and more.
 
 - [Getting Started](#getting-started)
   - [Architecture](#architecture)
@@ -11,16 +11,16 @@ This is a guide for getting started as user and/or developer with the PRIME PHDI
     - [Software](#software)
       - [Overview](#overview)
       - [Installation](#installation)
-    - [Developing Azure Locally](#developing-azure-locally)
-      - [Extensions](#extensions)
-      - [Testing](#testing)
-      - [Python](#python)
-        - [Development Dependencies](#development-dependencies)
-        - [Dependencies](#dependencies)
-        - [Testing Python](#testing-python)
+    - [Developing Python Google Cloud Functions](#developing-python-google-cloud-functions)
+      - [Cloud Function Directory Structure](#cloud-function-directory-structure)
+      - [Creating a Virtual Environment](#creating-a-virtual-environment)
+      - [Cloud Function Dependencies](#cloud-function-dependencies)
+      - [Development Dependencies](#development-dependencies)
+      - [Running Cloud Functions Locally](#running-cloud-functions-locally)
+      - [Cloud Function Unit Testing](#cloud-function-unit-testing)
       - [Pushing to Github](#pushing-to-github)
-        - [A Note on Files](#a-note-on-files)
-        - [Sensitive Information](#sensitive-information)
+    - [Infrastructure as Code (IaC)](#infrastructure-as-code-iac)
+    - [Continuous Integration and Continuous Deployment (CI/CD)](#continuous-integration-and-continuous-deployment-cicd)
 
 ## Architecture
 
@@ -82,33 +82,28 @@ At a high level, we follow the guide [here](https://cloud.google.com/functions/d
 
 #### Cloud Function Directory Structure
 
-All Cloud Functions live in the [cloud-functions](https://github.com/CDCgov/phdi-google-cloud/tree/main/cloud-functions) directory. The tree below shows a generalized example for a generic Cloud Functions called `myfunction`. 
+All Cloud Functions live in the [cloud-functions](https://github.com/CDCgov/phdi-google-cloud/tree/main/cloud-functions) directory. The tree below shows a hypoethetical example for a Cloud Function called `myfunction`. For Python Cloud Functions GCP requires that each function have a dedicated directory containing a `main.py` files with the function's entry point along with a `requirements.txt` specifying all of the function's dependencies. The PHDI team believes strongly in the importance of developing well tested code so we have chosen to include and additional with the the name `test_<FUNCTION-NAME>.py`, in this case `test_myfunction.py`, that cotains unit tests for the function. The deployment process for `myfunction` simply passes a zip file of the entire directory to GCP.
 
 ```bash
 cloud-functions/
-   ├── requirements_dev.txt
-   └── upcase_http/
-       ├── main.py
-       ├── requirements.txt
-       └── test_upcase_http.py
+├── requirements_dev.txt
+└── myfunction/
+    ├── main.py
+    ├── requirements.txt
+    └── test_myfunction.py
 ```
 
-#### Testing
+#### Creating a Virtual Environment
 
-Before diving into the specifics of working with Python, it's worth covering how testing Azure Functionality in VS Code in general works, which is outlined below.
+In order to avoid dependency conflicts between multiple Python projects and potentially between different Cloud Functions within this repo, we recommend that all Cloud Function development is done within a Python virtual environment dedicated to a single function. For information on creating, activating, deactivating, and managing Python virtual environment please refer to [this guide](https://realpython.com/python-virtual-environments-a-primer). We recommend naming your virtual environment `.venv` as we have already added to our `.gitignore` to prevent it from being checked into source control.
 
-* As long as you have the Azure Functions extension installed (as described above), then you can either click the `Run -> Debug` button (the one that looks like the sideways triangle with the bug) or press `F5` to run the Function.  
-* The second thing you'll need implemented is the Azurite storage extension described above. If you've installed this through the VS Code extension, then you can start the container by clicking one of the three buttons in the bottom-right tray of VS Code, which will saying "Azurite Table Service", "Azurite Queue Service", or "Azurite Blob Service". If you've installed Azurite using npm or Docker, use [the documentation](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite?tabs=npm) to work through how to start the service.  
-* To use this container, set your connection string to `UseDevelopmentStorage=true`as detailed [here](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite?tabs=visual-studio).
+#### Cloud Function Dependencies
 
-#### Python
+After creating a virtual environment and activating it you may install all of the Cloud Function's dependencies from its root directory with `pip install -r requirements.txt`. To create or update a `requirements.txt` files run `pip freeze > requirements.txt`. Please not that all Cloud Functions require the [Functions Framework](https://cloud.google.com/functions/docs/functions-framework) which can be installed with `pip install functions-framework`.
 
-Microsoft maintains a pretty good guide [here](https://docs.microsoft.com/en-us/azure/azure-functions/functions-reference-python?tabs=asgi%2Cazurecli-linux%2Capplication-level) for developing Azure functions with Python. We've followed this guide wherever possible, it's worth a look for reference.
+#### Development Dependencies
 
-##### Development Dependencies
-
-In your terminal, navigate to the `src/lib/phdi_building_blocks` directory and run `poetry install`
-In your terminal, navigate to the `src/lib/FunctionApps` directory and run `pip install -r requirements_dev.txt`
+In addition to the dependencies that a Cloud Functions requires we also make use of some other tools for development purposes that we recommend you install in your Cloud Function virtual environments.
 
 These include:
 
@@ -116,41 +111,61 @@ These include:
 - [pytest](https://docs.pytest.org/en/6.2.x/) - for easy unit testing
 - [flake8](https://flake8.pycqa.org/en/latest/) - for code style enforcement
 
-##### Dependencies
+All of these can be installed from the `requirements_dev.txt` file in `cloud-functions/` directory. Simply run `pip install -r requirements_dev.txt` from `cloud-functions/`, or `pip install -r ../requirements_dev.txt` from within a Cloud Function subdirectory.
 
-To add a new dependency, add it to `requirements.txt` if it is critical to run the app, and `requirements_dev.txt` if it helps local development. You can manually install these dependencies using `source .venv/bin/activate; pip install -r requirements.txt` or using the built-in F5 action provided by the Azure extension.
+#### Running Cloud Functions Locally
 
-Deploying the function app will result in it automatically installing the dependencies in `requirements.txt`.
+During development it can be helpful to run Cloud Functions on a local machine in order to test them without having to deploy to GCP. This can be done using the Functions Framework. To run a Cloud Function locally simply navigate into its root directory, activate its virtual environemnt, and `functions-framework --target <MY-FUNCTION-NAME> --debug`.
 
-##### Testing Python
+#### Cloud Function Unit Testing
 
-We use [pytest](https://docs.pytest.org/en/6.2.x/) for the purpose of unit testing functions. All functions should have associated pytest tests. Tests live within a `test` directory that is shared between all python-based apps using the same function app.
-
-Files should be named `test_{name}` and each method should begin with `test_` to ensure it is picked up by the Testing tab.
-
-To run tests, go to the `Test` tab and ensure tests can be located. From there you can run necessary automated tests.
-
-Tests that exercise storage blob-related funcitonality should use [Azurite](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite?tabs=visual-studio) , those testing SFTP should use SFTP mocks.
+As mentioned in [Cloud Function Directory Structure](#cloud-function-directory-structure) every Cloud Function has unit testing in a `test_<FUNCTION-NAME>.py` file. We use [pytest](https://docs.pytest.org) to run these unit tests. Pytest is included in the [Development Dependencies](#development-dependencies), but can also be installed with `pip install pytest`. To run the unit tests for a Cloud Function navigate to its root directory and simply run `pytest`. To run the unit tests for all Cloud Function in this repository navigate to `phdi-google-cloud/cloud-functions/` and run `pytest`.  
 
 #### Pushing to Github
 
 To get access to push to Github, ask to get maintainer access to the repo for your Github account.
 
-##### A Note on Files
+### Infrastructure as Code (IaC)
 
-Using the direct VSCode integration generates a number of files, the details of which are outlined in the above link. All files within the `.vscode` folder should be checked in. Double check that these do not contain environment variables or paths that are specific to your machine. Also, very importantly, **DO NOT** check in `local.settings.json` , this will contain sensitive information.
-
-##### Sensitive Information
-
-We use Azure KeyVault for sensitive information, and the "Configuration" properties of each function to store relevant variables. We tie the two together using [Azure KeyVault References](https://docs.microsoft.com/en-us/azure/app-service/app-service-key-vault-references).
-
-You can easily download the environment variable configuration for a given function app using the azure CLI with:
+The `phdi-google-cloud/terraform/` directory contains full coverage for all of the GCP infrastructure required to run the functionality provided in this repository with HashiCorp [Terraform](https://www.terraform.io/). This directory has the following structure:
 
 ```bash
-cd src/FunctionApps/NAME
-func azure functionapp fetch-app-settings pitest-python-functionapp --output-file local.settings.json
-func settings decrypt
+terraform/
+├── modules/
+│   ├── cloud-functions/
+│   │   ├── main.tf
+│   │   └── variables.tf
+│   ├── fhir/
+│   │   ├── main.tf
+│   │   └── variables.tf
+│   ├── network/
+│   │   └── main.tf
+│   └── storage/
+│       ├── main.tf
+│       └── outputs.tf
+└── vars/
+    └── skylight/
+        ├── backend.tf
+        ├── main.tf
+        ├── variables.tf
+        └── ~outputs.tf
 ```
 
-You can then further customize this file.
+The `modules/` directory contains configuration for each GCP resource required to run the pipelines defined in this repository. Resources are organized into further subdirectories by type. The `vars/` directory contains a subdirectory for each GCP environment we have deployed to. These directories are used to define configuration specific to each GCP deployment. For more information on using Terraform please refer to the [Terraform Documentation](https://www.terraform.io/docs) and [Terraform Registry](https://registry.terraform.io/). 
 
+### Continuous Integration and Continuous Deployment (CI/CD)
+
+We have implemented CI/CD pipelines with [GitHub Actions](https://docs.github.com/en/actions) orchestrated by [GitHub Workflows](https://docs.github.com/en/actions/using-workflows/about-workflows) found in the `phdi-google-cloud/.github/` directory.
+
+#### Continuous Integration (CI)
+
+The entire CI pipeline can be found in `phdi-google-cloud/.github/test.yaml`. It runs every time a Pull Request is opened and whenever additional changes are pushed to a branch. It includes the following steps:
+
+1. Identify all directories containing a Cloud Function.
+2. Run the unit tests for each Cloud Function.
+3. Check that all Python code complies with Black and Flake8.
+4. Check that all Terraform code is formated properly.
+
+#### Continuous Deployment (CD)
+
+A separate CD pipeline is configured for each GCP environemnt we deploy to. Each of these pipelines is defined in a YAML file starting with "deploy" in the `workflows/` directory (e.g. `phdi-google-cloud/.github/deploySkylight.yaml`). Generally these pipelines run every time code is merged into the `main` branch of the repository. However, additional dependencies can be specified. For example a succesfull deployment to a development environemnet could required before deploying to a production environment. 
