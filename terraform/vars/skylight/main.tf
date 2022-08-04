@@ -24,3 +24,11 @@ module "network" {
   source = "../../modules/network"
 }
 
+module "fhir" {
+  source         = "../../modules/fhir"
+  region         = "us-west1"
+  time_zone      = "UTC"
+  dataset_name   = "PHDI_DATASET"
+  fhirstore_name = "PHDI_FHIRSTORE"
+  fhir_version   = "R4"
+}
