@@ -9,7 +9,6 @@ def test_upcase_http(patched_storage):
         return_value={
             "filename": "myfile",
             "bucket_name": "mybucket",
-            "project": "myproject",
         }
     )
 
