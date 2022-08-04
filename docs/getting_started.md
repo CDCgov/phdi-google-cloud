@@ -4,6 +4,8 @@ This is a guide for getting started as user and/or developer with the PRIME PHDI
 
 - [Getting Started](#getting-started)
   - [Architecture](#architecture)
+    - [Google Workflows](#google-workflows)
+    - [Cloud Functions](#cloud-functions)
   - [Local Development Environment](#local-development-environment)
     - [Hardware](#hardware)
     - [Software](#software)
@@ -14,7 +16,6 @@ This is a guide for getting started as user and/or developer with the PRIME PHDI
       - [Testing](#testing)
       - [Python](#python)
         - [Development Dependencies](#development-dependencies)
-        - [What is the VSCode Azure Integration Actually Doing?](#what-is-the-vscode-azure-integration-actually-doing)
         - [Dependencies](#dependencies)
         - [Testing Python](#testing-python)
       - [Pushing to Github](#pushing-to-github)
@@ -23,21 +24,37 @@ This is a guide for getting started as user and/or developer with the PRIME PHDI
 
 ## Architecture
 
-We store data on Google Cloud Platform (GCP) in [Cloud Storage buckets](https://cloud.google.com/storage/docs/creating-buckets). Data is processed in pipelines, defined as [GCP Workflows](https://cloud.google.com/workflows/docs/), that each orchestrate a series of calls to [Cloud Functions](https://cloud.google.com/functions/docs). Each Cloud Function preforms one step of a pipeline (e.g patient name standardization).
+We store data on Google Cloud Platform (GCP) in [Cloud Storage buckets](https://cloud.google.com/storage/docs). Data is processed in pipelines, defined as [GCP Workflows](https://cloud.google.com/workflows/docs), that each orchestrate a series of calls to indepent microservices (AKA Building Blocks) that we have implemented using [Cloud Functions](https://cloud.google.com/functions/docs). Each service preforms a single step in a pipeline (e.g patient name standardization) and returns the processed data back to the workflow where it is passed on to the next service via a POST request. The diagram below describes the current version of our ingestion pipeline that converts source HL7v2 and CCDA data to FHIR, preforms some basic standardizations and enrichments, and finally uploads the data to a FHIR server.
 
 ![Architecture Diagram](./architecture-diagram.png)
 
-The chart below summarizes these functions, their purposes, triggers, inputs, and outputs:
+### Google Workflows
 
-| Name            | Language | FunctionApp           | Purpose                                                                                        | Trigger                                 | Input                                                                                                            | Output                                                          | Effect                                                                                                                                      |             |         |         |       |        |        |
-| --------------- | -------- | --------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | ------- | ------- | ----- | ------ | ------ |
-| DecryptFunction  | Python   | pitest-python-functionapp    | Pull in encrypted messages from SFTP storage, decrypt, and write to Blob storage.                                    | TBD                                    | TBD                                                                                      | N/A | Successfully decrypted data will be written to blob storage.              |             |         |         |       |        |        |
-| IngestFunction  | Python   | pitest-python-functionapp    | Pull in eICR, VXU, and ELR messages from blob storage.  Convert to FHIR format, standardize key fields, and record linkage identifier.                                    | BlobTrigger                                    | N/A - input params not used                                                                                      | N/A | Successfully ingested data will be written to blob storage as well as the FHIR server.              |             |         |         |       |        |        |
-| FhirExportFunction | Python   | pitest-python-functionapp    | Export data from the FHIR server     | HttpTrigger        | A blob trigger, operating on files present in the "bronze/raw" directory. Can optionally be passed file contents | N/A                                                             | Data in "pitestdata/bronze/raw" is decrypted, and moved to "pitestdata/bronze/decrypted"                                                    |             |         |         |       |        |        |
+Since the Building Blocks are designed to be composable users may want to chain serveral together into pipelines. We use [Google Workflows](https://cloud.google.com/workflows/docs) to define processes that require the use of multiple Building Blocks. These workflows are defined using [YAML](https://yaml.org/) configuration files found in the [google-worklows](https://github.com/CDCgov/phdi-google-cloud/tree/main/google-workflows) directory.
+
+The table below summarizes these workflows, their purposes, triggers, inputs, steps, and results:
+
+| Name | Purpose | Trigger | Input | Steps | Result |
+| ---- | ------- | ------- | ----- | ----- | ------ |
+| ingestion-pipeline | Read source data (HL7v2 and CCDA), convert to FHIR, standardize, and upload to a FHIR server | File creation in bucket via Eventarc trigger | New file name and its bucket | 1. convert-to-fhir<br>2.standardize-patient-names<br>3. standardize-patient-phone-numbers<br>4. geocode-patient-address<br>5. compute-patient-hash<br>6. upload-to-fhir-server | HL7v2 and CCDA messages are read, converted to FHIR, standardized and enriched, and uploaded to a FHIR server as they arrive in Cloud Storage. In the event that the conversion or upload steps fail the data is written to separate buckets along with relevent logging. |
+
+### Cloud Functions
+Google Cloud Functions are GCP's version of serverless functions, similar to Lamabda in Amazon Web Services (AWS) and Azure Functions in Mircosoft Azure. Severless function provide a relatively simple way to run services with modest runtime duration, memory, and compute requirements in the cloud. Since they are serverless, GCP abstracts all aspects of the underlying infrastructure allowing us to simply write and excute our Building Blocks without worrying about the computers they run on. The [cloud-functions](https://github.com/CDCgov/phdi-google-cloud/tree/main/cloud-functions) directory contains source code for each of our Cloud Functions. We have chosen to develop the functions in Python because the [PHDI SDK](https://github.com/CDCgov/phdi-sdk) is written in Python and GCP has [strong support and documentation](https://cloud.google.com/functions/docs/concepts/python-runtime) for developing Cloud Functions with Python.
+
+The table below summarizes these functions, their purposes, triggers, inputs, and outputs:
+
+| Name | Language | Purpose | Trigger | Input | Output | Effect |
+| ---- | -------- | ------- | ------- | ------| ------ | ------ |
+| convert-to-fhir | Python | Convert source HL7v2 or CCDA messages to FHIR. | POST request | file name and bucket name | JSON FHIR bundle or conversion failure message | HL7v2 or CCDA messages are read from a bucket and returned as a JSON FHIR bundle. In the even that the conversion fails the data is written to a separate bucket along with the response of the converter.|
+| standarize-patient-names | Python | Ensure all patient names are formatted similarly. | POST request | JSON FHIR bundle | JSON FHIR Bundle | A FHIR bundle is returned with standardized patient names. |
+| standardize-patient-phone-numbers | Python | Ensure all patient phone number have the same format. | POST request | JSON FHIR bundle | JSON FHIR bundle | A FHIR bundle is returned with all patient phone numbers in the E.164 standardard international format. |
+| geocode-patient-address | Python | Standardize patient addresses and enrich with latitude and longitude. | POST request | JSON FHIR bundle | JSON FHIR bundle | A FHIR bundle is returned with patient addresses in a consistent format that includes latitude and longitude. |
+| compute-patient-hash | Python | Generate an identifier for record linkage purposes. | POST request | JSON FHIR bundle | JSON FHIR bundle | A FHIR bundle is returned where every patient resource contains a hash based on their name, date of birth, and address that can be used to link their records. |
+| upload-to-fhir-server | Python | Add FHIR resources to a FHIR server. | POST request| JSON FHIR bundle | FHIR server response | All resources in a FHIR bundle are uploaded to a FHIR server. In the event that a resource cannot be uploaded it is written to a separate bucket along with the response from the FHIR server. |  
 
 ## Local Development Environment
 
-The below instructions cover how to setup a development environment for local development of functions
+The instructions below describe how to setup a development environment for local development of Cloud Functions.
 
 ### Hardware
 
@@ -49,49 +66,27 @@ Until we have properly containerized our apps, we will need to rely on informal 
 ### Software
 
 #### Overview
-The team uses VSCode as its IDE, but other options (e.g. IntelliJ, Eclipse, PyCharm, etc.) can be viable as well. The main drivers behind using VSCode are its integration with Azure, which is a natural byproduct of them both being Microsoft-owned prodcuts, and the amount of documentation that exists to help get the environment setup. The rest of this document will assume that you're using VSCode as your IDE.The project itself is coded primarily in Python.
-
-Lastly, there are some dependencies that the team makes use of in order to test Azure functionality locally, which include [Azurite](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite?tabs=visual-studio), [Azure Core Function Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local), and the .NET Core SDK. Azurite is a storage emulator, which will let you mock Azure's different data storage options, such as Tables, Queues, and Blobs. Azure Core Function Tools are the heart of what allows you to develop Azure functionality locally, and the .NET Core SDK is used for some of the functionality you might develop. For example, when building Azure Functions in Java, the .NET framework provides access to bindings (e.g `@BlobTrigger`) that you'll need. 
+The team uses VSCode as its IDE, but other options (e.g. IntelliJ, Eclipse, PyCharm, etc.) can be viable as well. The main driver behind using VSCode is that it integrates well with Microsoft Azure, the cloud provider that development on the PHDI project began with originally. The rest of this document will assume that you're using VSCode as your IDE. The project itself is coded primarily in Python.
 
 #### Installation
 1. Install the latest version of [VSCode](https://code.visualstudio.com/download) (or use `brew install vscode`).
-2. Install the [Azure Core Function Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local), but be sure to install the 3.x version, and not 4.x. 4.x does not work with all Azure functionality as well as one might hope.
-3. Install the [.NET Core SDK 3.1](https://dotnet.microsoft.com/en-us/download/dotnet/3.1). Versions 5.0 and 6.0 do not seem to work well with the 3.x Azure Core Function Tools.
-4. Install [Python 3.9.x](https://www.python.org/downloads/).  As of this writing, this is the highest Python version supported by Azure Funcation Apps.
-5. Install [Azure CLI Tools](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).  These tools are essential to work with various aspects of the Azure cloud. 
-In the next section, "Developing Azure Locally", we'll go over which Extensions you need to install, including the Azurite Extension, in order to begin developing Azure functionality.
-6. Install [pip](https://pip.pypa.io/en/stable/installation/). This is the dependency manager for the Azure Functions
-7. Install [poetry](https://python-poetry.org/docs/). This is the dependency manager for the internal library. 
+2. Install [Python 3.9.x](https://www.python.org/downloads/).  As of this writing, this is the highest Python version we currently support.
+3. Install [pip](https://pip.pypa.io/en/stable/installation/). This is the Python package manager we use.
+4. Install the VSCode [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) extension (optional but recommended). 
+5. Install the VSCode [HashiCorp Terraform](https://marketplace.visualstudio.com/items?itemName=HashiCorp.terraform) extension (optional but recommended).
+ 
 
-### Developing Azure Locally
+### Developing Python Google Cloud Functions
 
-At a high level, we follow the guide [here](https://docs.microsoft.com/en-us/azure/azure-functions/functions-develop-vs-code) for how to set up Azure Functions directly for integration with VSCode. As mentioned previously, it's possible to use alternative means of working with these functions, but this represents the path that we have found to be well documented and to make certain operations easier. To get started with developing Azure functionality in VSCode efficiently, you first need to install some useful extensions.
+At a high level, we follow the guide [here](https://cloud.google.com/functions/docs/how-to) for developing Python runtime Cloud Functions. Please note that this guide also provides documentation for Cloud Functions using other runtimes beyond Python so make sure to read carefully.
 
-#### Extensions
-
-If you prefer to minimize what gets installed on your machine, you can install each of the following extensions, which should provide the functionality that you need.
-
-**Azure CLI Tools**  
-These are the tools for developing and running commands for the Azure CLI, which is what's needed when you want to run your Azure Functions locally. 
-
-**Azure Account**  
-This is the extension used to sign into Azure and manage your subscription. Be sure to sign in to your CDC Superuser Account once you've installed this extension.
-
-**Azure Functions**  
-This is the core extension needed to build the Azure Functions locally.
-
-**Azure Resources**  
-This extension isn't explictly necessary, but can be helpful to view and manage Azure resources.
-
-**Azurite**  
-This is another core extension to install as it allows you to mock Azure's data storage tools like Tables, Queues, and Blobs so that you can store and access data locally as if you were engaging with those tools. There are other ways to install Azurite, such as with `npm` or Docker, but working with it through the extension works as well. If you'd like to install this via Docker or npm, you can see the installation instructions [here](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite?tabs=npm).
-
-If you'd prefer to minimize the amount of things you need to install yourself, you can install a single extension, which will provide all of those listed above plus more.
-
-**Azure Tools**  
-This extension installs 12 different extensions, which include the five listed above as well as Docker, Azure App Service, Azure Resource Manager, Azure Databases, Azure Storage, Azure Pipelines, and Azure Virtual Machines. If you find yourself needing these extensions, or believe you'll need them in the future, then installing this one extension could be worth it.
-
-_Note: At various points in your project, VS Code may ask you if you want to optimize for use with the tools. If so, be sure to click yes to optimize._
+#### Cloud Function Directory Structure
+'''
+cloud-functions/
+├── myfunction/
+    ├── main.py
+    ├── requirements.txt
+'''
 
 #### Testing
 
@@ -113,17 +108,8 @@ In your terminal, navigate to the `src/lib/FunctionApps` directory and run `pip 
 These include:
 
 - [Black](https://black.readthedocs.io/en/stable/) - automatic code formatter that enforces PEP best practices
-- [mypy](http://mypy-lang.org/) - enables static typing for python
 - [pytest](https://docs.pytest.org/en/6.2.x/) - for easy unit testing
 - [flake8](https://flake8.pycqa.org/en/latest/) - for code style enforcement
-
-##### What is the VSCode Azure Integration Actually Doing?
-
-Under the hood, this integration is doing the following:
-
-1. Creates a virtual environment (default path `.venv`) and installing all depedencies called out in `requirements.txt`. You can alternatively do this yourself with `source .venv/bin/activate; pip install -r requirements.txt`.
-2. Creates `.vscode/tasks.json`, which make it easier to activate the relevant virtual environment, installs dependencies, and starts a debugging session
-3. Creates `.vscode/launch.json`, which makes it so that when you hit F5 / go to `Run->Start Debugging` it runs the tasks from (2) and then attaches to the debugger for your functions when running locally.
 
 ##### Dependencies
 
