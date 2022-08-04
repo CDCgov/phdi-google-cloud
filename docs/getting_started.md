@@ -21,6 +21,8 @@ This is a guide for getting started as a user and/or developer with the PRIME PH
       - [Pushing to Github](#pushing-to-github)
     - [Infrastructure as Code (IaC)](#infrastructure-as-code-iac)
     - [Continuous Integration and Continuous Deployment (CI/CD)](#continuous-integration-and-continuous-deployment-cicd)
+      - [Continuous Integration (CI)](#continuous-integration-ci)
+      - [Continuous Deployment (CD)](#continuous-deployment-cd)
 
 ## Architecture
 
