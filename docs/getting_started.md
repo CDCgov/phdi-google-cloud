@@ -6,6 +6,7 @@ This is a guide for getting started as a user and/or developer with the PRIME PH
   - [Architecture](#architecture)
     - [Google Workflows](#google-workflows)
     - [Cloud Functions](#cloud-functions)
+    - [GCP Project Configuration](#gcp-project-configuration)
   - [Local Development Environment](#local-development-environment)
     - [Hardware](#hardware)
     - [Software](#software)
