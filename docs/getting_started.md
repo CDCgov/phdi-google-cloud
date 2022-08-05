@@ -20,6 +20,7 @@ This is a guide for getting started as a user and/or developer with the PRIME PH
       - [Cloud Function Unit Testing](#cloud-function-unit-testing)
       - [Pushing to Github](#pushing-to-github)
     - [Infrastructure as Code (IaC)](#infrastructure-as-code-iac)
+      - [Running Terraform Locally](#running-terraform-locally)
     - [Continuous Integration and Continuous Deployment (CI/CD)](#continuous-integration-and-continuous-deployment-cicd)
       - [Continuous Integration (CI)](#continuous-integration-ci)
       - [Continuous Deployment (CD)](#continuous-deployment-cd)
@@ -84,7 +85,7 @@ At a high level, we follow the guide [here](https://cloud.google.com/functions/d
 
 #### Cloud Function Directory Structure
 
-All Cloud Functions live in the [cloud-functions](https://github.com/CDCgov/phdi-google-cloud/tree/main/cloud-functions) directory. The tree below shows a hypoethetical example for a Cloud Function called `myfunction`. For Python Cloud Functions, GCP requires that each function have a dedicated directory containing a `main.py` file with the function's entry point along with a `requirements.txt` file specifying all of the function's dependencies. The PHDI team believes strongly in the importance of developing well tested code, so we include an additional file with the name `test_<FUNCTION-NAME>.py`. In this case `test_myfunction.py` cotains the unit tests for `myfunction`. The deployment process for `myfunction` simply passes a zip file of the entire directory to GCP.
+All Cloud Functions live in the [cloud-functions](https://github.com/CDCgov/phdi-google-cloud/tree/main/cloud-functions) directory. The tree below shows a hypoethetical example for a Cloud Function called `myfunction`. For Python Cloud Functions, GCP requires that each function have a dedicated directory containing a `main.py` file with the function's entry point along with a `requirements.txt` file specifying all of the function's dependencies. The PHDI team believes strongly in the importance of developing well tested code, so we include an additional file called `test_<FUNCTION-NAME>.py`. In this example `test_myfunction.py` cotains the unit tests for `myfunction`. The deployment process for `myfunction` simply passes a zip file of the entire directory to GCP.
 
 ```bash
 cloud-functions/
@@ -117,7 +118,7 @@ All of these can be installed from the `requirements_dev.txt` file in `cloud-fun
 
 #### Running Cloud Functions Locally
 
-During development it can be helpful to run Cloud Functions on a local machine in order to test them without having to deploy to GCP. This can be done using the [Functions Framework](https://cloud.google.com/functions/docs/functions-framework). To run a Cloud Function locally simply navigate into its root directory, activate its virtual environemnt, and `functions-framework --target <MY-FUNCTION-NAME> --debug`.
+During development it can be helpful to run Cloud Functions on a local machine in order to test them without having to deploy to GCP. This can be done using the [Functions Framework](https://cloud.google.com/functions/docs/functions-framework). To run a Cloud Function locally simply navigate into its root directory, activate its virtual environemnt, and run `functions-framework --target <MY-FUNCTION-NAME> --debug`.
 
 #### Cloud Function Unit Testing
 
@@ -155,6 +156,12 @@ terraform/
 
 The `modules/` directory contains configuration for each GCP resource required to run the pipelines defined in this repository. Resources are organized into further subdirectories by type. The `vars/` directory contains a subdirectory for each GCP environment we have deployed to. These directories are used to define configuration specific to each GCP deployment. For more information on using Terraform please refer to the [Terraform Documentation](https://www.terraform.io/docs) and [Terraform Registry](https://registry.terraform.io/). 
 
+#### Running Terraform Locally
+
+In order to use the Terraform code in this repository on your local machine you must first install which can be done following [this guide](https://learn.hashicorp.com/tutorials/terraform/install-cli#install-terraform). Additionally, you will also need to authenticate with a GCP project using the gcloud CLI. Install gcloud CLI following [this guide](https://cloud.google.com/sdk/docs/install). After installing this software authenticate with your GCP project by running `gcloud auth application-default login` and follow the prompts in your browser. Now you are ready run Terraform commands!
+
+To begin using terraform, navigate the subdirectory in `phdi-google-cloud/terraform/vars/` for the GCP environment you wish to work with. Then run `terraform init` to initialize Terraform for the desired environment. Now you can run `terraform plan` to have Terraform determine the difference between the code locally and the infrastructure currently deployed in GCP. Terraform will return a list of changes, resources it will create, destroy, or modify, that it would make if you chose to move forward with a deployment. After a carefull review, if these changes are acceptable you may deploy them by running `terraform apply`. Please refer to the [Terraform CLI documentation](https://www.terraform.io/cli/commands) for further information on using Terraform locally.
+
 ### Continuous Integration and Continuous Deployment (CI/CD)
 
 We have implemented CI/CD pipelines with [GitHub Actions](https://docs.github.com/en/actions) orchestrated by [GitHub Workflows](https://docs.github.com/en/actions/using-workflows/about-workflows) found in the `phdi-google-cloud/.github/` directory.
@@ -170,4 +177,4 @@ The entire CI pipeline can be found in `phdi-google-cloud/.github/test.yaml`. It
 
 #### Continuous Deployment (CD)
 
-A separate CD pipeline is configured for each GCP environemnt we deploy to. Each of these pipelines is defined in a YAML file starting with "deploy" in the `workflows/` directory (e.g. `phdi-google-cloud/.github/deploySkylight.yaml`). Generally, these pipelines run every time code is merged into the `main` branch of the repository. However, additional dependencies can be specified. For example, a succesfull deployment to a development environemnet could required before deploying to a production environment proceeds. 
+A separate CD pipeline is configured for each GCP environemnt we deploy to. Each of these pipelines is defined in a YAML file starting with "deploy" in the `workflows/` directory (e.g. `phdi-google-cloud/.github/deploySkylight.yaml`). Generally, these pipelines run every time code is merged into the `main` branch of the repository. However, additional dependencies can be specified. For example, a succesfull deployment to a development environemnet could required before deploying to a production environment proceeds. In order to authenticate the GitHub repository with GCP so that the CD pipeline can access and make changes to a project please follow [these instructions](https://github.com/google-github-actions/auth#setup).
