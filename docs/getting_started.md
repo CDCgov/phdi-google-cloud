@@ -55,6 +55,19 @@ The table below summarizes these functions, their purposes, triggers, inputs, an
 | compute-patient-hash | Python | Generate an identifier for record linkage purposes. | POST request | JSON FHIR bundle | JSON FHIR bundle | A FHIR bundle is returned where every patient resource contains a hash based on their name, date of birth, and address that can be used to link their records. |
 | upload-to-fhir-server | Python | Add FHIR resources to a FHIR server. | POST request| JSON FHIR bundle | FHIR server response | All resources in a FHIR bundle are uploaded to a FHIR server. In the event that a resource cannot be uploaded it is written to a separate bucket along with the response from the FHIR server. |  
 
+### GCP Project Configuration
+
+In order for all of the functionality offered in this repository to work properly in GCP some additional [Cloud APIs](https://cloud.google.com/apis) must be enabled. There is no need to make these changes manually as we have provided Terraform coverage to ensure these configurations are made. We are mentioning this here in order to clearly represent effect that deploying the tools in this repository will have on your GCP project. The APIs that must be enabled include:
+
+- [Cloud Functions API](https://cloud.google.com/functions/docs/reference/rest)
+- [Workflows API](https://cloud.google.com/workflows/docs/reference/rest)
+- [Cloud Healthcare API](https://cloud.google.com/healthcare-api)
+- [Cloud Pub/Sub API](https://cloud.google.com/pubsub/docs/reference/rest)
+- [Compute Engine API](https://cloud.google.com/compute/docs/reference/rest/v1)
+- [Eventarc API](https://cloud.google.com/eventarc/docs/apis)
+- [IAM Service Account Credentials API](https://cloud.google.com/iam/docs/reference/credentials/rest)
+- [Cloud Build API](https://cloud.google.com/build/docs/api/reference/rest)
+
 ## Local Development Environment
 
 The instructions below describe how to setup a development environment for local development of Cloud Functions.
