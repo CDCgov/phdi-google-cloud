@@ -55,3 +55,6 @@ data/
 !examples/*.ipynb*
 
 .DS_Store
+
+# GCP Application Creds
+appcreds.json
