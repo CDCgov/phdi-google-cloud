@@ -7,13 +7,15 @@ import os
 from google.auth.transport import requests
 # Imports a module to allow authentication using a service account
 from google.oauth2 import service_account
+# Imports the Google API Discovery Service.
+from googleapiclient import discovery
+import httplib2
+
+from oauth2client.client import OAuth2Credentials as creds
 
 
 def upload_to_fhir_server(
     message : str,
-    project_id : str,
-    location : str,
-    dataset_id : str,
     fhir_store_id : str
     ):
     """
@@ -40,15 +42,11 @@ def upload_to_fhir_server(
     # URL to the Cloud Healthcare API endpoint and version
     base_url = "https://healthcare.googleapis.com/v1"
 
-    url = "{}/projects/{}/locations/{}".format(base_url, project_id, location)
-
-    resource_path = "{}/datasets/{}/fhirStores/{}/fhir".format(
-        url, dataset_id, fhir_store_id
-    )
+    resource_path = "{}/{}/fhir".format(base_url, fhir_store_id)
     print(resource_path)
     headers = {"Content-Type": "application/fhir+json;charset=utf-8"}
     print("")
-    print(message)
+    print(json.dumps(message, indent=2))
     print("")
     print(headers)
     print("")
@@ -73,7 +71,7 @@ def upload_to_fhir_server(
 
     return resource
 
-def upload_single_msg_to_fhir_server(project_id, location, dataset_id, fhir_store_id, message):
+def upload_single_msg_to_fhir_server(fhir_store_id, message, resource_type):
     # Gets credentials from the environment.
     credentials = service_account.Credentials.from_service_account_file(
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
@@ -87,16 +85,13 @@ def upload_single_msg_to_fhir_server(project_id, location, dataset_id, fhir_stor
     # URL to the Cloud Healthcare API endpoint and version
     base_url = "https://healthcare.googleapis.com/v1"
 
-    url = "{}/projects/{}/locations/{}".format(base_url, project_id, location)
-
-    fhir_store_path = "{}/datasets/{}/fhirStores/{}/fhir".format(
-        url, dataset_id, fhir_store_id
-    )
+    fhir_store_path = "{}/{}/fhir/{}".format(base_url, fhir_store_id,resource_type)
+    print(fhir_store_path)
 
     # Sets required application/fhir+json header on the request
     headers = {"Content-Type": "application/fhir+json;charset=utf-8"}
     print("")
-    print(message)
+    print(json.dumps(message, indent=2))
     print("")
     print(headers)
     print("")
@@ -112,6 +107,55 @@ def upload_single_msg_to_fhir_server(project_id, location, dataset_id, fhir_stor
 
     return response
 
+def get_fhir_store_details(dataset_id, fhir_version):
+    api_version = "v1"
+    service_name = "healthcare"
+    # Instantiates an authorized API client by discovering the Healthcare API
+    # and using GOOGLE_APPLICATION_CREDENTIALS environment variable.
+    client = discovery.build(service_name, api_version)
+
+    fhir_store_parent = dataset_id
+
+    fhir_stores = (
+        client.projects()
+        .locations()
+        .datasets()
+        .fhirStores()
+        .list(parent=fhir_store_parent)
+        .execute()
+        .get("fhirStores", [])
+    )
+
+    for fhir_store in fhir_stores:
+        if fhir_store["version"] in fhir_version:
+            valid_fhir_store = fhir_store
+
+    return valid_fhir_store
+
+def get_dataset_details(project_id, location):
+    api_version = "v1"
+    service_name = "healthcare"
+    # Returns an authorized API client by discovering the Healthcare API
+    # and using GOOGLE_APPLICATION_CREDENTIALS environment variable.
+    client = discovery.build(service_name, api_version)
+
+    # TODO(developer): Uncomment these lines and replace with your values.
+    # project_id = 'my-project'  # replace with your GCP project ID
+    # location = 'us-central1'  # replace with the location of the datasets
+    dataset_parent = "projects/{}/locations/{}".format(project_id, location)
+
+    datasets = (
+        client.projects()
+        .locations()
+        .datasets()
+        .list(parent=dataset_parent)
+        .execute()
+        .get("datasets", [])
+    )
+
+    first_dataset = datasets[0]
+    print(first_dataset)
+    return first_dataset
 
 def main(filepath : str):
     """
@@ -123,24 +167,35 @@ def main(filepath : str):
     additional necessary functionality
     """
     
+    """
+    TODO: pull the data below either from a config file or setup
+    other methods to get this information based upon the account that
+    is logged in
+    """
     project_id =  "phdi-357418"
     location  = "us-west1"
-    dataset_id = "PHDI_DATASET-1659637332"
-    fhir_store_id = "PHDI_FHIRSTORE-1659637332"
-
+    fhir_version = "R4"
+    resource_type = "Observation"
     
-    print("HERE")
     # open the file and read it line by line, as each line is a bundle
     jsonFile = open(filepath,'r')
     Bundles = jsonFile.readlines()
-    print("THERE")
+   
+    dataset = get_dataset_details(project_id=project_id,location=location)
+    dataset_id = dataset.get("name")
+    print(dataset_id)
+
+    fhirStore = get_fhir_store_details(dataset_id=dataset_id,fhir_version=fhir_version)
+    print(json.dumps(fhirStore, indent=2))
+    fhir_store_id = fhirStore["name"]
+    print(fhir_store_id)
 
     count = 0
     for line in Bundles:
         count += 1
         #print("Line{}: {}".format(count,line.strip()))
-        #resource =  upload_to_fhir_server(message = line,project_id=project_id,location=location,dataset_id=dataset_id,fhir_store_id=fhir_store_id)
-        resource =  upload_single_msg_to_fhir_server(message = line,project_id=project_id,location=location,dataset_id=dataset_id,fhir_store_id=fhir_store_id)
+        resource =  upload_to_fhir_server(message = line,fhir_store_id=fhir_store_id)
+        #resource =  upload_single_msg_to_fhir_server(message = line,fhir_store_id=fhir_store_id,resource_type=resource_type)
 
 if __name__ == "__main__":
     main(argv[1])
