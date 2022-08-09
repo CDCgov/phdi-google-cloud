@@ -1,7 +1,5 @@
 import json
-from re import L
 from sys import argv
-from textwrap import indent
 import functions_framework
 import os
 # Imports the google.auth.transport.requests transport
@@ -10,11 +8,31 @@ from google.auth.transport import requests
 from google.oauth2 import service_account
 # Imports the Google API Discovery Service.
 from googleapiclient import discovery
-import httplib2
-from oauth2client.client import OAuth2Credentials as creds
 
 api_version = "v1"
 service_name = "healthcare"
+# Instantiates an authorized API client by discovering the Healthcare API
+# and using GOOGLE_APPLICATION_CREDENTIALS environment variable.
+# TODO: Get the credentials from the signed in account from local terminal
+#   and/or will work with the GCP Service Account
+#   MOVE ALL CREDS FUNCTIONALITY TO GCP SDK
+client = discovery.build(service_name, api_version)
+
+# Step 1: Get the credentials from the environment.
+# TODO: Get the credentials from the signed in account from local terminal
+#   and/or will work with the GCP Service Account
+#   MOVE ALL CREDS FUNCTIONALITY TO GCP SDK
+credentials = service_account.Credentials.from_service_account_file(
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
+)
+scoped_credentials = credentials.with_scopes(
+    ["https://www.googleapis.com/auth/cloud-platform"]
+)
+# Creates a requests Session object with the credentials.
+session = requests.AuthorizedSession(scoped_credentials)
+
+# URL to the Cloud Healthcare API endpoint and version
+base_url = "https://healthcare.googleapis.com/v1"
 
 
 def upload_bundle_to_fhir_server(
@@ -28,22 +46,6 @@ def upload_bundle_to_fhir_server(
     :param str: A message that essentially will contain a bundle of
     fhir resources that are expected to be uploaded to the FHIR store
     """
-
-    # Step 1: Get the credentials from the environment.
-    # TODO: Get the credentials from the signed in account from local terminal
-    #   and/or will work with the GCP Service Account
-    #   MOVE ALL CREDS FUNCTIONALITY TO GCP SDK
-    credentials = service_account.Credentials.from_service_account_file(
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
-    )
-    scoped_credentials = credentials.with_scopes(
-        ["https://www.googleapis.com/auth/cloud-platform"]
-    )
-    # Step 2: Create a request to get a Session object with the credentials.
-    session = requests.AuthorizedSession(scoped_credentials)
-
-    # URL to the Cloud Healthcare API endpoint and version
-    base_url = "https://healthcare.googleapis.com/v1"
 
     resource_path = "{}/{}/fhir".format(base_url, fhir_store_id)
     headers = {"Content-Type": "application/fhir+json;charset=utf-8"}
@@ -61,26 +63,11 @@ def upload_bundle_to_fhir_server(
 
     resource = response.json()
 
-    print("Executed bundle from the message passed in! {}")
+    print("Executed bundle from the message passed in!")
 
     return resource
 
 def upload_resource_to_fhir_server(fhir_resource, fhir_store_id, resource_type):
-    # Step 1: Get the credentials from the environment.
-    # TODO: Get the credentials from the signed in account from local terminal
-    #   and/or will work with the GCP Service Account
-    #   MOVE ALL CREDS FUNCTIONALITY TO GCP SDK
-    credentials = service_account.Credentials.from_service_account_file(
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
-    )
-    scoped_credentials = credentials.with_scopes(
-        ["https://www.googleapis.com/auth/cloud-platform"]
-    )
-    # Creates a requests Session object with the credentials.
-    session = requests.AuthorizedSession(scoped_credentials)
-
-    # URL to the Cloud Healthcare API endpoint and version
-    base_url = "https://healthcare.googleapis.com/v1"
 
     fhir_store_path = "{}/{}/fhir/{}".format(base_url, fhir_store_id,resource_type)
 
@@ -92,18 +79,11 @@ def upload_resource_to_fhir_server(fhir_resource, fhir_store_id, resource_type):
 
     resource = response.json()
 
-    print("Created Patient resource with ID {}".format(resource["id"]))
+    print("Created {} resource with ID {}".format(resource["id"],resource_type))
 
     return response
 
 def get_fhir_store_details(dataset_id, fhir_version):
-    
-    # Instantiates an authorized API client by discovering the Healthcare API
-    # and using GOOGLE_APPLICATION_CREDENTIALS environment variable.
-    # TODO: Get the credentials from the signed in account from local terminal
-    #   and/or will work with the GCP Service Account
-    #   MOVE ALL CREDS FUNCTIONALITY TO GCP SDK
-    client = discovery.build(service_name, api_version)
 
     fhir_store_parent = dataset_id
 
@@ -130,13 +110,6 @@ def get_fhir_store_details(dataset_id, fhir_version):
     return valid_fhir_store
 
 def get_dataset_details(project_id, location):
-    
-    # Returns an authorized API client by discovering the Healthcare API
-    # and using GOOGLE_APPLICATION_CREDENTIALS environment variable.
-    # TODO: Get the credentials from the signed in account from local terminal
-    #   and/or will work with the GCP Service Account
-    #   MOVE ALL CREDS FUNCTIONALITY TO GCP SDK
-    client = discovery.build(service_name, api_version)
 
     dataset_parent = "projects/{}/locations/{}".format(project_id, location)
 
@@ -185,10 +158,11 @@ def main(fhir_resource):
 
     try:
         # convert the message into a JSON Dictionary so we can check if it's a Bundle or not
-        json_resource = json.load(fhir_resource)
-
+        json_resource = json.loads(fhir_resource)
+    
         if json_resource is not None:
-            resource_type = json_resource['resourceType'][0]
+            resource_type = json_resource['resourceType']
+            print(resource_type)
 
             if resource_type is not None:
                 if resource_type == 'Bundle':
@@ -196,10 +170,10 @@ def main(fhir_resource):
                 else: 
                     resource_response = upload_resource_to_fhir_server(fhir_resource=json_resource,fhir_store_id=fhir_store_id,resource_type=resource_type)
     except BaseException as error:
-        resource_response = f"ERROR: {error=}, {type(error)=}"
+        resource_response = f"ERROR: {error}"
     
     print("Resource Response:")
     print(resource_response)
 
 if __name__ == "__main__":
-    main(argv[1])
+    main(argv[0])
