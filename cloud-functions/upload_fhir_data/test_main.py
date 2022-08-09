@@ -3,30 +3,37 @@ from unittest import mock
 from main import get_dataset_details
 import json
 
+
 @mock.patch("main.discovery")
 @mock.patch("main.api_version")
 @mock.patch("main.service_name")
 @mock.patch("main.client")
-def test_get_dataset_details(mock_discovery, mock_api_version, mock_service_name, mock_client):
+def test_get_dataset_details(
+    mock_discovery, mock_api_version, mock_service_name, mock_client
+):
     mock_api_version = "mock"
     mock_service_name = "Mocked"
     mock_project_id = "myprojectid"
     mock_location = "mylocation"
-    mock_dataset_parent = "projects/{}/locations/{}".format(mock_project_id, mock_location)
+    mock_dataset_parent = "projects/{}/locations/{}".format(
+        mock_project_id, mock_location
+    )
     mock_discovery_result = mock_discovery.build.return_value
     mock_client = mock_discovery_result
     final_return_value = [
-                {"name": "mydataset", "version": "myver"},
-                {"name": "otherdataset", "version": "otherver"},
+        {"name": "mydataset", "version": "myver"},
+        {"name": "otherdataset", "version": "otherver"},
     ]
-    mock_client.projects.locations.datasets.list(parent=mock_dataset_parent).execute().get("datasets", []).return_value = final_return_value
+    mock_client.projects.locations.datasets.list(
+        parent=mock_dataset_parent
+    ).execute().get("datasets", []).return_value = final_return_value
     print(final_return_value[0])
-    result = get_dataset_details(project_id=mock_project_id,location=mock_location)
+    result = get_dataset_details(project_id=mock_project_id, location=mock_location)
     print(result)
 
-    assert(result == final_return_value[0])
-   
-    
+    assert result == final_return_value[0]
+
+
 """
 @mock.patch("main.discovery")
 def get_client(patched_discovery):
