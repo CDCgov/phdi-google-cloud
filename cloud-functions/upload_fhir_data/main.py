@@ -1,6 +1,7 @@
 import json
 from re import L
 from sys import argv
+from textwrap import indent
 import functions_framework
 import os
 # Imports the google.auth.transport.requests transport
@@ -10,14 +11,15 @@ from google.oauth2 import service_account
 # Imports the Google API Discovery Service.
 from googleapiclient import discovery
 import httplib2
-
 from oauth2client.client import OAuth2Credentials as creds
 
+api_version = "v1"
+service_name = "healthcare"
 
-def upload_to_fhir_server(
-    message : str,
-    fhir_store_id : str
-    ):
+
+def upload_bundle_to_fhir_server(
+    bundle,
+    fhir_store_id):
     """
     All resources in a FHIR bundle are uploaded to a FHIR server. 
     In the event that a resource cannot be uploaded it is written to a 
@@ -27,9 +29,10 @@ def upload_to_fhir_server(
     fhir resources that are expected to be uploaded to the FHIR store
     """
 
-    print("HERE2")
-
     # Step 1: Get the credentials from the environment.
+    # TODO: Get the credentials from the signed in account from local terminal
+    #   and/or will work with the GCP Service Account
+    #   MOVE ALL CREDS FUNCTIONALITY TO GCP SDK
     credentials = service_account.Credentials.from_service_account_file(
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
     )
@@ -43,14 +46,8 @@ def upload_to_fhir_server(
     base_url = "https://healthcare.googleapis.com/v1"
 
     resource_path = "{}/{}/fhir".format(base_url, fhir_store_id)
-    print(resource_path)
     headers = {"Content-Type": "application/fhir+json;charset=utf-8"}
-    print("")
-    print(json.dumps(message, indent=2))
-    print("")
-    print(headers)
-    print("")
-
+    
     """
     # This is only used if you want to use a path and filename
     # that contains the bundle within it.  Otherwise we expect a bundle 
@@ -59,20 +56,20 @@ def upload_to_fhir_server(
     # with open(message, "r") as bundle_file:
     #    bundle_file_content = bundle_file.read()
     """
-    print("HERE")
-    jsonMsg = json.loads(message)
-    response = session.post(resource_path, headers=headers, data=jsonMsg)
+    response = session.post(resource_path, headers=headers, data=json.dumps(bundle))
     response.raise_for_status()
 
     resource = response.json()
 
     print("Executed bundle from the message passed in! {}")
-    print(json.dumps(resource, indent=2))
 
     return resource
 
-def upload_single_msg_to_fhir_server(fhir_store_id, message, resource_type):
-    # Gets credentials from the environment.
+def upload_resource_to_fhir_server(fhir_resource, fhir_store_id, resource_type):
+    # Step 1: Get the credentials from the environment.
+    # TODO: Get the credentials from the signed in account from local terminal
+    #   and/or will work with the GCP Service Account
+    #   MOVE ALL CREDS FUNCTIONALITY TO GCP SDK
     credentials = service_account.Credentials.from_service_account_file(
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
     )
@@ -86,19 +83,11 @@ def upload_single_msg_to_fhir_server(fhir_store_id, message, resource_type):
     base_url = "https://healthcare.googleapis.com/v1"
 
     fhir_store_path = "{}/{}/fhir/{}".format(base_url, fhir_store_id,resource_type)
-    print(fhir_store_path)
 
     # Sets required application/fhir+json header on the request
     headers = {"Content-Type": "application/fhir+json;charset=utf-8"}
-    print("")
-    print(json.dumps(message, indent=2))
-    print("")
-    print(headers)
-    print("")
-
-    jsonMsg = json.loads(message)
     
-    response = session.post(fhir_store_path, headers=headers, json=jsonMsg)
+    response = session.post(fhir_store_path, headers=headers, json=fhir_resource)
     response.raise_for_status()
 
     resource = response.json()
@@ -108,10 +97,12 @@ def upload_single_msg_to_fhir_server(fhir_store_id, message, resource_type):
     return response
 
 def get_fhir_store_details(dataset_id, fhir_version):
-    api_version = "v1"
-    service_name = "healthcare"
+    
     # Instantiates an authorized API client by discovering the Healthcare API
     # and using GOOGLE_APPLICATION_CREDENTIALS environment variable.
+    # TODO: Get the credentials from the signed in account from local terminal
+    #   and/or will work with the GCP Service Account
+    #   MOVE ALL CREDS FUNCTIONALITY TO GCP SDK
     client = discovery.build(service_name, api_version)
 
     fhir_store_parent = dataset_id
@@ -126,22 +117,27 @@ def get_fhir_store_details(dataset_id, fhir_version):
         .get("fhirStores", [])
     )
 
+    """
+    This is hard coded to get the first (version) FHIR datastore
+    TODO: we can later parameterize this to find a specific FHIR datastore
+    for the client by a few different methods
+    """
     for fhir_store in fhir_stores:
         if fhir_store["version"] in fhir_version:
             valid_fhir_store = fhir_store
+            break
 
     return valid_fhir_store
 
 def get_dataset_details(project_id, location):
-    api_version = "v1"
-    service_name = "healthcare"
+    
     # Returns an authorized API client by discovering the Healthcare API
     # and using GOOGLE_APPLICATION_CREDENTIALS environment variable.
+    # TODO: Get the credentials from the signed in account from local terminal
+    #   and/or will work with the GCP Service Account
+    #   MOVE ALL CREDS FUNCTIONALITY TO GCP SDK
     client = discovery.build(service_name, api_version)
 
-    # TODO(developer): Uncomment these lines and replace with your values.
-    # project_id = 'my-project'  # replace with your GCP project ID
-    # location = 'us-central1'  # replace with the location of the datasets
     dataset_parent = "projects/{}/locations/{}".format(project_id, location)
 
     datasets = (
@@ -152,19 +148,19 @@ def get_dataset_details(project_id, location):
         .execute()
         .get("datasets", [])
     )
-
+    """
+    This is hard coded to get the first dataset
+    TODO: we can later parameterize this to find a specific dataset
+    for the client by a few different methods
+    """
     first_dataset = datasets[0]
-    print(first_dataset)
     return first_dataset
 
-def main(filepath : str):
+def main(fhir_resource):
     """
     This is the main entry point for the ability to upload data
-    to the FHIR store
-
-    Currently this is using a file for testing purposes but this will be modified
-    later to have additional parameters as well as be updated to provide
-    additional necessary functionality
+    to the FHIR store - it accepts either a single FHIR resource
+    or a Bundle of the same or various FHIR resources
     """
     
     """
@@ -175,27 +171,35 @@ def main(filepath : str):
     project_id =  "phdi-357418"
     location  = "us-west1"
     fhir_version = "R4"
-    resource_type = "Observation"
-    
-    # open the file and read it line by line, as each line is a bundle
-    jsonFile = open(filepath,'r')
-    Bundles = jsonFile.readlines()
-   
+
+    """
+    Here we are gathering information necessary for our FHIR Store transactions
+    like the dataset and datastore/fhirstore.
+    TODO: This should be moved with the other pieces for authentication
+    and should be passed into this functionality or accessible to it at least"""
     dataset = get_dataset_details(project_id=project_id,location=location)
     dataset_id = dataset.get("name")
-    print(dataset_id)
+    
+    fhir_store = get_fhir_store_details(dataset_id=dataset_id,fhir_version=fhir_version)
+    fhir_store_id = fhir_store["name"]
 
-    fhirStore = get_fhir_store_details(dataset_id=dataset_id,fhir_version=fhir_version)
-    print(json.dumps(fhirStore, indent=2))
-    fhir_store_id = fhirStore["name"]
-    print(fhir_store_id)
+    try:
+        # convert the message into a JSON Dictionary so we can check if it's a Bundle or not
+        json_resource = json.load(fhir_resource)
 
-    count = 0
-    for line in Bundles:
-        count += 1
-        #print("Line{}: {}".format(count,line.strip()))
-        resource =  upload_to_fhir_server(message = line,fhir_store_id=fhir_store_id)
-        #resource =  upload_single_msg_to_fhir_server(message = line,fhir_store_id=fhir_store_id,resource_type=resource_type)
+        if json_resource is not None:
+            resource_type = json_resource['resourceType'][0]
+
+            if resource_type is not None:
+                if resource_type == 'Bundle':
+                    resource_response = upload_bundle_to_fhir_server(bundle=json_resource,fhir_store_id=fhir_store_id)
+                else: 
+                    resource_response = upload_resource_to_fhir_server(fhir_resource=json_resource,fhir_store_id=fhir_store_id,resource_type=resource_type)
+    except BaseException as error:
+        resource_response = f"ERROR: {error=}, {type(error)=}"
+    
+    print("Resource Response:")
+    print(resource_response)
 
 if __name__ == "__main__":
     main(argv[1])
