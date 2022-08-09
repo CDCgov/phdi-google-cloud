@@ -1,6 +1,5 @@
 import json
 from sys import argv
-import functions_framework
 import os
 
 # Imports the google.auth.transport.requests transport
@@ -53,9 +52,8 @@ def upload_bundle_to_fhir_server(bundle, fhir_store_id):
 
     """
     # This is only used if you want to use a path and filename
-    # that contains the bundle within it.  Otherwise we expect a bundle 
-    # message to be passed 
-
+    # that contains the bundle within it.  Otherwise we expect a bundle
+    # message to be passed
     # with open(message, "r") as bundle_file:
     #    bundle_file_content = bundle_file.read()
     """
@@ -70,7 +68,6 @@ def upload_bundle_to_fhir_server(bundle, fhir_store_id):
 
 
 def upload_resource_to_fhir_server(fhir_resource, fhir_store_id, resource_type):
-
     fhir_store_path = "{}/{}/fhir/{}".format(base_url, fhir_store_id, resource_type)
 
     # Sets required application/fhir+json header on the request
@@ -164,7 +161,8 @@ def main(fhir_resource):
     fhir_store_id = fhir_store["name"]
 
     try:
-        # convert the message into a JSON Dictionary so we can check if it's a Bundle or not
+        # convert the message into a JSON Dictionary so we can check
+        # if it's a Bundle or not
         json_resource = json.loads(fhir_resource)
 
         if json_resource is not None:

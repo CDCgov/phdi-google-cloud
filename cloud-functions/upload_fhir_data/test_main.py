@@ -1,7 +1,5 @@
-from typing import final
 from unittest import mock
 from main import get_dataset_details
-import json
 
 
 @mock.patch("main.discovery")
@@ -18,7 +16,9 @@ def test_get_dataset_details(
     mock_dataset_parent = "projects/{}/locations/{}".format(
         mock_project_id, mock_location
     )
-    mock_discovery_result = mock_discovery.build.return_value
+    mock_discovery_result = mock_discovery.build(
+        mock_api_version, mock_service_name
+    ).return_value
     mock_client = mock_discovery_result
     final_return_value = [
         {"name": "mydataset", "version": "myver"},
