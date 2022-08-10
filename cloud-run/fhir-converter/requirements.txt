@@ -1,0 +1,15 @@
+anyio==3.6.1
+attrs==22.1.0
+fastapi==0.79.0
+idna==3.3
+iniconfig==1.1.1
+packaging==21.3
+pluggy==1.0.0
+py==1.11.0
+pydantic==1.9.1
+pyparsing==3.0.9
+pytest==7.1.2
+sniffio==1.2.0
+starlette==0.19.1
+tomli==2.0.1
+typing_extensions==4.3.0
