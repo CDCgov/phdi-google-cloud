@@ -1,6 +1,5 @@
 from pathlib import Path
 from typing import Union, Optional
-import logging
 import subprocess
 import json
 
@@ -62,9 +61,9 @@ def convert_to_fhir(
 
     # Forumlate command for the FHIR Converter.
     fhir_conversion_command = [
-        f"dotnet run ",
+        "dotnet run ",
         f"--project {str(converter_project_path)} ",
-        f"convert -- ",
+        "convert -- ",
         f"--TemplateDirectory {str(template_directory_path)} ",
         f"--RootTemplate {root_template} ",
         f"--OutputDataFile {str(output_data_file_path)} ",

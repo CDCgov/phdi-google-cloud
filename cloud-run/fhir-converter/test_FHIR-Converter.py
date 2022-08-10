@@ -20,9 +20,9 @@ def test_convert_to_fhir(
     converter_project_path = "my/path/to/converter/project"
 
     base_fhir_conversion_command = [
-        f"dotnet run ",
+        "dotnet run ",
         f"--project {converter_project_path} ",
-        f"convert -- ",
+        "convert -- ",
         f"--TemplateDirectory {template_directory_path} ",
         f"--RootTemplate {root_template} ",
         f"--OutputDataFile {output_data_file_path} ",
@@ -30,7 +30,7 @@ def test_convert_to_fhir(
 
     # Provide source data content directly with succesfull conversion.
     patched_subprocess_run.return_value = mock.Mock(returncode=0)
-    result = convert_to_fhir(
+    convert_to_fhir(
         output_data_file_path,
         template_directory_path,
         converter_project_path,
@@ -48,7 +48,7 @@ def test_convert_to_fhir(
 
     # Provide file containing source data with unsuccesfull conversion.
     patched_subprocess_run.return_value = mock.Mock(returncode=1)
-    result = convert_to_fhir(
+    convert_to_fhir(
         output_data_file_path,
         template_directory_path,
         converter_project_path,
