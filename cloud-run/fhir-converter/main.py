@@ -62,7 +62,7 @@ def convert_to_fhir(
 
     # Forumlate command for the FHIR Converter.
     fhir_conversion_command = [
-        f"dotnet run ", 
+        f"dotnet run ",
         f"--project {str(converter_project_path)} ",
         f"convert -- ",
         f"--TemplateDirectory {str(template_directory_path)} ",
@@ -76,7 +76,7 @@ def convert_to_fhir(
         fhir_conversion_command.append(f"--InputDataFile {str(input_data_file_path)}")
 
     fhir_conversion_command = "".join(fhir_conversion_command)
-    
+
     # Call the FHIR Converter.
     converter_response = subprocess.run(
         fhir_conversion_command, shell=True, capture_output=True
@@ -89,20 +89,3 @@ def convert_to_fhir(
         result = vars(converter_response)
 
     return result
-
-
-if __name__ == "__main__":
-    template_directory_path = "/Users/danielpaseltiner/docker-msft-fhir-converter/FHIR-Converter/data/Templates/Ccda"
-    root_template = "CCD"
-    input_data_file_path = "/Users/danielpaseltiner/docker-msft-fhir-converter/FHIR-Converter/data/SampleData/Ccda/Patient-1.ccda"
-    output_data_file_path = "/Users/danielpaseltiner/docker-msft-fhir-converter/test.fhir"
-    converter_project_path = "/Users/danielpaseltiner/docker-msft-fhir-converter/FHIR-Converter/src/Microsoft.Health.Fhir.Liquid.Converter.Tool"
-    
-    result = convert_to_fhir(
-        output_data_file_path,
-        template_directory_path,
-        converter_project_path,
-        root_template,
-        input_data_content=Path(input_data_file_path).read_text(),
-    )
-    print(result)
