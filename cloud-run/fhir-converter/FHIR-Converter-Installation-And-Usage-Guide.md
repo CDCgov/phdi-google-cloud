@@ -32,7 +32,7 @@ Restart your shell with `exec $SHELL` and then run `dotnet`. If you get a respon
 
 ### Get Microsoft FHIR Converter
 Clone the Microsfot FHIR Converter source code from GitHub with a command like this one that downloads the 5.0.4 release (most recent at the time of writing). 
-`git clone https://github.com/microsoft/FHIR-Converter/tree/v5.0.4 --single-branch`
+`git clone https://github.com/microsoft/FHIR-Converter.git --branch v5.0.4 --single-branch`
 
 ### Build the FHIR Converter Tool
 Navigate to `.../FHIR-Converter/src/Microsoft.Health.Fhir.Liquid.Converter.Tool` and run `dotnet build` to build the FHIR Converter. 

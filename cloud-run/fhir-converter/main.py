@@ -1,16 +1,37 @@
 from pathlib import Path
-from typing import Union, Optional
 import subprocess
 import json
 
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+api = FastAPI()
+
+
+class FhirConverterInput(BaseModel):
+    """
+    Input parameters for the FHIR Converter.
+    """
+
+    input_data: str
+    input_type: str
+    root_template: str
+
+
+@api.get("/")
+async def root():
+    return {"status": "OK"}
+
+
+@api.post("/convert-to-fhir")
+async def convert(input: FhirConverterInput):
+    return convert_to_fhir(**dict(input))
+
 
 def convert_to_fhir(
-    output_data_file_path: Union[str, Path],
-    template_directory_path: Union[str, Path],
-    converter_project_path: Union[str, Path],
+    input_data: str,
+    input_type: str,
     root_template: str,
-    input_data_content: Optional[str] = None,
-    input_data_file_path: Optional[Union[str, Path]] = None,
 ) -> dict:
     """
     Call the Microsoft FHIR Converter CLI tool to convert an Hl7v2, or C-CDA message
@@ -24,55 +45,38 @@ def convert_to_fhir(
     refer to FHIR-Converter-Installation-And-Usage-Guide. The source code for the
     converter can be found at https://github.com/microsoft/FHIR-Converter.
 
-    :param output_file_path: The complete path for the output file containing the FHIR
-        bundle produced by the conversion.
-    :param template_directory_path: Path to the Templates/ subdirectory within the FHIR
-        Converter for data type to be converted (Ccda/, Hl7v2/, Json/, or Stu3ToR4/).
-    :param converter_project_path: Path to the
-        Microsoft.Health.Fhir.Liquid.Converter.Tool/ directory within the FHIR
-        converter.
-    :param root_template: Name of the liquid template within the template_direcotry_path
-        to be used for conversion, excluding the '.liquid' extension. Options are listed
-        in the FHIR-Converter README.md.
-    :param input_data_content: The message to be converted as a string.
-    :param input_data_file_path: The complete path to a file containing a single message
-        to convert to FHIR.
+    :param input_data: The message to be converted as a string.
+    :param input_type: The type of message to be converted. Valid values are "hl7v2" and "c-cda".
+    :param root_template: Name of the liquid template within to be used for conversion.
+        Options are listed in the FHIR-Converter README.md.
     """
 
-    # Ensure either input_data_content or input_data_file_path has been provided.
-    if input_data_content is None and input_data_file_path is None:
+    # Setup path variables
+    converter_project_path = "/build/FHIR-Converter/src/Microsoft.Health.Fhir.Liquid.Converter.Tool"
+    if input_type == "hl7v2":
+        template_directory_path = "/build/FHIR-Converter/data/Templates/Hl7v2"
+    elif input_type == "c-cda":
+        template_directory_path = "/build/FHIR-Converter/data/Templates/Ccda"
+    else:
         raise ValueError(
-            "A value for input_data_content or input_data_file_path must be provided."
+            f"Invalid input_type {input_type}. Valid values are 'hl7v2' and 'c-cda'."
         )
-    if input_data_content is not None and input_data_file_path is not None:
-        raise ValueError(
-            "Both input_data_content or input_data_file_path cannot be specified. "
-        )
+    output_data_file_path = "/tmp/output.json"
 
-    # Ensure all paths are pathlib objects not strings.
-    for path in [
-        input_data_file_path,
-        output_data_file_path,
-        template_directory_path,
-        converter_project_path,
-    ]:
-        if type(path) == str:
-            path = Path(path)
+    # Write input data to file
+    input_data_file_path = Path(f"/tmp/{input_type}-input.txt")
+    input_data_file_path.write_text(input_data)
 
-    # Forumlate command for the FHIR Converter.
+    # Formulate command for the FHIR Converter.
     fhir_conversion_command = [
         "dotnet run ",
-        f"--project {str(converter_project_path)} ",
+        f"--project {converter_project_path} ",
         "convert -- ",
-        f"--TemplateDirectory {str(template_directory_path)} ",
+        f"--TemplateDirectory {template_directory_path} ",
         f"--RootTemplate {root_template} ",
+        f"--InputDataFile {str(input_data_file_path)} "
         f"--OutputDataFile {str(output_data_file_path)} ",
     ]
-
-    if input_data_content is not None:
-        fhir_conversion_command.append(f"--InputDataContent $'{input_data_content}'")
-    else:
-        fhir_conversion_command.append(f"--InputDataFile {str(input_data_file_path)}")
 
     fhir_conversion_command = "".join(fhir_conversion_command)
 
