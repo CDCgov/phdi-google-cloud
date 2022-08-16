@@ -1,41 +1,14 @@
-// Terraform plugin for creating random IDs
-resource "random_id" "instance_id" {
-  byte_length = 8
-}
-
-resource "random_id" "toy_bucket_id" {
-  byte_length = 8
-}
-
-resource "random_id" "function_bucket_id" {
-  byte_length = 8
-}
-
-resource "google_storage_bucket" "tfstate" {
-  name          = "bucket-tfstate-${random_id.instance_id.hex}"
-  force_destroy = false
-  location      = "US"
-  storage_class = "STANDARD"
-  versioning {
-    enabled = true
-  }
-}
-
 resource "google_storage_bucket" "toybucket" {
-  name          = "bucket-toybucket-${random_id.toy_bucket_id.hex}"
-  force_destroy = false
-  location      = "US"
-  storage_class = "STANDARD"
+  name     = "phdi-${terraform.workspace}-toybucket-${var.project_id}"
+  location = "US"
   versioning {
     enabled = true
   }
 }
 
 resource "google_storage_bucket" "functions" {
-  name          = "bucket-functions-${random_id.function_bucket_id.hex}"
-  force_destroy = false
-  location      = "US"
-  storage_class = "STANDARD"
+  name     = "phdi-${terraform.workspace}-functions-${var.project_id}"
+  location = "US"
   versioning {
     enabled = true
   }

@@ -174,7 +174,15 @@ The `modules/` directory contains configuration for each GCP resource required t
 
 In order to use the Terraform code in this repository on your local machine you must first install which can be done following [this guide](https://learn.hashicorp.com/tutorials/terraform/install-cli#install-terraform). Additionally, you will also need to authenticate with a GCP project using the gcloud CLI. Install gcloud CLI following [this guide](https://cloud.google.com/sdk/docs/install). After installing this software authenticate with your GCP project by running `gcloud auth application-default login` and follow the prompts in your browser. Now you are ready run Terraform commands!
 
-To begin using terraform, navigate the subdirectory in `phdi-google-cloud/terraform/vars/` for the GCP environment you wish to work with. Then run `terraform init` to initialize Terraform for the desired environment. Now you can run `terraform plan` to have Terraform determine the difference between the code locally and the infrastructure currently deployed in GCP. Terraform will return a list of changes, resources it will create, destroy, or modify, that it would make if you chose to move forward with a deployment. After a carefull review, if these changes are acceptable you may deploy them by running `terraform apply`. Please refer to the [Terraform CLI documentation](https://www.terraform.io/cli/commands) for further information on using Terraform locally.
+To begin using terraform:  
+  1. Navigate to the directory `phdi-google-cloud/terraform/setup`. 
+  1. Run `terraform init` to initialize the setup Terraform for the dev environment. 
+  1. Create a new workspace called "dev" by running `terraform workspace new dev`. 
+  1. Run `terraform apply` to create a storage bucket for storing terraform state. It will prompt you for a Project ID and region/zone. Note the name of the bucket output by this command. 
+  1. Navigate to the directory `phdi-google-cloud/terraform/implementation`.
+  1. Run `terraform init` to initialize the implementation Terraform for the dev environment. It will prompt you for the name of a bucket to store Terraform's state. Enter the name of the bucket output in the earlier step.
+  1. Create a new workspace called "dev" by running `terraform workspace new dev`. 
+  1. Now you can run `terraform plan` to have Terraform determine the difference between the code locally and the infrastructure currently deployed in GCP. Terraform will return a list of changes, resources it will create, destroy, or modify, that it would make if you chose to move forward with a deployment. After a carefull review, if these changes are acceptable you may deploy them by running `terraform apply`. Please refer to the [Terraform CLI documentation](https://www.terraform.io/cli/commands) for further information on using Terraform locally.
 
 ### Continuous Integration and Continuous Deployment (CI/CD)
 
