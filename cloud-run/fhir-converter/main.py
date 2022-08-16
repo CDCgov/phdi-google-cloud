@@ -52,7 +52,9 @@ def convert_to_fhir(
     """
 
     # Setup path variables
-    converter_project_path = "/build/FHIR-Converter/src/Microsoft.Health.Fhir.Liquid.Converter.Tool"
+    converter_project_path = (
+        "/build/FHIR-Converter/src/Microsoft.Health.Fhir.Liquid.Converter.Tool"
+    )
     if input_type == "hl7v2":
         template_directory_path = "/build/FHIR-Converter/data/Templates/Hl7v2"
     elif input_type == "c-cda":
