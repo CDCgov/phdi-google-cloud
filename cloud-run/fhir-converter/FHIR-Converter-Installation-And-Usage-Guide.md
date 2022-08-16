@@ -8,7 +8,7 @@ To run the FHIR Converter in a Docker container, follow these steps:
   `docker build -t fhir-converter .`
   1. Start a container by running:  
   `docker run -p 8080:8080 fhir-converter`
-  1. Using curl or a REST client like Postman or Insomnia, make a POST request to http://localhost:8080/convert-to-fhir with a request body:
+  1. Using curl or a REST client like Postman or Insomnia, make a POST request to http://localhost:8080/convert-to-fhir with a request body. This request should have keys `input_data`, `input_type`, and `root_template`. `input_type` should be either `hl7v2` or `ccda`. `root_template` should be one of the templates provided with the Microsoft FHIR Converter tool, [found here](https://github.com/microsoft/FHIR-Converter/tree/main/data/Templates). `input_data` should be valid data matching the input type and template. For example:
   ```
   {
     "input_data": "VALID_INPUT_DATA",
