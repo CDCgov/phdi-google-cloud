@@ -1,6 +1,22 @@
 # Microsoft FHIR Converter CLI Installation Guide
 This document provides a guide for installing the [Microsoft FHIR Converter](https://github.com/microsoft/FHIR-Converter) as a Command Line Interface (CLI) tool on Windows, MacOS, and Linux systems, as well as a brief introduction to using the converter.
 
+## Running via Docker
+To run the FHIR Converter in a Docker container, follow these steps:  
+  
+  1. From the `cloud-run/fhir-converter` directory, run:  
+  `docker build -t fhir-converter .`
+  1. Start a container by running:  
+  `docker run -p 8080:8080 fhir-converter`
+  1. Using curl or a REST client like Postman or Insomnia, make a POST request to http://localhost:8080/convert-to-fhir with a request body:
+  ```
+  {
+    "input_data": "VALID_INPUT_DATA",
+    "input_type": "hl7v2",
+    "root_template": "ADT_A01",
+  }
+  ```
+
 ## Using the .NET Framework
 We will use the .NET SDK to build the FHIR Converter from source code. If you have already installed a .NET SDK, skip to [Download and Build the FHIR Converter](#download-and-build-the-fhir-converter), otherwise follow the steps below to install it on your system.
 
