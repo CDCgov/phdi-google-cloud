@@ -96,7 +96,7 @@ class FhirConverterInput(BaseModel):
 
 
 @api.get("/")
-async def root():
+async def health_check():
     return {"status": "OK"}
 
 
