@@ -1,6 +1,22 @@
 # Microsoft FHIR Converter CLI Installation Guide
 This document provides a guide for installing the [Microsoft FHIR Converter](https://github.com/microsoft/FHIR-Converter) as a Command Line Interface (CLI) tool on Windows, MacOS, and Linux systems, as well as a brief introduction to using the converter.
 
+## Running via Docker
+To run the FHIR Converter in a Docker container, follow these steps:  
+  
+  1. From the `cloud-run/fhir-converter` directory, run:  
+  `docker build -t fhir-converter .`
+  1. Start a container by running:  
+  `docker run -p 8080:8080 fhir-converter`
+  1. Using curl or a REST client like Postman or Insomnia, make a POST request to http://localhost:8080/convert-to-fhir with a request body. This request should have keys `input_data`, `input_type`, and `root_template`. `input_type` should be either `hl7v2` or `ccda`. `root_template` should be one of the templates provided with the Microsoft FHIR Converter tool, [found here](https://github.com/microsoft/FHIR-Converter/tree/main/data/Templates). `input_data` should be valid data matching the input type and template. For example:
+  ```
+  {
+    "input_data": "VALID_INPUT_DATA",
+    "input_type": "hl7v2",
+    "root_template": "ADT_A01",
+  }
+  ```
+
 ## Using the .NET Framework
 We will use the .NET SDK to build the FHIR Converter from source code. If you have already installed a .NET SDK, skip to [Download and Build the FHIR Converter](#download-and-build-the-fhir-converter), otherwise follow the steps below to install it on your system.
 
@@ -80,7 +96,7 @@ git clone https://github.com/microsoft/FHIR-Converter
 ```
 
 This will install the most recent version of the tool. However, if you'd like to use a specific version, you can use a command like this one that specifically downloads the 5.0.4 release (most recent at the time of writing). 
-`git clone https://github.com/microsoft/FHIR-Converter/tree/v5.0.4 --single-branch`
+`git clone https://github.com/microsoft/FHIR-Converter.git --branch v5.0.4 --single-branch`
 
 ### Build the FHIR Converter Tool
 Navigate to the directory that was just created with the `git clone` command, which should be a directory named "FHIR-Converter" inside of your current directory, and run `dotnet build`.
