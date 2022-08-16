@@ -23,7 +23,3 @@ COPY main.py .
 
 EXPOSE 8080
 CMD uvicorn main:api --host 0.0.0.0 --port 8080
-
-
-
-
