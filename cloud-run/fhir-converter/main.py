@@ -46,7 +46,8 @@ def convert_to_fhir(
     converter can be found at https://github.com/microsoft/FHIR-Converter.
 
     :param input_data: The message to be converted as a string.
-    :param input_type: The type of message to be converted. Valid values are "hl7v2" and "c-cda".
+    :param input_type: The type of message to be converted. Valid values are "hl7v2"
+        and "c-cda".
     :param root_template: Name of the liquid template within to be used for conversion.
         Options are listed in the FHIR-Converter README.md.
     """
