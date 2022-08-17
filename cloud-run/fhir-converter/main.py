@@ -135,11 +135,11 @@ def convert_to_fhir(
     )
     if input_type == "hl7v2":
         template_directory_path = "/build/FHIR-Converter/data/Templates/Hl7v2"
-    elif input_type == "c-cda":
+    elif input_type == "ccda":
         template_directory_path = "/build/FHIR-Converter/data/Templates/Ccda"
     else:
         raise ValueError(
-            f"Invalid input_type {input_type}. Valid values are 'hl7v2' and 'c-cda'."
+            f"Invalid input_type {input_type}. Valid values are 'hl7v2' and 'ccda'."
         )
     output_data_file_path = "/tmp/output.json"
 
