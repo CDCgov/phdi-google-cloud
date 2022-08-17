@@ -3,7 +3,8 @@ import json
 import functions_framework
 import flask
 from pydantic import BaseModel, ValidationError, validator
-from sdk_dependencies import GcpCredentialManager, upload_bundle_to_fhir_server
+from phdi.fhir.transport.http import upload_bundle_to_fhir_server
+from phdi.cloud.gcp import GcpCredentialManager
 
 
 class RequestBody(BaseModel):
