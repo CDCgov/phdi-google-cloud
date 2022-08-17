@@ -1,0 +1,31 @@
+name: Setup Environment
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup_environment:
+    name: Setup a new GCP environment
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform/setup
+    permissions:
+      contents: "read"
+      id-token: "write"
+    steps:
+      - name: Check Out Changes
+        uses: actions/checkout@v3
+
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v0"
+        with:
+          workload_identity_provider: ${{ secrets.SKYLIGHT_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SKYLIGHT_SERVICE_ACCOUNT_ID }}
+
+      - name: Deploy
+        uses: ./.github/actions/terraform-deploy
+        with:
+          env: skylight
