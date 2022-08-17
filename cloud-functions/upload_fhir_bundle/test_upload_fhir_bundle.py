@@ -1,4 +1,4 @@
-from main import RequestBody, upload_fhir_bundle, GcpCredentialManager
+from main import RequestBody, upload_fhir_bundle
 from pydantic import ValidationError
 import pytest
 from unittest import mock
