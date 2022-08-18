@@ -43,14 +43,3 @@ jobs:
 
       - name: terraform apply
         run: terraform apply -auto-approve -lock-timeout=30m
-
-      - name: Get tfstate bucket name
-        run: echo "state_bucket_name=$(terraform output state_bucket_name)" >> $GITHUB_ENV
-
-      - name: Set TFSTATE_BUCKET_NAME secret
-        uses: hmanzur/actions-set-secret@v2.0.0
-        with:
-          name: "TFSTATE_BUCKET_NAME"
-          value: "${{ env.state_bucket_name }}"
-          repository: hmanzur/actions-set-secret
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}

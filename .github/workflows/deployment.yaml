@@ -31,8 +31,19 @@ jobs:
           workload_identity_provider: ${{ secrets.SKYLIGHT_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.SKYLIGHT_SERVICE_ACCOUNT_ID }}
 
-      - name: Deploy
-        uses: ./.github/actions/terraform-deploy
-        with:
-          directory: implementation
-          environment: ${{ inputs.environment }}
+      - name: Load input variables
+        env:
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          REGION: ${{ secrets.GCP_REGION }}
+          ZONE: ${{ secrets.GCP_ZONE }}
+        run: |
+          echo project_id=\""$PROJECT_ID"\" >> terraform.tfvars
+          echo region=\""$REGION"\" >> terraform.tfvars
+          echo zone=\""$ZONE"\" >> terraform.tfvars
+          echo bucket=\"phdi-tfstate-"$PROJECT_ID"\" >> backend.tfvars
+
+      - name: terraform init
+        run: terraform init -backend-config=backend.tfvars
+
+      - name: terraform apply
+        run: terraform apply -auto-approve -lock-timeout=30m
