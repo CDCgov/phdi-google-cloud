@@ -1,14 +1,16 @@
 resource "google_storage_bucket" "toybucket" {
-  name     = "phdi-${terraform.workspace}-toybucket-${var.project_id}"
-  location = "US"
+  name          = "phdi-${terraform.workspace}-toybucket-${var.project_id}"
+  location      = "US"
+  force_destroy = true
   versioning {
     enabled = true
   }
 }
 
 resource "google_storage_bucket" "functions" {
-  name     = "phdi-${terraform.workspace}-functions-${var.project_id}"
-  location = "US"
+  name          = "phdi-${terraform.workspace}-functions-${var.project_id}"
+  location      = "US"
+  force_destroy = true
   versioning {
     enabled = true
   }
@@ -16,8 +18,8 @@ resource "google_storage_bucket" "functions" {
 
 data "archive_file" "upcase_source" {
   type        = "zip"
-  source_dir  = "../../../cloud-functions/upcase_http"
-  output_path = "../../../cloud-functions/upcase_function.zip"
+  source_dir  = "../../cloud-functions/upcase_http"
+  output_path = "../../cloud-functions/upcase_function.zip"
 }
 
 # Add source code zip to the Cloud Function's bucket

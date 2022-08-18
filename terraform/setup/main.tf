@@ -15,7 +15,7 @@ provider "google" {
 }
 
 resource "google_storage_bucket" "tfstate" {
-  name          = "phdi-${terraform.workspace}-tfstate-${var.project_id}"
+  name          = "phdi-tfstate-${var.project_id}"
   force_destroy = true
   location      = "US"
 }

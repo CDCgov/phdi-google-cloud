@@ -11,7 +11,3 @@ variable "zone" {
   description = "value of the GCP zone to deploy to"
   default     = "us-east1-b"
 }
-
-variable "state_bucket_name" {
-  description = "value of the GCP bucket name to use for state"
-}

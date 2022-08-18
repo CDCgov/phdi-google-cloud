@@ -1,16 +1,22 @@
-name: Setup Environment
+name: Deployment
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy to"
+        type: environment
+        required: true
 
 jobs:
-  setup_environment:
-    name: Setup a new GCP environment
+  deployment:
+    name: Deploy to GCP
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     defaults:
       run:
         shell: bash
-        working-directory: ./terraform/setup
+        working-directory: ./terraform/implementation
     permissions:
       contents: "read"
       id-token: "write"
@@ -28,4 +34,5 @@ jobs:
       - name: Deploy
         uses: ./.github/actions/terraform-deploy
         with:
-          env: skylight
+          directory: implementation
+          environment: ${{ inputs.environment }}

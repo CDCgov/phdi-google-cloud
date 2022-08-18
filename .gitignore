@@ -61,4 +61,6 @@ data/
 .terraform.lock.hcl
 .infracost
 terraform.tfstate
+terraform.tfstate.d
 terraform.tfstate.backup
+*.tfvars

@@ -176,11 +176,10 @@ In order to use the Terraform code in this repository on your local machine you 
 
 To begin using terraform:  
   1. Navigate to the directory `phdi-google-cloud/terraform/setup`. 
-  1. Run `terraform init` to initialize the setup Terraform for the dev environment. 
-  1. Create a new workspace called "dev" by running `terraform workspace new dev`. 
+  1. Run `terraform init` to initialize the setup Terraform. 
   1. Run `terraform apply` to create a storage bucket for storing terraform state. It will prompt you for a Project ID and region/zone. Note the name of the bucket output by this command. 
   1. Navigate to the directory `phdi-google-cloud/terraform/implementation`.
-  1. Run `terraform init` to initialize the implementation Terraform for the dev environment. It will prompt you for the name of a bucket to store Terraform's state. Enter the name of the bucket output in the earlier step.
+  1. Run `terraform init` to initialize the implementation Terraform. It will prompt you for the name of a bucket to store Terraform's state. Enter the name of the bucket output in the earlier step.
   1. Create a new workspace called "dev" by running `terraform workspace new dev`. 
   1. Now you can run `terraform plan` to have Terraform determine the difference between the code locally and the infrastructure currently deployed in GCP. Terraform will return a list of changes, resources it will create, destroy, or modify, that it would make if you chose to move forward with a deployment. After a carefull review, if these changes are acceptable you may deploy them by running `terraform apply`. Please refer to the [Terraform CLI documentation](https://www.terraform.io/cli/commands) for further information on using Terraform locally.
 

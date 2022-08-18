@@ -1,7 +1,7 @@
 name: "Terraform Deploy"
 description: "Run terraform apply"
 inputs:
-  env:
+  environment:
     description: "Environment to deploy to"
     required: true
   directory:
@@ -10,14 +10,13 @@ inputs:
 
 runs:
   using: "composite"
-
   steps:
     - name: terraform init
       run: terraform init
       shell: bash
       working-directory: ./terraform/${{ inputs.directory }}
     - name: terraform workspace
-      run: terraform workspace new ${{ inputs.env }}
+      run: terraform workspace new ${{ inputs.environment }}
       shell: bash
       working-directory: ./terraform/${{ inputs.directory }}
     - name: terraform apply
