@@ -39,39 +39,39 @@ if [ -z "$PROJECT_ID" ]; then
 fi
 
 # Create a service account
-gcloud iam service-accounts create "terraform" --project "${PROJECT_ID}"
+gcloud iam service-accounts create "github" \
+  --project "${PROJECT_ID}" \
+  --display-name "github"
 
 # Get the service account ID and set some variables
-SERVICE_ACCOUNT_ID=$(gcloud iam service-accounts list --filter="displayName:terraform" --format="value(email)")
-SERVICE_ACCOUNT_MEMBER="'serviceAccount:${SERVICE_ACCOUNT_ID}'"
-SERVICE_ACCOUNT_ROLE="'projects/${PROJECT_ID}/roles/owner'"
+SERVICE_ACCOUNT_ID=$(gcloud iam service-accounts list --filter="displayName:github" --format="value(email)")
 
 # Grant the service account the owner role on the project
 gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
-  --member=$SERVICE_ACCOUNT_MEMBER \
-  --role=$SERVICE_ACCOUNT_ROLE
+  --member="serviceAccount:${SERVICE_ACCOUNT_ID}" \
+  --role="roles/owner"
 
 # Enable the IAM Credentials API
 gcloud services enable iamcredentials.googleapis.com --project "${PROJECT_ID}"
 
 # Create a Workload Identity Pool
-gcloud iam workload-identity-pools create "terraform-pool" \
+gcloud iam workload-identity-pools create "github-pool" \
   --project="${PROJECT_ID}" \
   --location="global" \
-  --display-name="terraform pool"
+  --display-name="github pool"
 
 # Get the full ID of the Workload Identity Pool
-WORKLOAD_IDENTITY_POOL_ID=$(gcloud iam workload-identity-pools describe "terraform-pool" \
+WORKLOAD_IDENTITY_POOL_ID=$(gcloud iam workload-identity-pools describe "github-pool" \
   --project="${PROJECT_ID}" \
   --location="global" \
   --format="value(name)")
 
 # Create a Workload Identity Provider in that pool
-gcloud iam workload-identity-pools providers create-oidc "terraform-provider" \
+gcloud iam workload-identity-pools providers create-oidc "github-provider" \
   --project="${PROJECT_ID}" \
   --location="global" \
-  --workload-identity-pool="terraform-pool" \
-  --display-name="Terraform provider" \
+  --workload-identity-pool="github-pool" \
+  --display-name="github provider" \
   --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
   --issuer-uri="https://token.actions.githubusercontent.com"
 
@@ -82,10 +82,10 @@ gcloud iam service-accounts add-iam-policy-binding "${SERVICE_ACCOUNT_ID}" \
   --member="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_POOL_ID}/attribute.repository/${GITHUB_REPO}"
 
 # Extract the Workload Identity Provider resource name
-WORKLOAD_IDENTITY_POOL_PROVIDER=$(gcloud iam workload-identity-pools providers describe "terraform-provider" \
+WORKLOAD_IDENTITY_PROVIDER=$(gcloud iam workload-identity-pools providers describe "github-provider" \
   --project="${PROJECT_ID}" \
   --location="global" \
-  --workload-identity-pool="terraform-pool" \
+  --workload-identity-pool="github-pool" \
   --format="value(name)")
 
 # Output the variables needed to load into GitHub Actions secrets
