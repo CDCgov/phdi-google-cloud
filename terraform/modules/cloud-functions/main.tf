@@ -1,5 +1,5 @@
 resource "google_cloudfunctions_function" "upcase" {
-  name        = "upcase-function"
+  name        = "phdi-${terraform.workspace}-upcase-function"
   description = "Upcase function"
   runtime     = "python39"
 

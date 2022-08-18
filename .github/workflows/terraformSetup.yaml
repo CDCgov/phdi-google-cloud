@@ -22,14 +22,14 @@ jobs:
         name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v0"
         with:
-          workload_identity_provider: ${{ secrets.SKYLIGHT_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SKYLIGHT_SERVICE_ACCOUNT_ID }}
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT_ID }}
 
       - name: Load input variables
         env:
-          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-          REGION: ${{ secrets.GCP_REGION }}
-          ZONE: ${{ secrets.GCP_ZONE }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          REGION: ${{ secrets.REGION }}
+          ZONE: ${{ secrets.ZONE }}
         run: |
           echo project_id=\""$PROJECT_ID"\" >> terraform.tfvars
           echo region=\""$REGION"\" >> terraform.tfvars
