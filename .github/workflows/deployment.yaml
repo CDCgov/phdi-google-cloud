@@ -47,7 +47,7 @@ jobs:
       - name: Set environment
         run: |-
           echo "ENVIRONMENT=$(
-          if ${{ github.event.inputs.environment }}; then
+          if "${{ github.event.inputs.environment }}"; then
             echo ${{ github.event.inputs.environment }}
           else
             echo dev
