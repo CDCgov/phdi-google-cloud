@@ -2,9 +2,6 @@ name: Terraform Setup
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - nick/bootstrap-terraform
 
 jobs:
   setup_environment:
