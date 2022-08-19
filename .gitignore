@@ -58,3 +58,11 @@ data/
 
 # GCP Application Creds
 appcreds.json
+# Terraform
+.terraform
+.terraform.lock.hcl
+.infracost
+terraform.tfstate
+terraform.tfstate.d
+terraform.tfstate.backup
+*.tfvars
