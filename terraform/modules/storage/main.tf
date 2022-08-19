@@ -33,7 +33,7 @@ resource "google_storage_bucket_object" "upcase_source_zip" {
   bucket = google_storage_bucket.functions.name
 }
 
-data "archive_file" "upcase_source" {
+data "archive_file" "upload_fhir_bundle" {
   type        = "zip"
   source_dir  = "../../../cloud-functions/upload_fhir_bundle"
   output_path = "../../../cloud-functions/upload_fhir_bundle.zip"
