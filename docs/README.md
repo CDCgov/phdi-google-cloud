@@ -29,12 +29,12 @@ The Public Health Data Infrastructure (PHDI) projects are part of the Pandemic-R
 
 To deploy this pipeline to your own Google Cloud environment, follow these steps.
   
-  Be sure to replace all instances of `CDCgov` in GitHub URLs with your user or organization name.
+  Be sure to replace all instances of `myuser` in GitHub URLs with your user or organization name.
   1. [Install the gcloud CLI](https://cloud.google.com/sdk/docs/install-sdk)
-  1. [Fork this repository](https://github.com/CDCgov/phdi-google-cloud/fork) into your personal or organization account
+  1. [Fork this repository](https://github.com/myuser/phdi-google-cloud/fork) into your personal or organization account
   1. Clone your newly forked repository to your local machine by running:
 
-         git clone https://github.com/CDCgov/phdi-google-cloud.git
+         git clone https://github.com/myuser/phdi-google-cloud.git
 
   1. Navigate to the new repository directory with:
 
@@ -46,11 +46,11 @@ To deploy this pipeline to your own Google Cloud environment, follow these steps
 
   1. Follow [these steps](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) to set the secrets output by the previous step in your repository.
   1. Setup a storage bucket for Terraform state by running the GitHub Action at this URL:  
-  https://github.com/CDCgov/phdi-google-cloud/actions/workflows/terraformSetup.yaml
+  https://github.com/myuser/phdi-google-cloud/actions/workflows/terraformSetup.yaml
   1. Create an environment named `dev` in your repository at this URL:  
-  https://github.com/CDCgov/phdi-google-cloud/settings/environments/new
+  https://github.com/myuser/phdi-google-cloud/settings/environments/new
   1. Deploy to your newly created `dev` environment by running the GitHub Action at this URL, selecting `dev` as the environment input:  
-  https://github.com/CDCgov/phdi-google-cloud/actions/workflows/deployment.yaml
+  https://github.com/myuser/phdi-google-cloud/actions/workflows/deployment.yaml
   1. Success! You should now see resources in your GCP project ready for data ingestion.
 
 ### Structure and Organization

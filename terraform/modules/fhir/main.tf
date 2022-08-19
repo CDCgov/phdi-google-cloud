@@ -1,5 +1,5 @@
 resource "google_healthcare_dataset" "dataset" {
-  name      = "phdi-${terraform.workspace}-dataset"
+  name      = "phdi-${terraform.workspace}-dataset-${var.project_id}"
   location  = var.region
   time_zone = var.time_zone
 }

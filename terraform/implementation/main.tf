@@ -32,4 +32,5 @@ module "fhir" {
   region       = var.region
   time_zone    = "UTC"
   fhir_version = "R4"
+  project_id   = var.project_id
 }
