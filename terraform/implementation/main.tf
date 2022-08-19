@@ -10,9 +10,10 @@ module "storage" {
 }
 
 module "cloud-functions" {
-  source                   = "../modules/cloud-functions"
-  functions_storage_bucket = module.storage.functions_storage_bucket
-  upcase_source_zip        = module.storage.upcase_source_zip
+  source                        = "../modules/cloud-functions"
+  functions_storage_bucket      = module.storage.functions_storage_bucket
+  upcase_source_zip             = module.storage.upcase_source_zip
+  upload_fhir_bundle_source_zip = module.storage.upload_fhir_bundle_source_zip
 }
 
 module "google-workflows" {
