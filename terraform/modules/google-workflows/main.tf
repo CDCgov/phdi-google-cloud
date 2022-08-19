@@ -1,13 +1,13 @@
 resource "google_workflows_workflow" "workflow-1" {
-  name            = "workflow-1"
-  region          = "us-west1"
+  name            = "phdi-${terraform.workspace}-workflow-1"
+  region          = var.region
   description     = "Magic"
   service_account = var.workflow_service_account
-  source_contents = file("../../../google-workflows/workflow-1.yaml")
+  source_contents = file("../../google-workflows/workflow-1.yaml")
 }
 
 resource "google_eventarc_trigger" "toy-bucket-new-file" {
-  name     = "toy-bucket-new-file"
+  name     = "phdi-${terraform.workspace}-toy-bucket-new-file"
   location = "us"
   matching_criteria {
     attribute = "type"

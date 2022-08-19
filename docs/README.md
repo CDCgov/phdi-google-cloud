@@ -2,6 +2,7 @@
 
 - [Public Health Data Infrastructure Google Cloud](#public-health-data-infrastructure-google-cloud)
   - [Overview](#overview)
+    - [Quick Start](#quick-start)
     - [Structure and Organizations](#structure-and-organization)
       - [Serverless Funtions](#serverless-functions)
       - [Pipeline Orchestration](#pipeline-orchestration)
@@ -23,6 +24,34 @@
 ## Overview
 
 The Public Health Data Infrastructure (PHDI) projects are part of the Pandemic-Ready Interoperability Modernization Effort (PRIME), a multi-year collaboration between CDC and the U.S. Digital Service (USDS) to strengthen data quality and information technology systems in state and local health departments. Under the PRIME umberalla the PHDI project seeks to develop tools, often reffered to as Building Blocks, that State, Tribal, Local, and Territorial public health agencies (STLTs) can use to better handle the public health data they recieve. The purpose of this repository is to implement the Building Blocks devloped from the [PHDI SDK](https://github.com/CDCgov/phdi-sdk) on Google Cloud Platform (GCP). This will allow users to easily begin using these Building Blocks in their own GCP environment. For more information on using this repository beyond what is contained in this document please refer to our [Getting Started](getting_started.md) doc.
+
+### Quick Start
+
+To deploy this pipeline to your own Google Cloud environment, follow these steps.
+  
+  Be sure to replace all instances of `myuser` in GitHub URLs with your user or organization name.
+  1. [Install the gcloud CLI](https://cloud.google.com/sdk/docs/install-sdk)
+  1. [Fork this repository](https://github.com/myuser/phdi-google-cloud/fork) into your personal or organization account
+  1. Clone your newly forked repository to your local machine by running:
+
+         git clone https://github.com/myuser/phdi-google-cloud.git
+
+  1. Navigate to the new repository directory with:
+
+         cd phdi-google-cloud
+
+  1. Authenticate the gcloud CLI by running:
+
+         ./quick-start.sh
+
+  1. Follow [these steps](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) to set the secrets output by the previous step in your repository.
+  1. Setup a storage bucket for Terraform state by running the GitHub Action at this URL:  
+  https://github.com/myuser/phdi-google-cloud/actions/workflows/terraformSetup.yaml
+  1. Create an environment named `dev` in your repository at this URL:  
+  https://github.com/myuser/phdi-google-cloud/settings/environments/new
+  1. Deploy to your newly created `dev` environment by running the GitHub Action at this URL, selecting `dev` as the environment input:  
+  https://github.com/myuser/phdi-google-cloud/actions/workflows/deployment.yaml
+  1. Success! You should now see resources in your GCP project ready for data ingestion.
 
 ### Structure and Organization
 

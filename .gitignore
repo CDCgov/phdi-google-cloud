@@ -55,3 +55,12 @@ data/
 !examples/*.ipynb*
 
 .DS_Store
+
+# Terraform
+.terraform
+.terraform.lock.hcl
+.infracost
+terraform.tfstate
+terraform.tfstate.d
+terraform.tfstate.backup
+*.tfvars
