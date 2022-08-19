@@ -58,7 +58,7 @@ jobs:
         run: terraform init -backend-config=backend.tfvars
 
       - name: terraform workspace
-        run: terraform workspace new ${{ env.ENVIRONMENT }}
+        run: terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
 
       - name: terraform apply
         run: terraform apply -auto-approve -lock-timeout=30m
