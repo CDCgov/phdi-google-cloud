@@ -11,8 +11,8 @@ resource "google_cloudfunctions_function" "upcase" {
 }
 
 resource "google_cloudfunctions_function" "upload-fhir-bundle" {
-  name        = "upload-fhir-bundle"
-  description = "Uploade a FHIR bundle to FHIR Store"
+  name        = "phdi-${terraform.workspace}-upload-fhir-bundle"
+  description = "Upload a FHIR bundle to FHIR Store"
   runtime     = "python39"
 
   available_memory_mb   = 128

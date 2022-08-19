@@ -8,7 +8,7 @@ from phdi.cloud.gcp import GcpCredentialManager
 
 
 class RequestBody(BaseModel):
-    """A class to modek the body of requests to the upload_fhir_bundle() function. The
+    """A class to model the body of requests to the upload_fhir_bundle() function. The
     body of every request must contain:
     :project_id: The ID of the GCP project containing the FHIR store that data will be
         uploaded to.
