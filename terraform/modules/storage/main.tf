@@ -35,8 +35,8 @@ resource "google_storage_bucket_object" "upcase_source_zip" {
 
 data "archive_file" "upload_fhir_bundle" {
   type        = "zip"
-  source_dir  = "../../../cloud-functions/upload_fhir_bundle"
-  output_path = "../../../cloud-functions/upload_fhir_bundle.zip"
+  source_dir  = "../../cloud-functions/upload_fhir_bundle"
+  output_path = "../../cloud-functions/upload_fhir_bundle.zip"
 }
 
 # Add source code zip to the Cloud Function's bucket
