@@ -39,7 +39,6 @@ variable "gcp_services_list" {
     "run.googleapis.com",
     "servicemanagement.googleapis.com",
     "serviceusage.googleapis.com",
-    "source.googleapis.com",
     "sql-component.googleapis.com",
     "storage-api.googleapis.com",
     "storage-component.googleapis.com",
