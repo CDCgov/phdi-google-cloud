@@ -9,9 +9,16 @@
             - [Analytics Pipeline](#analytics-pipeline)
         - [Additional References](#additional-references)
     - [Implementing the PHDI Google Cloud Platform Pipelines](#implementing-the-phdi-google-cloud-platform-pipelines)
-        - [Step 1: Fork the phdi-google-cloud Respository](#step-1-fork-the-phdi-google-cloud-respository)
-        - [Step 2: Prepare Your GCP Environment](#step-2-prepare-your-gcp-environment)
-        - [Step 3: Install the Gcloud CLI](#step-3-install-the-gcloud-cli)
+        - [Step 1: Prepare Your GCP Environment](#step-1-prepare-your-gcp-environment)
+        - [Step 2: Install the Gcloud CLI](#step-2-install-the-gcloud-cli)
+        - [Step 3: Fork the PHDI google-cloud-repository](#step-3-fork-the-phdi-google-cloud-respository)
+        - [Step 4: Clone the Forked Repository](#step-4-clone-the-forked-repository)
+        - [Step 5: Run the Quickstart Script](#step-5-run-the-quickstart-script)
+        - [Step 6: Set Repository Secrets](#step-6-set-repository-secrets)
+        - [Step 7: Run the Terraform Setup GitHub Workflow](#step-7-run-the-terraform-setup-github-workflow)
+        - [Step 8: Run the Deployment GitHub Workflow](#step-8-run-the-deployment-github-workflow)
+        - [Step 9: Run End-to-end Functional Tests](#step-9-run-the-end-to-end-functional-tests)
+    - [Estimated Costs](#estimated-costs)
 
 ## Introduction
 This document provides a detailed guide for implementing the PHDI pipelines provided in this repository.
@@ -47,7 +54,18 @@ We have only provided a brief overview of PHDI, Building Blocks, and the pipelin
 ## Implementing the PHDI Google Cloud Platform Pipelines
 In this section we describe how a STLT can take this repository and use it to spin up all of the funtionality that it offers in their own GCP environment.
 
-### Step 1: Fork the phdi-google-cloud Respository
+### Step 1: Prepare Your GCP Environment
+In order to proceed you will need either:
+- a GCP account with permissions to create new projects in your organization's GCP environment,
+or
+- a GCP account with `Owner` access to a project in your organizations's GCP environment that was created to house the PHDI GCP pipelines, and the name of this project.
+
+If you do not have meet either of these criteria contact the owner of your organization's GCP environment.
+
+### Step 2: Install the Gcloud CLI.
+The gcloud CLI is a command line tool provided by Google for working with GCP. We will use it to authenticate your local machine with your organization's GCP environment. Follow [this guide](https://cloud.google.com/sdk/docs/install) to install gcloud. After installation run `gcloud auth application-default login` and follow the prompts in your browser to login to GCP.
+
+### Step 3: Fork the phdi-google-cloud Respository
 Fork the phdi-google-cloud respository into your organization's, or your personal, GitHub account.
 1. Navigate to [https://github.com/CDCgov/phdi-google-cloud](https://github.com/CDCgov/phdi-google-cloud).
 2. Click on the `Fork` button in the top right.
@@ -56,26 +74,49 @@ Fork the phdi-google-cloud respository into your organization's, or your persona
 4. Click `Create fork` at the bottom of the page.
 ![fork-repo-2](./fork-repo-2.png)
 
-### Step 2: Prepare Your GCP Environment
-In order to proceed you will need either:
-- a GCP account with permissions to create new projects in your organization's GCP environment,
-or
-- a GCP account with `Owner` access to a project in your organizations's GCP environment that was created to house the PHDI GCP pipelines, and the name of this project.
+### Step 4: Clone the Forked Repository
+Clone the forked version of the phdi-google-cloud repository by running `git clone https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git`. If you do not have `git` installed please follow [this guide](https://github.com/git-guides/install-git) to install it.
 
-If you do not have meet either of these criteria contact the owner of your organization's GCP environment.
+### Step 5: Run the Quick Start Script
+In this step we will work through GCP's [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation) to granted your phdi-google-cloud repo access to deploy the pipelines to your organization's GCP environment. We have provided a script to automate most of this process that we recommend you use. However if you prefer to work through it manually you may follow [this guide](https://github.com/google-github-actions/auth#setup).
 
-### Step 3: Install the Gcloud CLI
+From your machine's command line:
+1. Navigate to the root directory of the repository you cloned in step 4.
+2. Login into GCP by running `gcloud auth application-default login`.
+3. Run the quick start script and follow the prompts.
+    - [quick-start.sh](../quick-start.sh) for Mac an Linux
+    - TODO: WRITE WINDOWS BATCH QUICK START SCRIPT
 
+If you plan to deploy to an existing project in your GCP environment, have the project ID ready and provided it to the quick start script when prompted.
 
-Install gcloud
-Run quickstart script
-Set Github repo env variables
-Run the initial setup/Github workflow
-Run the deployment workflow
-End-to-end test
-Sample data to run through the pipeline with expected inputs/outputs
-Costs
-The estimated costs for running this pipeline are X with one hl7 message.
-If resources are in the same region, network transfers are free. 
-Costs for storage are X.
-Storing data in FHIR server and FHIR server calls (sliding scale, cheaper per request)
+### Step 6: Set Repository Secrets
+Set the following secret values in your forked phdi-google-cloud repository:
+- `PROJECT_ID` - Specified by the quick start script.
+- `SERVICE_ACCOUNT_ID` - Specified by the quick start script.
+- `WORKLOAD_IDENTITY_PROVIDER` - Specified by the quick start script.
+- `REGION` - Your choice of GCP region.
+- `ZONE`- Your choice of GCP zone.
+
+Information about GCP regions and zones is available [here](https://cloud.google.com/compute/docs/regions-zones).
+
+To create a repository secret follow this steps.
+1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git` in your browser.
+2. Click on `Settings` in the top right.
+![repo-secret-1](./repo-secret-1.png)
+3. Click on `Secrets` and then `Actions` in the bottom left.
+![repo-secret-2](./repo-secret-2.png)
+4. Click on `New repository secret`.
+![repo-secret-3](./repo-secret-3.png)
+5. Fill in `Name` and `Value` fields and then click `Add secret`.
+![repo-secret-4](./repo-secret-4.png)
+
+### Step 7: Run the Terraform Setup GitHub Workflow
+Now we will run the 
+
+### Step 8: Run the Deployment GitHub Workflow
+
+### Step 9: Run End-to-end Functional Tests
+TODO: Design some basic tests and describe how to run them here.
+
+## Estimated Costs
+TODO: Conduct cost analysis for the ingestion pipeline.
