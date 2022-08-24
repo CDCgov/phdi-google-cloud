@@ -4,16 +4,12 @@ variable "project_id" {
 
 variable "region" {
   description = "value of the GCP region to deploy to"
-  default     = "us-east1"
+  default     = "us-central1"
 }
 
 variable "zone" {
   description = "value of the GCP zone to deploy to"
-  default     = "us-east1-b"
-}
-
-variable "git_sha" {
-  description = "value of the git SHA of the current commit"
+  default     = "us-central1-a"
 }
 
 variable "gcp_services_list" {

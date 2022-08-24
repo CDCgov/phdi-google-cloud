@@ -50,7 +50,9 @@ module "artifact-registries" {
 
 module "cloud-run" {
   source                         = "../modules/cloud-run"
+  depends_on                     = [module.artifact-registries.phdi-repo]
   region                         = var.region
+  project_id                     = var.project_id
   workflow_service_account_email = module.google-workflows.workflow_service_account_email
-  git_sha = var.git_sha
+  git_sha                        = data.external.git_sha.result.sha
 }

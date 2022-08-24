@@ -25,5 +25,5 @@ resource "google_eventarc_trigger" "toy-bucket-new-file" {
   destination {
     workflow = google_workflows_workflow.workflow-1.id
   }
-  service_account = var.workflow_service_account
+  service_account = google_service_account.workflow_service_account.id
 }
