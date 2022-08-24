@@ -24,6 +24,7 @@ variable "gcp_services_list" {
     "cloudbuild.googleapis.com",
     "clouddebugger.googleapis.com",
     "cloudfunctions.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
     "cloudtrace.googleapis.com",
     "compute.googleapis.com",
     "containerregistry.googleapis.com",
