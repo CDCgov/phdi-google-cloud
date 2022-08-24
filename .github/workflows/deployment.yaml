@@ -42,11 +42,10 @@ jobs:
           echo project_id=\""$PROJECT_ID"\" >> terraform.tfvars
           echo region=\""$REGION"\" >> terraform.tfvars
           echo zone=\""$ZONE"\" >> terraform.tfvars
-          echo git_sha=\"${{ github.sha }}\" >> terraform.tfvars
           echo bucket=\"phdi-tfstate-"$PROJECT_ID"\" >> backend.tfvars
 
       - name: Set environment
-        run: |
+        run: |-
           echo "ENVIRONMENT=$(
           if "${{ github.event.inputs.environment }}"; then
             echo ${{ github.event.inputs.environment }}
