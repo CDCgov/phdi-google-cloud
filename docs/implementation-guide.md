@@ -64,7 +64,15 @@ or
 If you do not meet either of these criteria contact the owner of your organization's GCP environment.
 
 ### Step 2: Install the Gcloud CLI.
-The gcloud CLI is a command line tool provided by Google for working with GCP. We will use it to authenticate your local machine with your organization's GCP environment. Follow [this guide](https://cloud.google.com/sdk/docs/install) to install gcloud. After installation run `gcloud auth application-default login` and follow the prompts in your browser to login to GCP.
+The gcloud CLI is a command line tool provided by Google for working with GCP. We will use it to authenticate your local machine with your organization's GCP environment. Follow [this guide](https://cloud.google.com/sdk/docs/install) to install gcloud. Confirm that the installation was successful by running `gcloud --version`. If gcloud is installed properly you should get a response similar to what is shown below.
+
+```bash
+❯ gcloud --version
+Google Cloud SDK 399.0.0
+bq 2.0.75
+core 2022.08.19
+gsutil 5.12
+```
 
 ### Step 3: Fork the phdi-google-cloud Repository
 Fork the phdi-google-cloud repository into your organization's, or your personal, GitHub account.
@@ -83,8 +91,7 @@ In this step we will work through GCP's [Workload Identity Federation](https://c
 
 From your machine's command line:
 1. Navigate to the root directory of the repository you cloned in step 4.
-2. Login into GCP by running `gcloud auth application-default login`.
-3. Run the quick start script and follow the prompts.
+2. Run the quick start script and follow the prompts.
     - [quick-start.sh](../quick-start.sh) for Mac and Linux
     - TODO: WRITE WINDOWS BATCH QUICK START SCRIPT
 
