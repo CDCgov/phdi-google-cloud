@@ -18,7 +18,7 @@
         - [Step 7: Run the Terraform Setup GitHub Workflow](#step-7-run-the-terraform-setup-github-workflow)
         - [Step 8: Create a Development Environment](#step-8-create-a-development-environment)
         - [Step 9: Run the Deployment GitHub Workflow](#step-9-run-the-deployment-github-workflow)
-        - [Step 10: Run End-to-end Functional Tests](#step-10-run-the-end-to-end-functional-tests)
+        - [Step 10: Run End-to-end Functional Tests](#step-10-run-end-to-end-functional-tests)
     - [Estimated Costs](#estimated-costs)
 
 ## Introduction
@@ -33,7 +33,7 @@ PHDI's goal is to provide STLTs with modern tools to solve challenges working wi
 ### PHDI Pipelines
 The composable nature of Building Blocks allows them to be strung together into data pipelines where each Building Block represents a single step in a pipeline. As an example, let's consider a hypothetical case where a STLT would like to improve the quality of their patient address data and ensure that patient names are written consistently. They could solve this problem by using the name standardization and geocoding Building Blocks, mentioned in the previous section, to build a simple pipeline that standardizes patients' names and geocodes their addresses. Non-standardized data would be sent into the pipeline, where it would pass through each of the Building Blocks, and then exit the pipeline with standardized name and address fields. STLTs are welcome to use Building Blocks to create their own custom pipelines. However, because many STLTs are facing similar challenges with their data this repository implements two pipelines, developed by the PHDI team, centered around a GCP FHIR Store. The complete architecture for this system is shown in the diagram below.
 
-![Architecture Diagram](./architecture-diagram.png)
+![Architecture Diagram](./images/architecture-diagram.png)
 
 #### Ingestion Pipeline
 The ingestion pipeline is intended to allow STLTs to easily bring data that is reported to them into their system after performing standardizations and enrichments. Source data can be provided in either Hl7v2 or C-CDA formats allowing this single pipeline to handle the ingestion of ELR, VXU, ADT, and eCR messages. The pipeline is able to handle both data types because the inital step is to convert to FHIR. After this conversion the pipeline is able to handle all reported data the same way by simply processing the FHIR bundles, collections of FHIR resources, that result from the conversion. Once data has be converted to FHIR the following standardizations and enrichments are made:
@@ -70,10 +70,10 @@ The gcloud CLI is a command line tool provided by Google for working with GCP. W
 Fork the phdi-google-cloud repository into your organization's, or your personal, GitHub account.
 1. Navigate to [https://github.com/CDCgov/phdi-google-cloud](https://github.com/CDCgov/phdi-google-cloud).
 2. Click on the `Fork` button in the top right.
-![fork-repo-1](./fork-repo-1.png)
+![fork-repo-1](./images/fork-repo-1.png)
 3. Select the owner of the forked repository. We recommend that this is an organization and not an individual.
 4. Click `Create fork` at the bottom of the page.
-![fork-repo-2](./fork-repo-2.png)
+![fork-repo-2](./images/fork-repo-2.png)
 
 ### Step 4: Clone the Forked Repository
 Clone the forked version of the phdi-google-cloud repository by running `git clone https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git`. If you do not have `git` installed please follow [this guide](https://github.com/git-guides/install-git) to install it.
@@ -103,13 +103,13 @@ Information about GCP regions and zones is available [here](https://cloud.google
 To create a repository secret follow these steps.
 1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git` in your browser.
 2. Click on `Settings` in the top right.
-![navigate-to-settings](./navigate-to-settings.png)
+![navigate-to-settings](./images/navigate-to-settings.png)
 3. Click on `Secrets` and then `Actions` in the bottom left.
-![repo-secret-2](./repo-secret-2.png)
+![repo-secret-2](./images/repo-secret-2.png)
 4. Click on `New repository secret`.
-![repo-secret-3](./repo-secret-3.png)
+![repo-secret-3](./images/repo-secret-3.png)
 5. Fill in `Name` and `Value` fields and then click `Add secret`.
-![repo-secret-4](./repo-secret-4.png)
+![repo-secret-4](./images/repo-secret-4.png)
 
 ### Step 7: Run the Terraform Setup GitHub Workflow
 In order for Terraform to deploy the PHDI pipelines, it needs a place to store the "state" of your GCP project. In this context "state" is simply a record of the current configuration of the project. In the first stage of a deployment Terraform compares the configuration specified in the `terraform/` directory of your forked phdi-google-cloud repository to the current state of your GCP project. In the second stage Terraform makes the necessary changes to resolve any differences and align the GCP project with the repository. To create a GCP storage bucket for storing the state of your GCP project run the `Terraform Setup` GitHub Workflow. For additional information please reffer to [this documentation](https://www.terraform.io/language/state) from Terraform.
@@ -117,13 +117,13 @@ In order for Terraform to deploy the PHDI pipelines, it needs a place to store t
 To run `Terraform Setup` follow the steps below.
 1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git` in your browser.
 2. Click on `Actions` near the center at the top of the page.
-![navigate-to-actions](./navigate-to-actions.png)
+![navigate-to-actions](./images/navigate-to-actions.png)
 3. Select `Terraform Step` from the list of Workflows on the left side of the screen.
-![terraform-setup-1](./terraform-setup-1.png)
+![terraform-setup-1](./images/terraform-setup-1.png)
 4. Click on `Run workflow` in the middle of the right side of the screen.
-![terraform-setup-2](./terraform-setup-2.png)
+![terraform-setup-2](./images/terraform-setup-2.png)
 5. Ensure the `main` branch is selected and click the green `Run workflow` button.
-![terraform-setup-3](./terraform-setup-3.png)
+![terraform-setup-3](./images/terraform-setup-3.png)
 
 ### Step 8: Create a Development Environment
 Your forked version of the phdi-google-cloud repository can deploy multiple instances of the PHDI pipeline infrastructure to your GCP project, each managed by its own [terraform workspace](https://www.terraform.io/language/state/workspaces). This allows you to easily create and maintain instances of the PHDI pipelines dedicated for distinct purposes like development, testing, and production. We recommend that your organization maintain at least two instances of the PHDI pipelines, one for production and at least one other for development and testing purposes. Each instance of the PHDI pipelines is associated with a GitHub Environment. To create a new Environemnt in your forked version of the phdi-google-cloud respository follow the steps below.
@@ -131,26 +131,26 @@ Your forked version of the phdi-google-cloud repository can deploy multiple inst
 To create a repository secret follow this steps.
 1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git` in your browser.
 2. Click on `Settings` in the top right.
-![navigate-to-settings](./navigate-to-settings.png)
+![navigate-to-settings](./images/navigate-to-settings.png)
 3. Click on `Environments` in the middle of the left side of the screen.
-![create-environment-1](./create-environment-1.png)
+![create-environment-1](./images/create-environment-1.png)
 4. Click on `New environment` in the top right.
-![create-environment-2](./create-environment-2.png)
+![create-environment-2](./images/create-environment-2.png)
 5. Enter a name for your development environment (e.g. `dev`) and click `Configure environment`. No additional configuration of the environment is required at this time you proceed to step 9.
-![create-environment-3](./create-environment-3.png)
+![create-environment-3](./images/create-environment-3.png)
 
 ### Step 9: Run the Deployment GitHub Workflow
 At this point we have completed all of the necessary setup. We are now ready to deploy the PHID pipelines to your GCP project with Terraform via the provided `Deployment` GitHub Workflow. To run this workflow to deploy the PHDI pipelines to the development environment you created previously follow the steps below.
 
 1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git` in your browser.
 2. Click on `Actions` near the center at the top of the page.
-![navigate-to-actions](./navigate-to-actions.png)
+![navigate-to-actions](./images/navigate-to-actions.png)
 3. Select `Deployment` from the list of Workflows on the left side of the screen.
-![deployment-1](./deployment-1.png)
+![deployment-1](./images/deployment-1.png)
 4. Click on `Run workflow` in the middle of the right side of the screen.
-![deployment-2](./deployment-2.png)
+![deployment-2](./images/deployment-2.png)
 5. Ensure the `main` branch is selected and choose the environment you wish to deploy to and click the green `Run workflow` button. In the screenshot below we are deploying to our development environment which we have called `dev` 
-![deployment-3](./deployment-3.png)
+![deployment-3](./images/deployment-3.png)
 
 ### Step 10: Run End-to-end Functional Tests
 TODO: Design some basic tests and describe how to run them here.
