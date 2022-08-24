@@ -16,8 +16,9 @@
         - [Step 5: Run the Quickstart Script](#step-5-run-the-quickstart-script)
         - [Step 6: Set Repository Secrets](#step-6-set-repository-secrets)
         - [Step 7: Run the Terraform Setup GitHub Workflow](#step-7-run-the-terraform-setup-github-workflow)
-        - [Step 8: Run the Deployment GitHub Workflow](#step-8-run-the-deployment-github-workflow)
-        - [Step 9: Run End-to-end Functional Tests](#step-9-run-the-end-to-end-functional-tests)
+        - [Step 8: Create a Development Environment](#step-8-create-a-development-environment)
+        - [Step 9: Run the Deployment GitHub Workflow](#step-9-run-the-deployment-github-workflow)
+        - [Step 10: Run End-to-end Functional Tests](#step-10-run-the-end-to-end-functional-tests)
     - [Estimated Costs](#estimated-costs)
 
 ## Introduction
@@ -111,11 +112,25 @@ To create a repository secret follow this steps.
 ![repo-secret-4](./repo-secret-4.png)
 
 ### Step 7: Run the Terraform Setup GitHub Workflow
-Now we will run the 
+In order for Terraform to deploy the PHDI pipelines, it needs a place to store the "state" of your GCP project. In this context "state" is simply a record of the current configuration of the project. In the first stage of a deployment Terraform compares the configuration specified in the `terraform/` directory of your forked phdi-google-cloud repository to the current state of your GCP project. In the second stage Terraform makes the necessary changes to resolve any differences and align the GCP project with the repository. To create a GCP storage bucket for storing the state of your GCP project run the `Terraform Setup` GitHub Workflow.
 
-### Step 8: Run the Deployment GitHub Workflow
+To run `Terraform Setup` follow the steps below.
+1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git` in your browser.
+2. Click on `Actions` near the center at the top of the page.
+![navigate-to-actions](./navigate-to-actions.png)
+3. Select `Terraform Step` from the list of Workflows on the left side of the screen.
+![terraform-setup-1](./terraform-setup-1.png)
+4. Click on `Run workflow` in the middle of the right side of the screen.
+![terraform-setup-2](./terraform-setup-2.png)
+5. Ensure the `main` branch is selected and click the green `Run workflow` button.
+![terraform-setup-3](./terraform-setup-3.png)
 
-### Step 9: Run End-to-end Functional Tests
+### Step 8: Create a Development Environment
+
+
+### Step 9: Run the Deployment GitHub Workflow
+
+### Step 10: Run End-to-end Functional Tests
 TODO: Design some basic tests and describe how to run them here.
 
 ## Estimated Costs
