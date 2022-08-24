@@ -1,5 +1,4 @@
 from main import http_standardize_names
-import pytest
 from unittest import mock
 
 
@@ -25,9 +24,7 @@ def test_upload_fhir_bundle_bad_body():
 @mock.patch("main.http_standardize_names")
 def test_upload_fhir_bundle_good_request(patched_standardized_names):
     request = mock.Mock(headers={"Content-Type": "application/json"})
-    request.get_json.return_value = {
-        {"resourceType": "Bundle"},
-    }
+    request.get_json.return_value = {"resourceType": "Bundle"}
     http_standardize_names(request)
 
     patched_standardized_names.assert_called_with(request.get_json())

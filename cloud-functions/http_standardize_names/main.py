@@ -1,5 +1,3 @@
-from http.client import BAD_REQUEST
-import json
 import logging
 import functions_framework
 import flask
