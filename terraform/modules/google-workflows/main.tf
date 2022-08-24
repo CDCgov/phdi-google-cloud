@@ -1,8 +1,13 @@
+resource "google_service_account" "workflow_service_account" {
+  account_id   = "workflow-1-account"
+  display_name = "Service Account for Google Workflows"
+}
+
 resource "google_workflows_workflow" "workflow-1" {
   name            = "phdi-${terraform.workspace}-workflow-1"
   region          = var.region
-  description     = "Magic"
-  service_account = var.workflow_service_account
+  description     = "A workflow to orchestrate the PHDI pipeline"
+  service_account = google_service_account.workflow_service_account.id
   source_contents = file("../../google-workflows/workflow-1.yaml")
 }
 

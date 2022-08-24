@@ -42,10 +42,11 @@ jobs:
           echo project_id=\""$PROJECT_ID"\" >> terraform.tfvars
           echo region=\""$REGION"\" >> terraform.tfvars
           echo zone=\""$ZONE"\" >> terraform.tfvars
+          echo git_sha=\"${{ github.sha }}\" >> terraform.tfvars
           echo bucket=\"phdi-tfstate-"$PROJECT_ID"\" >> backend.tfvars
 
       - name: Set environment
-        run: |-
+        run: |
           echo "ENVIRONMENT=$(
           if "${{ github.event.inputs.environment }}"; then
             echo ${{ github.event.inputs.environment }}
@@ -53,6 +54,13 @@ jobs:
             echo dev
           fi
           )" >> $GITHUB_ENV
+
+      - name: Build and push FHIR Converter
+        run: |
+          gcloud auth configure-docker ${{ secrets.REGION }}-docker.pkg.dev
+          cd ../../cloud-run/fhir-converter
+          docker build -t ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/phdi-${{ env.ENVIRONMENT }}-repository/fhir-converter:${{ github.sha }} .
+          docker push ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/phdi-${{ env.ENVIRONMENT }}-repository/fhir-converter:${{ github.sha }}
 
       - name: terraform init
         run: terraform init -backend-config=backend.tfvars

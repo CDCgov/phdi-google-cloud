@@ -12,6 +12,10 @@ variable "zone" {
   default     = "us-east1-b"
 }
 
+variable "git_sha" {
+  description = "value of the git SHA of the current commit"
+}
+
 variable "gcp_services_list" {
   description = "The list of GCP APIs necessary for the project."
   type        = list(string)
