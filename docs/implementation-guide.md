@@ -79,7 +79,7 @@ Fork the phdi-google-cloud repository into your organization's, or your personal
 Clone the forked version of the phdi-google-cloud repository by running `git clone https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git`. If you do not have `git` installed please follow [this guide](https://github.com/git-guides/install-git) to install it.
 
 ### Step 5: Run the Quick Start Script
-In this step we will work through GCP's [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation) to granted your phdi-google-cloud repo access to deploy the pipelines to your organization's GCP environment. We have provided a script to automate most of this process that we recommend you use. However if you prefer to work through it manually you may follow [this guide](https://github.com/google-github-actions/auth#setup).
+In this step we will work through GCP's [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation) to grant your phdi-google-cloud repo access to deploy the pipelines to your organization's GCP environment. We have provided a script to automate most of this process that we recommend you use. However, if you prefer to work through it manually you may follow [this guide](https://github.com/google-github-actions/auth#setup).
 
 From your machine's command line:
 1. Navigate to the root directory of the repository you cloned in step 4.
@@ -88,7 +88,7 @@ From your machine's command line:
     - [quick-start.sh](../quick-start.sh) for Mac and Linux
     - TODO: WRITE WINDOWS BATCH QUICK START SCRIPT
 
-If you plan to deploy to an existing project in your GCP environment, have the project ID ready and provide it to the quick start script when prompted.
+If you plan to deploy to an existing project in your GCP environment, have the project name ready and provide it to the quick start script when prompted.
 
 ### Step 6: Set Repository Secrets
 Set the following secret values in your forked phdi-google-cloud repository:
@@ -101,7 +101,7 @@ Set the following secret values in your forked phdi-google-cloud repository:
 Information about GCP regions and zones is available [here](https://cloud.google.com/compute/docs/regions-zones).
 
 To create a repository secret follow these steps.
-1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git` in your browser.
+1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud` in your browser.
 2. Click on `Settings` in the top right.
 ![navigate-to-settings](./images/navigate-to-settings.png)
 3. Click on `Secrets` and then `Actions` in the bottom left.
@@ -115,10 +115,10 @@ To create a repository secret follow these steps.
 In order for Terraform to deploy the PHDI pipelines, it needs a place to store the "state" of your GCP project. In this context "state" is simply a record of the current configuration of the project. In the first stage of a deployment Terraform compares the configuration specified in the `terraform/` directory of your forked phdi-google-cloud repository to the current state of your GCP project. In the second stage Terraform makes the necessary changes to resolve any differences and align the GCP project with the repository. To create a GCP storage bucket for storing the state of your GCP project run the `Terraform Setup` GitHub Workflow. For additional information please reffer to [this documentation](https://www.terraform.io/language/state) from Terraform.
 
 To run `Terraform Setup` follow the steps below.
-1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git` in your browser.
+1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud` in your browser.
 2. Click on `Actions` near the center at the top of the page.
 ![navigate-to-actions](./images/navigate-to-actions.png)
-3. Select `Terraform Step` from the list of Workflows on the left side of the screen.
+3. Select `Terraform Setup` from the list of Workflows on the left side of the screen.
 ![terraform-setup-1](./images/terraform-setup-1.png)
 4. Click on `Run workflow` in the middle of the right side of the screen.
 ![terraform-setup-2](./images/terraform-setup-2.png)
@@ -129,7 +129,7 @@ To run `Terraform Setup` follow the steps below.
 Your forked version of the phdi-google-cloud repository can deploy multiple instances of the PHDI pipeline infrastructure to your GCP project, each managed by its own [terraform workspace](https://www.terraform.io/language/state/workspaces). This allows you to easily create and maintain instances of the PHDI pipelines dedicated for distinct purposes like development, testing, and production. We recommend that your organization maintain at least two instances of the PHDI pipelines, one for production and at least one other for development and testing purposes. Each instance of the PHDI pipelines is associated with a GitHub Environment. To create a new Environemnt in your forked version of the phdi-google-cloud respository follow the steps below.
 
 To create a repository secret follow this steps.
-1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git` in your browser.
+1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud` in your browser.
 2. Click on `Settings` in the top right.
 ![navigate-to-settings](./images/navigate-to-settings.png)
 3. Click on `Environments` in the middle of the left side of the screen.
@@ -140,9 +140,9 @@ To create a repository secret follow this steps.
 ![create-environment-3](./images/create-environment-3.png)
 
 ### Step 9: Run the Deployment GitHub Workflow
-At this point we have completed all of the necessary setup. We are now ready to deploy the PHID pipelines to your GCP project with Terraform via the provided `Deployment` GitHub Workflow. To run this workflow to deploy the PHDI pipelines to the development environment you created previously follow the steps below.
+At this point we have completed all of the necessary setup. We are now ready to deploy the PHDI pipelines to your GCP project with Terraform via the provided `Deployment` GitHub Workflow. To run this workflow to deploy the PHDI pipelines to the development environment you created previously, follow the steps below.
 
-1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git` in your browser.
+1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud` in your browser.
 2. Click on `Actions` near the center at the top of the page.
 ![navigate-to-actions](./images/navigate-to-actions.png)
 3. Select `Deployment` from the list of Workflows on the left side of the screen.
