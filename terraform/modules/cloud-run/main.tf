@@ -8,7 +8,7 @@ resource "null_resource" "docker_build" {
     command     = <<-EOT
       gcloud auth configure-docker ${var.region}-docker.pkg.dev
       docker build -t ${var.region}-docker.pkg.dev/${var.project_id}/phdi-${terraform.workspace}-repository/fhir-converter:${var.git_sha} .
-      docker push ${var.region}-docker.pkg.dev/${var.project_id}/phdi-${terraform.workspace}-repository/fhir-converter:${var.git_sha}"
+      docker push ${var.region}-docker.pkg.dev/${var.project_id}/phdi-${terraform.workspace}-repository/fhir-converter:${var.git_sha}
     EOT
   }
 }
