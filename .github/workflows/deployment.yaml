@@ -55,13 +55,6 @@ jobs:
           fi
           )" >> $GITHUB_ENV
 
-      - name: Build and push FHIR Converter
-        run: |
-          gcloud auth configure-docker ${{ secrets.REGION }}-docker.pkg.dev
-          cd ../../cloud-run/fhir-converter
-          docker build -t ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/phdi-${{ env.ENVIRONMENT }}-repository/fhir-converter:${{ github.sha }} .
-          docker push ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/phdi-${{ env.ENVIRONMENT }}-repository/fhir-converter:${{ github.sha }}
-
       - name: terraform init
         run: terraform init -backend-config=backend.tfvars
 
