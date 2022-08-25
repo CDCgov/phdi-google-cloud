@@ -25,7 +25,7 @@ def http_standardize_names(request: flask.Request) -> flask.Response:
 
     try:
         request_json = request.get_json(silent=False)
-    except BaseException as error:
+    except AttributeError as error:
         logging.error(error)
 
         return {
