@@ -87,6 +87,9 @@ jobs:
     defaults:
       run:
         working-directory: ./terraform
+    permissions:
+      contents: "read"
+      id-token: "write"
     env:
       TERRAFORM_DIRS: |
         setup implementation
