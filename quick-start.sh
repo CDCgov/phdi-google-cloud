@@ -38,6 +38,9 @@ if [ -z "$PROJECT_ID" ]; then
     exit 1
 fi
 
+# Enable APIs needed for Terraform
+gcloud services enable serviceusage.googleapis.com cloudresourcemanager.googleapis.com
+
 # Create a service account
 gcloud iam service-accounts create "github" \
   --project "${PROJECT_ID}" \
