@@ -103,7 +103,7 @@ Set the following secret values in your forked phdi-google-cloud repository:
 - `SERVICE_ACCOUNT_ID` - Specified by the quick start script.
 - `WORKLOAD_IDENTITY_PROVIDER` - Specified by the quick start script.
 - `REGION` - Your choice of GCP region; quick start script suggests `us-central1`.
-- `ZONE`- Your choice of GCP zone; quick start screipt suggests `us-central1-a`.
+- `ZONE`- Your choice of GCP zone; quick start script suggests `us-central1-a`.
 
 Information about GCP regions and zones is available [here](https://cloud.google.com/compute/docs/regions-zones).
 
