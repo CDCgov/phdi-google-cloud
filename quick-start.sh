@@ -97,8 +97,8 @@ echo
 echo "PROJECT_ID: ${PROJECT_ID}"
 echo "SERVICE_ACCOUNT_ID: ${SERVICE_ACCOUNT_ID}"
 echo "WORKLOAD_IDENTITY_PROVIDER: ${WORKLOAD_IDENTITY_PROVIDER}"
-echo "REGION: us-west1 (or your preferred region)"
-echo "ZONE: us-west1b (or your preferred zone in the region above)"
+echo "REGION: us-central1 (or your preferred region)"
+echo "ZONE: us-central1-a (or your preferred zone in the region above)"
 echo
 echo "More info on regions and zones can be found at:"
 echo "https://cloud.google.com/compute/docs/regions-zones/"
