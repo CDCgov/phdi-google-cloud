@@ -82,20 +82,7 @@ jobs:
         run: |
           flake8
 
-  check-terraform-formatting:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./terraform
-    steps:
-      - uses: actions/checkout@v2
-      - uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: ${{env.TEST_RUNNER_TERRAFORM_VERSION}}
-      - name: Check format
-        run: terraform fmt -check -recursive
-
-  check-terraform-validity:
+  terraform-checks:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -108,6 +95,8 @@ jobs:
       - uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: 1.1.4
+      - name: Check format
+        run: terraform fmt -check -recursive
       - name: Terraform Init
         run: |
           for d in $TERRAFORM_DIRS
@@ -121,4 +110,11 @@ jobs:
           do
             echo "Validating $d";
             (cd $d && terraform validate)
+          done
+      - name: Terraform Plan
+        run: |
+          for d in $TERRAFORM_DIRS
+          do
+            echo "Planning $d";
+            (cd $d && terraform plan)
           done
