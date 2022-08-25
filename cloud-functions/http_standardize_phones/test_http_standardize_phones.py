@@ -1,6 +1,6 @@
 import copy
 import json
-from main import http_standardize_names
+from main import http_standardize_phones
 from unittest import mock
 import pytest
 
@@ -8,24 +8,25 @@ import pytest
 test_request_body = json.load(open("../assets/single_patient_bundle.json", "r"))
 
 
-def test_standardize_names_bad_header():
+def test_standardize_phones_bad_header():
     request = mock.Mock(headers={"Content-Type": "not-application/json"})
 
-    assert http_standardize_names(request) == {
+    result = http_standardize_phones(request)
+    assert result == {
         "status": 400,
         "summary": "Bad request",
         "description": "Header must inclue: 'Content-Type:application/json'.",
     }
 
 
-def test_standardize_names_bad_body():
+def test_standardize_phones_bad_body():
     request = mock.Mock(headers={"Content-Type": "application/json"})
     request.get_json.return_value = ""
     with pytest.raises(AttributeError):
-        http_standardize_names(request=request)
+        http_standardize_phones(request=request)
 
 
-def test_standardize_names_bad_resource_type():
+def test_standardize_phones_bad_resource_type():
     request = mock.Mock(headers={"Content-Type": "application/json"})
     body_with_wrong_resource_type = copy.deepcopy(test_request_body)
     body_with_wrong_resource_type["resourceType"] = None
@@ -39,17 +40,17 @@ def test_standardize_names_bad_resource_type():
         "summary": "Bad request",
         "description": error_message,
     }
-    result = http_standardize_names(request=request)
+    result = http_standardize_phones(request=request)
     assert result == expected_result
 
 
-def test_standardize_names_good_request():
+def test_standardize_phones_good_request():
     request = mock.Mock(headers={"Content-Type": "application/json"})
 
     expected_result = copy.deepcopy(test_request_body)
-    expected_result["entry"][0]["resource"]["name"][0]["family"] = "SMITH"
-    expected_result["entry"][0]["resource"]["name"][0]["given"][0] = "DEEDEE"
+    expected_result["entry"][0]["resource"]["telecom"][0]["value"] = "+18015557777"
     request.get_json.return_value = test_request_body
-    actual_result = http_standardize_names(request)
+    actual_result = http_standardize_phones(request)
+    print(expected_result)
 
     assert actual_result == expected_result

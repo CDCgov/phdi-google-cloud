@@ -1,7 +1,7 @@
-import logging
 import functions_framework
 import flask
-from utils import validate_request_headers
+import sys
+import os
 from phdi.fhir.harmonization.standardization import standardize_phones
 
 
@@ -18,38 +18,25 @@ def http_standardize_phones(request: flask.Request) -> flask.Response:
     :return: The bundle or resource with phones appropriately
       standardized
     """
+    current = os.path.dirname(os.path.realpath(__file__))
+    parent = os.path.dirname(current)
+    sys.path.append(parent)
+    from utils import validate_request_header, validate_fhir_bundle_or_resource
 
+    content_type = "application/json"
     # Validate request header.
-    validate_request_headers(request)
-    if request.headers.get("Content-Type") != "application/json":
-        logging.error("Header must inclue: 'Content-Type:application/json'.")
-        return {
-            "status": 400,
-            "summary": "Bad request",
-            "description": "Header must inclue: 'Content-Type:application/json'.",
-        }
-
-    try:
-        request_json = request.get_json(silent=False)
-    except AttributeError as error:
-        logging.error(error)
-
-        return {
-            "status": 400,
-            "summary": "Invalid request body",
-            "description": "Invalid JSON",
-        }
+    validated_request = validate_request_header(request, content_type)
 
     # Check that the request body contains a FHIR bundle or resource.
-    if request_json.get("resourceType") is None:
-        error_message = (
-            "FHIR Resource Type not specified. "
-            + "The request body must contain a valid FHIR bundle or resource."
-        )
-        logging.error(error_message)
-        return {"status": 400, "summary": "Bad request", "description": error_message}
+    if (
+        validated_request.get("status") is None
+        or validated_request.get("status") != 400
+    ):
+        request_json = validate_fhir_bundle_or_resource(validated_request)
 
-    # Perform the name standardization
-    response = standardize_names(request_json)
+        # Perform the phone standardization
+        response = standardize_phones(request_json)
+    else:
+        return validated_request
 
     return response
