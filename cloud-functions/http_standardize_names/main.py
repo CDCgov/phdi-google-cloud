@@ -33,7 +33,15 @@ def http_standardize_names(request: flask.Request) -> flask.Response:
             "summary": "Invalid request body",
             "description": "Invalid JSON",
         }
-
+      # Check that the request body contains a FHIR bundle or resource.
+      if request_json.get("resourceType") is None:
+          error_message = "FHIR Resource Type not specified. The request body must contain a valid FHIR bundle or resource."
+          logging.error(error_message)
+          return {
+              "status": 400,
+              "summary": "Bad request",
+              "description": error_message
+          }
     # Perform the name standardization
     response = standardize_names(request_json)
 
