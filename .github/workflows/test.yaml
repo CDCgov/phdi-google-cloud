@@ -10,7 +10,6 @@ on:
 
 env:
   TEST_RUNNER_PYTHON_VERSION: 3.9
-  TEST_RUNNER_TERRAFORM_VERSION: 1.2.5
 
 jobs:
   list-cloud-functions:
@@ -81,61 +80,3 @@ jobs:
       - name: Check style (flake8)
         run: |
           flake8
-
-  terraform-checks:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./terraform/implementation
-    permissions:
-      contents: "read"
-      id-token: "write"
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.1.4
-
-      - name: terraform fmt
-        run: terraform fmt -check -recursive
-
-      - id: "auth"
-        name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@v0"
-        with:
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT_ID }}
-
-      - name: Load input variables
-        env:
-          PROJECT_ID: ${{ secrets.PROJECT_ID }}
-          REGION: ${{ secrets.REGION }}
-          ZONE: ${{ secrets.ZONE }}
-        run: |
-          echo project_id=\""$PROJECT_ID"\" >> terraform.tfvars
-          echo region=\""$REGION"\" >> terraform.tfvars
-          echo zone=\""$ZONE"\" >> terraform.tfvars
-          echo bucket=\"phdi-tfstate-"$PROJECT_ID"\" >> backend.tfvars
-
-      - name: Set environment
-        run: |-
-          echo "ENVIRONMENT=$(
-          if "${{ github.event.inputs.environment }}"; then
-            echo ${{ github.event.inputs.environment }}
-          else
-            echo dev
-          fi
-          )" >> $GITHUB_ENV
-
-      - name: terraform init
-        run: terraform init -backend-config=backend.tfvars
-
-      - name: terraform workspace
-        run: terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
-
-      - name: terraform validate
-        run: terraform validate
-
-      - name: terraform plan
-        run: terraform plan
