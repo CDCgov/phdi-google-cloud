@@ -38,4 +38,8 @@ resource "google_cloudfunctions_function" "read_source_data" {
     }
   }
   entry_point           = "read_source_data"
+  environment_variables = {
+    PROJECT_ID      = var.project_id
+    INGESTION_TOPIC = var.ingestion_topic
+  }
 }

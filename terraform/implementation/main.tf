@@ -25,6 +25,7 @@ module "cloud-functions" {
   upcase_source_zip             = module.storage.upcase_source_zip
   upload_fhir_bundle_source_zip = module.storage.upload_fhir_bundle_source_zip
   read_source_data_source_zip   = module.storage.read_source_data_source_zip
+  ingestion_topic               = module.pubsub.ingestion_topic
   depends_on                    = [google_project_service.enable_google_apis]
 }
 

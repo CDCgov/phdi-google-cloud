@@ -8,7 +8,7 @@ resource "google_storage_bucket" "toybucket" {
 }
 
 resource "google_storage_bucket" "phi_storage_bucket" {
-  name          = "phdi-${terraform.workspace}-phi_bucket-${var.project_id}"
+  name          = "phdi-${terraform.workspace}-phi-bucket-${var.project_id}"
   location      = "US"
   force_destroy = true
   versioning {
