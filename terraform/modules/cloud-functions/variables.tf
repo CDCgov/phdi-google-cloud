@@ -1,3 +1,7 @@
+variable "project_id" {
+  description = "value of the GCP project ID to use"
+}
+
 variable "functions_storage_bucket" {
   description = "value of google_storage_bucket.functions.name"
 }
