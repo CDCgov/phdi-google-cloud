@@ -1,9 +1,10 @@
 import functions_framework
-from google.cloud import storage
+
 import logging
-from phdi.conversion import  convert_batch_messages_to_list
+from phdi.conversion import convert_batch_messages_to_list
 import os
 from google.cloud import pubsub_v1
+from google.cloud import storage
 
 @functions_framework.cloud_event
 def read_source_data(cloud_event):
