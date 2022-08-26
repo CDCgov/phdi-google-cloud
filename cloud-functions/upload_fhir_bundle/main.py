@@ -74,8 +74,8 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
                 "description": error_as_dictionary,
             }
 
-        # Construct the FHIR store URL the base Cloud Healthcare API endpoint, project ID,
-        # location, dataset ID, and FHIR store ID.
+        # Construct the FHIR store URL the base Cloud Healthcare API endpoint,
+        #  project ID, location, dataset ID, and FHIR store ID.
         credential_manager = GcpCredentialManager()
         base_url = "https://healthcare.googleapis.com/v1/projects"
         fhir_store_url = [
