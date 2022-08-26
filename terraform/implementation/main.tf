@@ -21,8 +21,10 @@ module "storage" {
 module "cloud-functions" {
   source                        = "../modules/cloud-functions"
   functions_storage_bucket      = module.storage.functions_storage_bucket
+  phi_storage_bucket            = module.storage.phi_storage_bucket
   upcase_source_zip             = module.storage.upcase_source_zip
   upload_fhir_bundle_source_zip = module.storage.upload_fhir_bundle_source_zip
+  read_source_data_source_zip   = module.storage.read_source_data_source_zip
   depends_on                    = [google_project_service.enable_google_apis]
 }
 
