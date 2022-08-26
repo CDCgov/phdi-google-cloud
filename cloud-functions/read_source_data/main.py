@@ -11,13 +11,13 @@ from google.cloud import storage
 def read_source_data(cloud_event):
     
     # Extract buck and file names.
-    event_data = json.loads(b64decode(cloud_event['data']).decode('utf-8'))
     try:
-        filename = event_data["name"]
-        bucket_name = event_data["bucket"]
+        filename = cloud_event.data["name"]
+        bucket_name = cloud_event.data["bucket"]
+    except AttributeError:
+        logging.error("Bad CloudEvent payload - 'data' attribute missing.")
     except KeyError:
-        logging.error(cloud_event)
-        #logging.error("Bad CloudEvent payload a file or bucket name was not included.")
+        logging.error("Bad CloudEvent payload - 'name' or 'bucket' name was not included.")
         return
 
     # Determine data type and root template.
