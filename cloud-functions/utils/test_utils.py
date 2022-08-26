@@ -6,7 +6,6 @@ from utils import (
     validate_request_header,
 )
 from unittest import mock
-import pytest
 
 
 test_request_body = json.load(open("../assets/single_patient_bundle.json", "r"))
@@ -24,10 +23,19 @@ def test_utils_bad_header():
 
 
 def test_utils_bad_body():
-    request = ""
+    request = mock.Mock(headers={"Content-Type": "application/json"})
+    request.get_json.return_value = ""
+    expected_result = {
+        "status": 400,
+        "summary": "Bad request",
+        "description": "Header must inclue: 'Content-Type:application/json'.",
+    }
 
-    with pytest.raises(AttributeError):
-        validate_request_body_json(request)
+    result = validate_request_body_json(request)
+    print("Blah")
+
+    print(result)
+    assert result == expected_result
 
 
 def test_utils_resource_type():
