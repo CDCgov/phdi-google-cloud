@@ -3,6 +3,10 @@ variable "functions_storage_bucket" {
 }
 
 variable "phi_storage_bucket" {
+  description = "value of google_pubsub_topic.ingestion_topic.name"
+}
+
+variable "ingestion_topic" {
   description = "value of google_storage_bucket.phi.name"
 }
 
