@@ -1,6 +1,4 @@
 import functions_framework
-import json
-from base64 import b64decode
 import logging
 from phdi.conversion import convert_batch_messages_to_list
 import os
