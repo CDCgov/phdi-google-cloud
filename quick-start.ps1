@@ -34,11 +34,12 @@ $GITHUB_REPO = Read-Host
 # Login to Google Cloud Platform
 gcloud auth login
 
+# Create a project if needed and get the project ID
 if ($NEW_PROJECT) {
-    gcloud projects create $PROJECT_NAME
+    gcloud projects create --name="$PROJECT_NAME"
 }
 
-$PROJECT_ID = (gcloud projects list --filter="name:$PROJECT_NAME" --format="value(projectId)")
+$PROJECT_ID = (gcloud projects list --filter="name:'$PROJECT_NAME'" --format="value(projectId)")
 if ([string]::IsNullOrEmpty($PROJECT_ID)) {
     Write-Host "Error: Project ID not found. To list projects, run 'gcloud projects list'."
     Exit 1
@@ -46,6 +47,13 @@ if ([string]::IsNullOrEmpty($PROJECT_ID)) {
 
 # Set the current project to the PROJECT_ID specified above
 gcloud config set project "$PROJECT_ID"
+
+# Enable necessary APIs
+gcloud services enable `
+    iam.googleapis.com `
+    cloudresourcemanager.googleapis.com `
+    iamcredentials.googleapis.com `
+    sts.googleapis.com
 
 # Create a service account
 gcloud iam service-accounts create "github" --project "$PROJECT_ID" --display-name "github"
@@ -58,8 +66,12 @@ gcloud projects add-iam-policy-binding "$PROJECT_ID" `
     --member="serviceAccount:$SERVICE_ACCOUNT_ID" `
     --role="roles/owner"
 
-# Enable the IAM Credentials API
-gcloud services enable iamcredentials.googleapis.com --project "$PROJECT_ID"
+# It's possible that creating the workload-identity-pools can fail if it's a new project
+# due to propagation timings of certain APIs.
+if ($NEW_PROJECT) {
+    Write-Host "Waiting 60 seconds for Workload Identity Federation to be created."
+    Start-Sleep -Seconds 60
+}
 
 # Create a Workload Identity Pool
 gcloud iam workload-identity-pools create "github-pool" `
@@ -81,7 +93,7 @@ gcloud iam workload-identity-pools providers create-oidc "github-provider" `
     --location="global" `
     --workload-identity-pool="github-pool" `
     --display-name="github provider" `
-    --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.respository=assertion.repository" `
+    --attribute-mapping="google.subject=assertion.sub, attribute.actor=assertion.actor, attribute.respository=assertion.repository" `
     --issuer-uri="https://token.actions.githubusercontent.com"
 
 # Allow authentications from Workload Identity Provider origination from your repository to impersonate the Service Account created above
