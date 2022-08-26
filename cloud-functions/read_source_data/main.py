@@ -8,7 +8,7 @@ from google.cloud import storage
 
 @functions_framework.cloud_event
 def read_source_data(cloud_event):
-    logging.error(type(cloud_event))
+    logging.error(cloud_event.data["name"])
     # Extract buck and file names.
     try:
         filename = cloud_event["data"]["name"]
