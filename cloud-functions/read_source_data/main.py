@@ -14,8 +14,8 @@ def read_source_data(cloud_event):
         filename = cloud_event["data"]["name"]
         bucket_name = cloud_event["data"]["bucket"]
     except KeyError:
-        logging.info(cloud_event)
-        logging.error("Bad CloudEvent payload a file or bucket name was not included.")
+        logging.error(cloud_event)
+        #logging.error("Bad CloudEvent payload a file or bucket name was not included.")
         return
 
     # Determine data type and root template.
