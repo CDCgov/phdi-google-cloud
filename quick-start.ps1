@@ -53,7 +53,8 @@ gcloud services enable `
     iam.googleapis.com `
     cloudresourcemanager.googleapis.com `
     iamcredentials.googleapis.com `
-    sts.googleapis.com
+    sts.googleapis.com `
+    serviceusage.googleapis.com
 
 # Create a service account
 gcloud iam service-accounts create "github" --project "$PROJECT_ID" --display-name "github"
