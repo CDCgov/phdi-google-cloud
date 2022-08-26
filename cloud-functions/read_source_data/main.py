@@ -1,5 +1,6 @@
 import functions_framework
-
+import json
+from base64 import b64decode
 import logging
 from phdi.conversion import convert_batch_messages_to_list
 import os
@@ -8,11 +9,12 @@ from google.cloud import storage
 
 @functions_framework.cloud_event
 def read_source_data(cloud_event):
-    logging.error(cloud_event.data["name"])
+    
     # Extract buck and file names.
+    event_data = json.loads(b64decode(cloud_event['data']).decode('utf-8'))
     try:
-        filename = cloud_event["data"]["name"]
-        bucket_name = cloud_event["data"]["bucket"]
+        filename = event_data["name"]
+        bucket_name = event_data["bucket"]
     except KeyError:
         logging.error(cloud_event)
         #logging.error("Bad CloudEvent payload a file or bucket name was not included.")
