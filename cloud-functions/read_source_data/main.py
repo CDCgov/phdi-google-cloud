@@ -54,13 +54,13 @@ def read_source_data(cloud_event):
     # Publish messages to pub/sub topic
     try:  
         project_id = os.environ["PROJECT_ID"]
-        topic_id = os.environ["TOPIC_ID"]
+        ingestion_topic = os.environ["INGESTION_TOPIC"]
     except KeyError: 
         logging.error("Missing required environment variables. Values for PROJECT_ID and TOPIC_ID must be set.")
         return
 
     publisher = pubsub_v1.PublisherClient()
-    topic_path = publisher.topic_path(project_id, topic_id)
+    topic_path = publisher.topic_path(project_id, ingestion_topic)
     for message in messages:
         message = message.encode("utf-8")
         future = publisher.publish(
