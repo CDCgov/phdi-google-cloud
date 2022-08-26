@@ -24,13 +24,12 @@ def validate_request_header(
     return request
 
 
-def validate_request_body_json(request: flask.Request) -> dict:
+def validate_request_body_json(request: flask.Request) -> flask.Response:
     try:
         request_json = request.get_json(silent=False)
         return request_json
     except AttributeError as error:
         logging.error(error)
-
         return {
             "status": 400,
             "summary": "Invalid request body",
@@ -38,7 +37,7 @@ def validate_request_body_json(request: flask.Request) -> dict:
         }
 
 
-def validate_fhir_bundle_or_resource(request: flask.Request) -> dict:
+def validate_fhir_bundle_or_resource(request: flask.Request) -> flask.Response:
     # first ensure that the response body is in proper JSON format
     request_json = validate_request_body_json(request)
     if request_json.get("status") is None or request_json.get("status") != 400:
