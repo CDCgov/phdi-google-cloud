@@ -25,13 +25,8 @@ def validate_request_header(
 
 
 def validate_request_body_json(request: flask.Request) -> flask.Response:
-    print("REQUEST:")
-    print(request)
-    print("Blah")
-    print(request.get_json)
     try:
         request_json = request.get_json(silent=False)
-        print("HELLO!")
         return request_json
     except AttributeError as error:
         logging.error(error)
