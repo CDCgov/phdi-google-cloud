@@ -14,7 +14,6 @@ def _fail(message: str, status: str) -> flask.Response:
     return result
 
 
-# Validate request header.
 def validate_request_header(
     request: flask.Request, content_type: str
 ) -> flask.Response:
