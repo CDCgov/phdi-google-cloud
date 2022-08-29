@@ -47,7 +47,7 @@ def validate_request_body_json(request: flask.Request) -> flask.Response:
     """
 
     if request.is_json():
-        return _success
+        return _success()
     else:
         return _fail(
             message="Invalid request body - Invalid JSON", status="Bad Request"
@@ -66,10 +66,7 @@ def validate_fhir_bundle_or_resource(request: flask.Request) -> flask.Response:
         otherwise will return a generic 200 flask.Response
     """
 
-    request_json = request.get_json
-    print("BLAH:")
-    print(request_json)
-
+    request_json = request.get_json()
     # Check that the request body contains a FHIR bundle or resource.
     if request_json.get("resourceType") is None:
         error_message = (
