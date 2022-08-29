@@ -30,13 +30,24 @@ gcloud auth login
 
 # Create a project if needed and get the project ID
 if [ $NEW_PROJECT = true ]; then
-    gcloud projects create $PROJECT_NAME
+    gcloud projects create --name="${PROJECT_NAME}"
 fi
-PROJECT_ID=$(gcloud projects list --filter="name:${PROJECT_NAME}" --format="value(projectId)")
+PROJECT_ID=$(gcloud projects list --filter="name:'${PROJECT_NAME}'" --format="value(projectId)")
 if [ -z "$PROJECT_ID" ]; then
     echo "Error: Project ID not found. To list projects, run 'gcloud projects list'."
     exit 1
 fi
+
+# Set the current project to the PROJECT_ID specified above
+gcloud config set project "${PROJECT_ID}"
+
+# Enable necessary APIs
+gcloud services enable \
+    iam.googleapis.com \
+    cloudresourcemanager.googleapis.com \
+    iamcredentials.googleapis.com \
+    sts.googleapis.com \
+    serviceusage.googleapis.com
 
 # Create a service account
 gcloud iam service-accounts create "github" \
@@ -51,8 +62,10 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
   --member="serviceAccount:${SERVICE_ACCOUNT_ID}" \
   --role="roles/owner"
 
-# Enable the IAM Credentials API
-gcloud services enable iamcredentials.googleapis.com --project "${PROJECT_ID}"
+if [ $NEW_PROJECT = true ]; then
+    echo "Waiting 60 seconds for Workload Identity Federation to be created."
+    sleep 60s
+fi
 
 # Create a Workload Identity Pool
 gcloud iam workload-identity-pools create "github-pool" \

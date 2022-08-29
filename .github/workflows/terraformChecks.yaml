@@ -1,5 +1,4 @@
-name: Deployment
-
+name: Terraform checks
 on:
   workflow_dispatch:
     inputs:
@@ -7,27 +6,72 @@ on:
         description: "Environment to deploy to"
         type: environment
         required: true
+  pull_request:
+    branches:
+      - "**"
+    paths:
+      - "terraform/**"
   push:
     branches:
       - main
 
+env:
+  TEST_RUNNER_TERRAFORM_VERSION: 1.2.5
+
 jobs:
-  deployment:
-    name: Deploy to GCP
+  check-terraform-formatting:
     runs-on: ubuntu-latest
     defaults:
       run:
-        shell: bash
+        working-directory: ./terraform
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: ${{env.TEST_RUNNER_TERRAFORM_VERSION}}
+      - name: Check format
+        run: terraform fmt -check -recursive
+  check-terraform-validity:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform
+    env:
+      TERRAFORM_DIRS: |
+        setup implementation
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.1.4
+      - name: Terraform Init
+        run: |
+          for d in $TERRAFORM_DIRS
+          do
+            echo "Initializing $d";
+            (cd $d && terraform init -backend=false)
+          done
+      - name: Terraform Validate
+        run: |
+          for d in $TERRAFORM_DIRS
+          do
+            echo "Validating $d";
+            (cd $d && terraform validate)
+          done
+  check-terraform-plan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
         working-directory: ./terraform/implementation
     permissions:
       contents: "read"
       id-token: "write"
     steps:
-      - name: Check Out Changes
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.1.4
 
       - id: "auth"
         name: "Authenticate to Google Cloud"
@@ -63,20 +107,5 @@ jobs:
       - name: terraform workspace
         run: terraform workspace select ${{ env.ENVIRONMENT }} || terraform workspace new ${{ env.ENVIRONMENT }}
 
-      - name: Create artifact registry
-        run: terraform apply -target="module.artifact-registries" -auto-approve -lock-timeout=30m
-
-      - name: Log in to artifact registry with docker
-        run: gcloud auth configure-docker ${{ secrets.REGION }}-docker.pkg.dev
-
-      - name: Build and push FHIR Converter
-        uses: docker/build-push-action@v3
-        with:
-          context: ./cloud-run/fhir-converter
-          push: true
-          tags: ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/phdi-${{ env.ENVIRONMENT }}-repository/fhir-converter:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: terraform apply
-        run: terraform apply -auto-approve -lock-timeout=30m
+      - name: terraform plan
+        run: terraform plan
