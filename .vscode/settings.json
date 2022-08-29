@@ -4,5 +4,6 @@
         "CFPB",
         "ISSO",
         "cybersecurity"
-    ]
+    ],
+    "python.formatting.provider": "black"
 }
