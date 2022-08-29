@@ -5,6 +5,55 @@
 #
 ################################################################################
 
+# Function to output the variables needed to load into GitHub Actions secrets
+function Get-Variables {
+    Write-Host "Please load the following variables into your repository secrets at this URL:"
+    Write-Host "https://github.com/$GITHUB_REPO/settings/secrets/actions"
+    Write-Host  ""
+    Write-Host "PROJECT_ID: $PROJECT_ID"
+    Write-Host "SERVICE_ACCOUNT_ID: $SERVICE_ACCOUNT_ID"
+    Write-Host "WORKLOAD_IDENTITY_PROVIDER: $WORKLOAD_IDENTITY_PROVIDER"
+    Write-Host "REGION: us-central1 (or your preferred region)"
+    Write-Host "ZONE: us-central1-a (or your preferred zone in the region above)"
+    Write-Host ""
+    Write-Host "More info on regions and zones can be found at:"
+    Write-Host "https://cloud.google.com/compute/docs/regions-zones/"
+    Write-Host ""
+    Write-Host "You can now continue with the Quick Start instructions in the README.md file."
+}
+
+# Function to use GitHub CLI to set repository secrets
+function Set-Variables {
+    if (! Get-Command 'gh' -errorAction SilentlyContinue) {
+        Write-Host "Error: The GitHub CLI is not installed. To install, visit this page:"
+        Write-Host "https://cli.github.com/manual/installation"
+        Write-Host
+        Get-Variables
+        Exit
+    }
+
+    Write-Host "Please enter the name of the region you would like to deploy to (e.g. us-central1)."
+    Write-Host "More info: https://cloud.google.com/compute/docs/regions-zones/regions-zones"
+    $REGION = Read-Host
+
+    Write-Host "Please enter the name of the zone you would like to deploy to (e.g. us-central1-a)."
+    Write-Host "More info: https://cloud.google.com/compute/docs/regions-zones/regions-zones"
+    $ZONE = Read-Host
+
+    Write-Host "Logging in to GitHub..."
+    gh auth login
+
+    Write-Host "Setting repository secrets..."
+    gh secret -R "$GITHUB_REPO" set PROJECT_ID --body "$PROJECT_ID" 
+    gh secret -R "$GITHUB_REPO" set SERVICE_ACCOUNT_ID --body "$SERVICE_ACCOUNT_ID"
+    gh secret -R "$GITHUB_REPO" set WORKLOAD_IDENTITY_PROVIDER --body "$WORKLOAD_IDENTITY_PROVIDER"
+    gh secret -R "$GITHUB_REPO" set REGION --body "$REGION"
+    gh secret -R "$GITHUB_REPO" set ZONE --body "$ZONE"
+
+    Write-Host "Repository secrets set!"
+    Write-Host "You can now continue with the Quick Start instructions in the README.md file."
+}
+
 # Prompt user for project name and repository name
 Write-Host "Welcome to the PHDI Google Cloud setup script!"
 Write-Host "This script will help you setup gcloud authentication for Github Actions."
@@ -112,19 +161,20 @@ $WORKLOAD_IDENTITY_PROVIDER = ( `
         --format="value(name)" `
 )
 
-# Output the variables needed to load into Github Actions Secrets
 Write-Host "Workload Identity Federation setup complete!"
 Write-Host ""
-Write-Host "Please load the following variables into your repository secrets at this URL:"
-Write-Host "https://github.com/$GITHUB_REPO/settings/secrets/actions"
-Write-Host  ""
-Write-Host "PROJECT_ID: $PROJECT_ID"
-Write-Host "SERVICE_ACCOUNT_ID: $SERVICE_ACCOUNT_ID"
-Write-Host "WORKLOAD_IDENTITY_PROVIDER: $WORKLOAD_IDENTITY_PROVIDER"
-Write-Host "REGION: us-central1 (or your preferred region)"
-Write-Host "ZONE: us-central1-a (or your preferred zone in the region above)"
-Write-Host ""
-Write-Host "More info on regions and zones can be found at:"
-Write-Host "https://cloud.google.com/compute/docs/regions-zones/"
-Write-Host ""
-Write-Host "You can now continue with the Quick Start instructions in the README.md file."
+
+while ($null -eq $SCRIPT_DONE) {
+    $yn = Read-Host "Would you like to use the GitHub CLI to set repository secrets automatically? (y/n) "
+    Switch ($yn) {
+        { @("y", "Y") -eq $_ } {
+            Set-Variables
+            $SCRIPT_DONE = $true
+        }
+        { @("n", "N") -eq $_ } {
+            Get-Variables
+            $SCRIPT_DONE = $true
+        }
+        default { "Please enter y or n." }
+    }
+}
