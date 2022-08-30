@@ -76,3 +76,37 @@ def validate_fhir_bundle_or_resource(request: flask.Request) -> flask.Response:
         return _fail(message=error_message, status="Bad Request")
 
     return _success()
+
+
+def log_error_and_generate_response(response: str, status: str) -> flask.Response:
+    """
+    Given an error message and and HTTP status code log the error and create a
+    flask.Response object containing the satus code and message.
+
+    :param response: An error message to be logged and included in the
+        returned flask.Response object.
+    :param status: An HTTP status code to be included in the returned flask.Response
+        object.
+    :return: A flask.Response object containing the specified response message and HTTP
+        status code.
+    """
+    logging.error(response)
+    response = flask.Response(response=response, status=status)
+    return response
+
+
+def log_info_and_generate_response(response: str, status: str) -> flask.Response:
+    """
+    Given an info level message and and HTTP status code log the message and create a
+    flask.Response object containing the satus code and message.
+
+    :param response: An info level message to be logged and included in the
+        returned flask.Response object.
+    :param status: An HTTP status code to be included in the returned flask.Response
+        object.
+    :return: A flask.Response object containing the specified response message and HTTP
+        status code.
+    """
+    logging.info(response)
+    response = flask.Response(response=response, status=status)
+    return response

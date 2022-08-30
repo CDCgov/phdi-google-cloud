@@ -7,36 +7,10 @@ from google.cloud import storage
 import json
 import flask
 from cloudevents.http import CloudEvent
-
-
-def log_error_and_generate_response(response: str, status: str) -> flask.Response:
-    """
-    Given an error message and and HTTP status code log the error and create a
-    flask.Response object containing the satus code and message.
-
-    :param response: An error message to be logged and included in the
-        returned flask.Response object.
-    :param status: An HTTP status code to be included in the returned flask.Response
-        object.
-    """
-    logging.error(response)
-    response = flask.Response(response=response, status=status)
-    return response
-
-
-def log_info_and_generate_response(response: str, status: str) -> flask.Response:
-    """
-    Given an info level message and and HTTP status code log the message and create a
-    flask.Response object containing the satus code and message.
-
-    :param response: An info level message to be logged and included in the
-        returned flask.Response object.
-    :param status: An HTTP status code to be included in the returned flask.Response
-        object.
-    """
-    logging.info(response)
-    response = flask.Response(response=response, status=status)
-    return response
+from phdi_cloud_function_utils import (
+    log_error_and_generate_response,
+    log_info_and_generate_response,
+)
 
 
 @functions_framework.cloud_event
@@ -50,6 +24,8 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
 
     :param cloud_event: A CloudEvent object provided by GCP whenever a new file is
         written to the storage bucket containing source data to be ingested.
+    :return: A flask.Response object containing a message describing the function's
+        outcome and associated HTTP status code.
     """
 
     # Extract buck and file names.

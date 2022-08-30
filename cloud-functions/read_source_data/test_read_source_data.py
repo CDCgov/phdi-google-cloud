@@ -241,11 +241,3 @@ def test_read_source_data(
             "200",
         ).response
     )
-
-
-def test_log_error_and_generate_response():
-    response = log_info_and_generate_response("my-response", "200")
-    assert (
-        response.response
-        == flask.Response(response="my-response", status="200").response
-    )

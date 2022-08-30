@@ -6,9 +6,11 @@ from utils import (
     validate_request_header,
     _fail,
     _success,
+    log_error_and_generate_response,
+    log_info_and_generate_response
 )
 from unittest import mock
-
+import flask
 
 test_request_body = json.load(open("../assets/single_patient_bundle.json", "r"))
 
@@ -87,3 +89,17 @@ def test_utils_request():
     assert result.status == expected_result.status
     assert result.status_code == expected_result.status_code
     assert result.response == expected_result.response
+
+def test_log_info_and_generate_response():
+    response = log_info_and_generate_response("my-response", "200")
+    assert (
+        response.response
+        == flask.Response(response="my-response", status="200").response
+    )
+
+def test_log_error_and_generate_response():
+    response = log_error_and_generate_response("my-response", "400")
+    assert (
+        response.response
+        == flask.Response(response="my-response", status="400").response
+    )
