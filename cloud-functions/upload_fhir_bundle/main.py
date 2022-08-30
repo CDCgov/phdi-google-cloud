@@ -4,7 +4,7 @@ import functions_framework
 import flask
 from pydantic import BaseModel, ValidationError, validator
 from phdi.fhir.transport.http import upload_bundle_to_fhir_server
-from phdi_cloud_function_utils import validate_request_header, _full_response
+from phdi_cloud_function_utils import validate_request_header, _full_response, _fail
 from phdi.cloud.gcp import GcpCredentialManager
 
 
@@ -62,11 +62,11 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
     except ValidationError as error:
         logging.error(error)
         error_as_dictionary = json.loads(error.json())[0]
-        return {
-            "status": 400,
-            "summary": "Invalid request body",
-            "description": error_as_dictionary,
-        }
+        error_response = _fail(
+            message=error_as_dictionary, status="Invalid request body"
+        )
+
+        return error_response
 
     # Construct the FHIR store URL the base Cloud Healthcare API endpoint,
     #  project ID, location, dataset ID, and FHIR store ID.

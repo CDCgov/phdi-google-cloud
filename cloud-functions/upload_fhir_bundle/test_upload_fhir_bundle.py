@@ -59,15 +59,14 @@ def test_upload_fhir_bundle_bad_body():
         "bundle": {"resourceType": "Bundle"},
     }
 
-    assert upload_fhir_bundle(request) == {
-        "description": {
-            "loc": ["dataset_id"],
-            "msg": "str type expected",
-            "type": "type_error.str",
-        },
-        "status": 400,
-        "summary": "Invalid request body",
-    }
+    result = upload_fhir_bundle(request)
+    expected_result = _fail(
+        "{'loc': ['dataset_id'], 'msg': 'str type expected', 'type': 'type_error.str'}",
+        "Bad Request",
+    )
+    expected_result.status_code = 400
+    assert result.status == expected_result.status
+    assert result.status_code == expected_result.status_code
 
 
 @mock.patch("main.upload_bundle_to_fhir_server")

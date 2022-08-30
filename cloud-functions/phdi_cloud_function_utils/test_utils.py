@@ -88,3 +88,10 @@ def test_utils_request():
     assert result.status == expected_result.status
     assert result.status_code == expected_result.status_code
     assert result.response == expected_result.response
+
+
+def test_full_response():
+    result = _full_response(test_request_body)
+    assert result.status_code == 200
+    assert result.status == "200 OK"
+    assert result.get_json() is None
