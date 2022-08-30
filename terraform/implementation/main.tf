@@ -72,5 +72,5 @@ module "cloud-run" {
 }
 
 module "pubsub" {
-  source = "../modules/pubsub"  
+  source = "../modules/pubsub"
 }
