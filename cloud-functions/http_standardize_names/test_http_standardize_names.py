@@ -55,4 +55,4 @@ def test_standardize_names_good_request():
     request.get_json.return_value = test_request_body
     actual_result = http_standardize_names(request)
 
-    assert actual_result == expected_result
+    json.loads(actual_result.get_data()) == expected_result

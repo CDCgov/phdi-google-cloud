@@ -101,5 +101,5 @@ def test_upload_fhir_bundle_good_request(
     upload_fhir_bundle(request)
 
     patched_upload_bundle_to_fhir_server.assert_called_with(
-        request.get_json()["bundle"], patched_credential_manager(), fhir_store_url
+        request, patched_credential_manager(), fhir_store_url
     )

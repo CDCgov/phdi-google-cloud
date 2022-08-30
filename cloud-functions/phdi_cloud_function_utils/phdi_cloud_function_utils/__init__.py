@@ -4,7 +4,10 @@ from flask import Request, Response
 
 
 def _full_response(json_response: dict) -> Response:
-    response = Response(status="OK", message=json.dumps(response=json_response))
+    # TODO: Modify this to store the json_response in the json attribute
+    #   not sure if this is possible, but it would be nice to have the
+    #   Response.get_json() be able to return the response
+    response = Response(status="OK", response=json.dumps(json_response))
     response.status_code = 200
     return response
 

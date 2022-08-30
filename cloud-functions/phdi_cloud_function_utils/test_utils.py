@@ -6,6 +6,7 @@ from phdi_cloud_function_utils import (
     validate_request_header,
     _fail,
     _success,
+    _full_response,
 )
 from unittest import mock
 

@@ -35,6 +35,10 @@ def http_standardize_phones(request: flask.Request) -> flask.Response:
     if body_response.status_code != 400:
         # Perform the phone standardization
         request_json = request.get_json(silent=False)
-        body_response = _full_response(standardize_phones(request_json))
+        response = standardize_phones(request_json)
+        print("BLAH")
+        print(response)
+        print("YEAH")
+        body_response = _full_response(response)
 
     return body_response

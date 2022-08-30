@@ -4,7 +4,7 @@ import functions_framework
 import flask
 from pydantic import BaseModel, ValidationError, validator
 from phdi.fhir.transport.http import upload_bundle_to_fhir_server
-from phdi_cloud_function_utils import validate_request_header, _success
+from phdi_cloud_function_utils import validate_request_header, _full_response
 from phdi.cloud.gcp import GcpCredentialManager
 
 
@@ -87,8 +87,7 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
 
     # Upload bundle to the FHIR store using the GCP Crednetial Manager for
     # authentication.
-    response = _success
-    response = make_response
+    response = _full_response(
         upload_bundle_to_fhir_server(
             request_body.bundle, credential_manager, fhir_store_url
         )
