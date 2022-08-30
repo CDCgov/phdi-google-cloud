@@ -3,7 +3,7 @@ import json
 from flask import Request, Response
 
 
-def _full_response(json_response: dict) -> Response:
+def _full_response(json_response) -> Response:
     # TODO: Modify this to store the json_response in the json attribute
     #   not sure if this is possible, but it would be nice to have the
     #   Response.get_json() be able to return the response
