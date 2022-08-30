@@ -2,10 +2,9 @@ import logging
 import json
 import functions_framework
 import flask
-import os
-import sys
 from pydantic import BaseModel, ValidationError, validator
 from phdi.fhir.transport.http import upload_bundle_to_fhir_server
+from phdi_cloud_function_utils import validate_request_header
 from phdi.cloud.gcp import GcpCredentialManager
 
 
@@ -48,20 +47,13 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
     :return: Returns a flask.Response object containing and overall response from the
         FHIR store as well as for the upload of each individual resource in the bundle.
     """
-    current = os.path.dirname(os.path.realpath(__file__))
-    parent = os.path.dirname(current)
-    sys.path.append(parent)
-    from utils import validate_request_header
 
     content_type = "application/json"
     # Validate request header.
-    validated_request = validate_request_header(request, content_type)
+    header_response = validate_request_header(request, content_type)
 
-    if (
-        validated_request.get("status") is None
-        or validated_request.get("status") != 400
-    ):
-        request_json = validated_request.get_json(silent=False)
+    if header_response.status_code != 400:
+        request_json = request.get_json(silent=False)
         # Validate request body.
         try:
             request_body = RequestBody.parse_obj(request_json)
@@ -98,6 +90,6 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
             request_body.bundle, credential_manager, fhir_store_url
         )
     else:
-        return validated_request
+        return header_response
 
     return response.json()

@@ -1,8 +1,10 @@
 import functions_framework
-import os
-import sys
 import flask
 from phdi.fhir.harmonization.standardization import standardize_names
+from phdi_cloud_function_utils import (
+    validate_fhir_bundle_or_resource,
+    validate_request_header,
+)
 
 
 @functions_framework.http
@@ -15,24 +17,20 @@ def http_standardize_names(request: flask.Request) -> flask.Response:
     :param data: Either a FHIR bundle or a FHIR-formatted JSON dict
     :return: The bundle or resource with names appropriately standardized
     """
-    current = os.path.dirname(os.path.realpath(__file__))
-    parent = os.path.dirname(current)
-    sys.path.append(parent)
-    from utils import validate_request_header, validate_fhir_bundle_or_resource
-
     content_type = "application/json"
     # Validate request header.
-    validated_request = validate_request_header(request, content_type)
+    header_response = validate_request_header(request, content_type)
 
     # Check that the request body contains a FHIR bundle or resource.
-    if (
-        validated_request.get("status") is None
-        or validated_request.get("status") != 400
-    ):
-        request_json = validate_fhir_bundle_or_resource(validated_request)
-        # Perform the name standardization
-        response = standardize_names(request_json)
+    if header_response.status_code != 400:
+        body_response = validate_fhir_bundle_or_resource(request)
+        if body_response.status_code != 400:
+            request_json = request.get_json(silent=False)
+            # Perform the name standardization
+            final_response = standardize_names(request_json)
+        else:
+            return body_response
     else:
-        return validated_request
+        return header_response
 
-    return response
+    return final_response

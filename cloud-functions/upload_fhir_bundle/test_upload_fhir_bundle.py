@@ -35,36 +35,6 @@ def test_request_body():
         )
 
 
-def test_upload_fhir_bundle_bad_header():
-    request = mock.Mock(headers={"Content-Type": "not-application/json"})
-    assert upload_fhir_bundle(request) == {
-        "status": 400,
-        "summary": "Bad request",
-        "description": "Header must inclue: 'Content-Type:application/json'.",
-    }
-
-
-def test_upload_fhir_bundle_bad_body():
-    request = mock.Mock(headers={"Content-Type": "application/json"})
-
-    request.get_json.return_value = {
-        "dataset_id": ["dataset_id"],
-        "location": "location",
-        "fhir_store_id": "fhir_store_id",
-        "bundle": {"resourceType": "Bundle"},
-    }
-
-    assert upload_fhir_bundle(request) == {
-        "description": {
-            "loc": ["dataset_id"],
-            "msg": "str type expected",
-            "type": "type_error.str",
-        },
-        "status": 400,
-        "summary": "Invalid request body",
-    }
-
-
 @mock.patch("main.upload_bundle_to_fhir_server")
 @mock.patch("main.GcpCredentialManager")
 def test_upload_fhir_bundle_good_request(
