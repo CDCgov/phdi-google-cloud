@@ -41,6 +41,7 @@ oauthlib==3.2.0
 packaging==21.3
 pandas==1.4.3
 phdi==0.1.0.dev1
+phdi_cloud_function_utils @ git+https://github.com/CDCgov/phdi-google-cloud@dan/utils-module-restructure#subdirectory=cloud-functions/phdi_cloud_function_utils
 phonenumbers==8.12.54
 polling==0.3.2
 portalocker==2.5.1
