@@ -31,6 +31,7 @@ To deploy this pipeline to your own Google Cloud environment, follow these steps
   
   Be sure to replace all instances of `myuser` in GitHub URLs with your user or organization name.
   1. [Install the gcloud CLI](https://cloud.google.com/sdk/docs/install-sdk)
+  1. [Install the GitHub CLI](https://cli.github.com/manual/installation) (optional)
   1. [Fork this repository](https://github.com/myuser/phdi-google-cloud/fork) into your personal or organization account
   1. Clone your newly forked repository to your local machine by running:
 

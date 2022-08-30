@@ -7,6 +7,55 @@
 #
 ################################################################################
 
+# Function to output the variables needed to load into GitHub Actions secrets
+print_variables() {
+  echo "Please load the following variables into your repository secrets at this URL:"
+  echo "https://github.com/$GITHUB_REPO/settings/secrets/actions"
+  echo
+  echo "PROJECT_ID: ${PROJECT_ID}"
+  echo "SERVICE_ACCOUNT_ID: ${SERVICE_ACCOUNT_ID}"
+  echo "WORKLOAD_IDENTITY_PROVIDER: ${WORKLOAD_IDENTITY_PROVIDER}"
+  echo "REGION: us-central1 (or your preferred region)"
+  echo "ZONE: us-central1-a (or your preferred zone in the region above)"
+  echo
+  echo "More info on regions and zones can be found at:"
+  echo "https://cloud.google.com/compute/docs/regions-zones/"
+  echo
+  echo "You can now continue with the Quick Start instructions in the README.md file."
+}
+
+# Function to use GitHub CLI to set repository secrets
+set_variables() {
+  if ! command -v gh &> /dev/null; then
+    echo "Error: The GitHub CLI is not installed. To install, visit this page:"
+    echo "https://cli.github.com/manual/installation"
+    echo
+    print_variables
+    exit
+  fi
+
+  echo "Please enter the name of the region you would like to deploy to (e.g. us-central1)."
+  echo "More info: https://cloud.google.com/compute/docs/regions-zones/regions-zones"
+  read REGION
+
+  echo "Please enter the name of the zone you would like to deploy to (e.g. us-central1-a)."
+  echo "More info: https://cloud.google.com/compute/docs/regions-zones/regions-zones"
+  read ZONE
+
+  echo "Logging in to GitHub..."
+  gh auth login
+
+  echo "Setting repository secrets..."
+  gh secret -R "${GITHUB_REPO}" set PROJECT_ID --body "${PROJECT_ID}" 
+  gh secret -R "${GITHUB_REPO}" set SERVICE_ACCOUNT_ID --body "${SERVICE_ACCOUNT_ID}"
+  gh secret -R "${GITHUB_REPO}" set WORKLOAD_IDENTITY_PROVIDER --body "${WORKLOAD_IDENTITY_PROVIDER}"
+  gh secret -R "${GITHUB_REPO}" set REGION --body "${REGION}"
+  gh secret -R "${GITHUB_REPO}" set ZONE --body "${ZONE}"
+
+  echo "Repository secrets set!"
+  echo "You can now continue with the Quick Start instructions in the README.md file."
+}
+
 # Prompt user for project name and repository name
 echo "Welcome to the PHDI Google Cloud setup script!"
 echo "This script will help you setup gcloud authentication for GitHub Actions."
@@ -64,7 +113,7 @@ gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
 
 if [ $NEW_PROJECT = true ]; then
     echo "Waiting 60 seconds for Workload Identity Federation to be created."
-    sleep 60s
+    sleep 60
 fi
 
 # Create a Workload Identity Pool
@@ -101,19 +150,14 @@ WORKLOAD_IDENTITY_PROVIDER=$(gcloud iam workload-identity-pools providers descri
   --workload-identity-pool="github-pool" \
   --format="value(name)")
 
-# Output the variables needed to load into GitHub Actions secrets
 echo "Workload Identity Federation setup complete!"
 echo
-echo "Please load the following variables into your repository secrets at this URL:"
-echo "https://github.com/$GITHUB_REPO/settings/secrets/actions"
-echo
-echo "PROJECT_ID: ${PROJECT_ID}"
-echo "SERVICE_ACCOUNT_ID: ${SERVICE_ACCOUNT_ID}"
-echo "WORKLOAD_IDENTITY_PROVIDER: ${WORKLOAD_IDENTITY_PROVIDER}"
-echo "REGION: us-central1 (or your preferred region)"
-echo "ZONE: us-central1-a (or your preferred zone in the region above)"
-echo
-echo "More info on regions and zones can be found at:"
-echo "https://cloud.google.com/compute/docs/regions-zones/"
-echo
-echo "You can now continue with the Quick Start instructions in the README.md file."
+
+while true; do
+    read -p "Would you like to use the GitHub CLI to set repository secrets automatically? (y/n) " yn
+    case $yn in
+        [Yy]* ) set_variables; break;;
+        [Nn]* ) print_variables; break;;
+        * ) echo "Please answer y or n.";;
+    esac
+done
