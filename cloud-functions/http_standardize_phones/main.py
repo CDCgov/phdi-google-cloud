@@ -4,6 +4,7 @@ from phdi.fhir.harmonization.standardization import standardize_phones
 from phdi_cloud_function_utils import (
     validate_fhir_bundle_or_resource,
     validate_request_header,
+    _full_response,
 )
 
 
@@ -26,16 +27,14 @@ def http_standardize_phones(request: flask.Request) -> flask.Response:
     header_response = validate_request_header(request, content_type)
 
     # Check that the request body contains a FHIR bundle or resource.
-    if header_response.status_code != 400:
-        body_response = validate_fhir_bundle_or_resource(request)
-
-        if body_response.status_code != 400:
-            # Perform the phone standardization
-            request_json = request.get_json(silent=False)
-            final_response = standardize_phones(request_json)
-        else:
-            return body_response
-    else:
+    if header_response.status_code == 400:
         return header_response
 
-    return final_response
+    body_response = validate_fhir_bundle_or_resource(request)
+
+    if body_response.status_code != 400:
+        # Perform the phone standardization
+        request_json = request.get_json(silent=False)
+        body_response = _full_response(standardize_phones(request_json))
+
+    return body_response

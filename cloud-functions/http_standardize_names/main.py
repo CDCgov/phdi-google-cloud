@@ -22,15 +22,13 @@ def http_standardize_names(request: flask.Request) -> flask.Response:
     header_response = validate_request_header(request, content_type)
 
     # Check that the request body contains a FHIR bundle or resource.
-    if header_response.status_code != 400:
-        body_response = validate_fhir_bundle_or_resource(request)
-        if body_response.status_code != 400:
-            request_json = request.get_json(silent=False)
-            # Perform the name standardization
-            final_response = standardize_names(request_json)
-        else:
-            return body_response
-    else:
+    if header_response.status_code == 400:
         return header_response
 
-    return final_response
+    body_response = validate_fhir_bundle_or_resource(request)
+    if body_response.status_code != 400:
+        request_json = request.get_json(silent=False)
+        # Perform the name standardization
+        body_response.set_data(standardize_names(request_json))
+
+    return body_response
