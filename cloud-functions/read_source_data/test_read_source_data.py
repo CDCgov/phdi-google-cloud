@@ -35,7 +35,7 @@ def test_unknown_message():
     ]
     response = read_source_data(cloud_event)
     assert response.response == [
-        b"Unknown message type: unknown-message-type. Messages should be ELR, VXU, or eCR."
+        b"Unknown message type: unknown-message-type. Messages should be ELR, VXU, or eCR."  # noqa
     ]
 
 
@@ -53,7 +53,7 @@ def test_missing_environment_variables(
     ]
     response = read_source_data(cloud_event)
     assert response.response == [
-        b"Missing required environment variables. Values for PROJECT_ID and TOPIC_ID must be set."
+        b"Missing required environment variables. Values for PROJECT_ID and TOPIC_ID must be set."  # noqa
     ]
 
 
@@ -143,7 +143,7 @@ def test_publishing_retry_success(
 
     cloud_event = mock.MagicMock()
     cloud_event.data.__getitem__.side_effect = [
-        f"source-data/elr/some-filename",
+        "source-data/elr/some-filename",
         "some-bucket",
     ]
     patched_batch_converter.return_value = ["some-message"]
@@ -182,7 +182,7 @@ def test_publishing_failure(
 
     cloud_event = mock.MagicMock()
     cloud_event.data.__getitem__.side_effect = [
-        f"source-data/elr/some-filename.txt",
+        "source-data/elr/some-filename.txt",
         "some-bucket",
     ]
     patched_batch_converter.return_value = ["some-message"]
@@ -219,7 +219,7 @@ def test_read_source_data(
 
     cloud_event = mock.MagicMock()
     cloud_event.data.__getitem__.side_effect = [
-        f"source-data/elr/some-filename.txt",
+        "source-data/elr/some-filename.txt",
         "some-bucket",
     ]
     patched_batch_converter.return_value = ["some-message"]
@@ -233,7 +233,11 @@ def test_read_source_data(
     assert (
         response.response
         == log_info_and_generate_response(
-            "Processed source-data/elr/some-filename.txt, which contained 1 messages, of which 1 were successfully published, and 0 could not be published.",
+            (
+                "Processed source-data/elr/some-filename.txt, which contained 1 "
+                "messages, of which 1 were successfully published, and 0 could not be "
+                "published."
+            ),
             "200",
         ).response
     )

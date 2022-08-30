@@ -83,7 +83,10 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
             root_template = "CCD"
 
         else:
-            response = f"Unknown message type: {filename_parts[1]}. Messages should be ELR, VXU, or eCR."
+            response = (
+                f"Unknown message type: {filename_parts[1]}. Messages should be "
+                "ELR, VXU, or eCR."
+            )
             response = log_error_and_generate_response(response=response, status="400")
             return response
     else:
@@ -99,7 +102,10 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
         ingestion_topic = os.environ["INGESTION_TOPIC"]
 
     except KeyError:
-        response = "Missing required environment variables. Values for PROJECT_ID and TOPIC_ID must be set."
+        response = (
+            "Missing required environment variables. Values for PROJECT_ID and "
+            "TOPIC_ID must be set."
+        )
         response = log_error_and_generate_response(response=response, status="400")
         return response
 
@@ -135,12 +141,14 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
         try:
             message_id = future.result()
             logging.info(
-                f"Message {idx} in {filename} was published to {topic_path} with message ID {message_id}."
+                f"Message {idx} in {filename} was published to {topic_path} with"
+                "message ID {message_id}."
             )
         except Exception as error:
             error_message = str(error)
             logging.warning(
-                f"First attempt to publish message {idx} in {filename} failed because {error_message}. Trying again..."
+                f"First attempt to publish message {idx} in {filename} failed because "
+                "{error_message}. Trying again..."
             )
             # Retry publishing.
             try:
@@ -149,13 +157,15 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
                 )
                 message_id = future.result()
                 logging.info(
-                    f"Message {idx} in {filename} was published to {topic_path} with message ID {message_id}."
+                    f"Message {idx} in {filename} was published to {topic_path} with "
+                    "message ID {message_id}."
                 )
             # On second failure write the message to storage and continue.
             except Exception as error:
                 error_message = str(error)
                 logging.error(
-                    f"Publishing message {idx} in {filename} failed because {error_message}."
+                    f"Publishing message {idx} in {filename} failed because"
+                    "{error_message}."
                 )
                 failure_filename = filename.split("/")
                 failure_filename[0] = "publishing-failures"
@@ -166,10 +176,15 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
                 blob = bucket.blob(failure_filename)
                 blob.upload_from_string(message)
                 logging.info(
-                    "Message {idx} in {filename} was written to {failure_filename} in {bucket_name}."
+                    "Message {idx} in {filename} was written to {failure_filename} in "
+                    "{bucket_name}."
                 )
                 failure_count += 1
 
-    response = f"Processed {filename}, which contained {idx+1} messages, of which {idx+1-failure_count} were successfully published, and {failure_count} could not be published."
+    response = (
+        f"Processed {filename}, which contained {idx+1} messages, of which "
+        "{idx+1-failure_count} were successfully published, and {failure_count} "
+        "could not be published."
+    )
     response = log_info_and_generate_response(response=response, status="200")
     return response
