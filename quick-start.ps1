@@ -166,7 +166,7 @@ Write-Host "Workload Identity Federation setup complete!"
 Write-Host ""
 
 while ($null -eq $SCRIPT_DONE) {
-    $yn = Read-Host "Would you like to use the GitHub CLI to set repository secrets automatically? (y/n) "
+    $yn = Read-Host "Would you like to use the GitHub CLI to set repository secrets automatically? (y/n)"
     Switch ($yn) {
         { @("y", "Y") -eq $_ } {
             Set-Variables
