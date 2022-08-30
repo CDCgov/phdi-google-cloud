@@ -10,7 +10,6 @@ on:
 
 env:
   TEST_RUNNER_PYTHON_VERSION: 3.9
-  TEST_RUNNER_TERRAFORM_VERSION: 1.2.5
 
 jobs:
   list-cloud-functions:
@@ -81,44 +80,3 @@ jobs:
       - name: Check style (flake8)
         run: |
           flake8
-
-  check-terraform-formatting:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./terraform
-    steps:
-      - uses: actions/checkout@v2
-      - uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: ${{env.TEST_RUNNER_TERRAFORM_VERSION}}
-      - name: Check format
-        run: terraform fmt -check -recursive
-
-  check-terraform-validity:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./terraform
-    env:
-      TERRAFORM_DIRS: |
-        setup implementation
-    steps:
-      - uses: actions/checkout@v3
-      - uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.1.4
-      - name: Terraform Init
-        run: |
-          for d in $TERRAFORM_DIRS
-          do
-            echo "Initializing $d";
-            (cd $d && terraform init -backend=false)
-          done
-      - name: Terraform Validate
-        run: |
-          for d in $TERRAFORM_DIRS
-          do
-            echo "Validating $d";
-            (cd $d && terraform validate)
-          done

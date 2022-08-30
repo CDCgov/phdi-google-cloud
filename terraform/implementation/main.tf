@@ -12,6 +12,7 @@ resource "google_project_service" "enable_google_apis" {
   disable_on_destroy = false
 }
 
+
 module "storage" {
   source     = "../modules/storage"
   project_id = var.project_id
