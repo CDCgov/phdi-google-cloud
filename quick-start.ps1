@@ -24,7 +24,8 @@ function Get-Variables {
 
 # Function to use GitHub CLI to set repository secrets
 function Set-Variables {
-    if (! Get-Command 'gh' -errorAction SilentlyContinue) {
+    $GH_COMMAND = Get-Command "gh" -ErrorAction SilentlyContinue
+    if ($null -eq $GH_COMMAND) {
         Write-Host "Error: The GitHub CLI is not installed. To install, visit this page:"
         Write-Host "https://cli.github.com/manual/installation"
         Write-Host
