@@ -1,22 +1,25 @@
 import logging
-import flask
+from flask import Request, Response, make_response, jsonify
 
 
-def _success() -> flask.Response:
-    result = flask.Response(status="OK", response="Validation Succeeded!")
+def _full_response(json_response: dict) -> Response:
+    response = make_response(jsonify(json_response), 200)
+    return response
+
+
+def _success() -> Response:
+    result = Response(status="OK", response="Validation Succeeded!")
     result.status_code = 200
     return result
 
 
-def _fail(message: str, status: str) -> flask.Response:
-    result = flask.Response(status=status, response=message)
+def _fail(message: str, status: str) -> Response:
+    result = Response(status=status, response=message)
     result.status_code = 400
     return result
 
 
-def validate_request_header(
-    request: flask.Request, content_type: str
-) -> flask.Response:
+def validate_request_header(request: Request, content_type: str) -> Response:
     """
     Validate that the request header is of the correct type specified
     as one of the parameters.
@@ -36,7 +39,7 @@ def validate_request_header(
     return _success()
 
 
-def validate_request_body_json(request: flask.Request) -> flask.Response:
+def validate_request_body_json(request: Request) -> Response:
     """
     Validate that the request body is proper JSON
 
@@ -53,7 +56,7 @@ def validate_request_body_json(request: flask.Request) -> flask.Response:
         )
 
 
-def validate_fhir_bundle_or_resource(request: flask.Request) -> flask.Response:
+def validate_fhir_bundle_or_resource(request: Request) -> Response:
     """
     Validate that the request body is proper JSON with either a
     FHIR Bundle or other FHIR resource
