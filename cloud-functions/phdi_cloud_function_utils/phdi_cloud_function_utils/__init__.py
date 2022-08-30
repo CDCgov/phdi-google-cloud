@@ -4,7 +4,7 @@ from flask import Request, Response
 
 
 def _full_response(json_response: dict) -> Response:
-    response = Response(status="OK", message=json.dumps(response=json_response))
+    response = Response(status="OK", response=json.dumps(json_response))
     response.status_code = 200
     return response
 
