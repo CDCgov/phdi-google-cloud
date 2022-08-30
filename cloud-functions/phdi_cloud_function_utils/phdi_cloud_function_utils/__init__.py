@@ -3,7 +3,7 @@ import json
 from flask import Request, Response
 
 
-def _full_response(json_response: dict) -> Response:
+def _full_response(json_response) -> Response:
     response = Response(status="OK", response=json.dumps(json_response))
     response.status_code = 200
     return response
