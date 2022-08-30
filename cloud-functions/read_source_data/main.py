@@ -62,10 +62,10 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
         return response
 
     except KeyError:
-        response= "Bad CloudEvent payload - 'name' or 'bucket' name was not included."
+        response = "Bad CloudEvent payload - 'name' or 'bucket' name was not included."
         response = log_error_and_generate_response(response=response, status="400")
         return response
-    
+
     # Determine data type and root template.
     filename_parts = filename.split("/")
     if filename_parts[0] == "source-data":
@@ -99,7 +99,7 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
         ingestion_topic = os.environ["INGESTION_TOPIC"]
 
     except KeyError:
-        response= "Missing required environment variables. Values for PROJECT_ID and TOPIC_ID must be set."
+        response = "Missing required environment variables. Values for PROJECT_ID and TOPIC_ID must be set."
         response = log_error_and_generate_response(response=response, status="400")
         return response
 
@@ -127,7 +127,7 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
             "root_template": root_template,
             "filename": filename,
         }
-        
+
         pubsub_message = json.dumps(pubsub_message).encode("utf-8")
         future = publisher.publish(
             topic_path, pubsub_message, origin="read_source_data"

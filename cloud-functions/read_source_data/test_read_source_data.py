@@ -3,56 +3,91 @@ from unittest import mock
 import json
 import flask
 
+
 def test_bad_cloud_event():
     cloud_event = mock.MagicMock()
     cloud_event.data.__getitem__.side_effect = AttributeError()
     response = read_source_data(cloud_event)
     assert response.response == [b"Bad CloudEvent payload - 'data' attribute missing."]
-    
+
     cloud_event = mock.MagicMock()
     cloud_event.data.__getitem__.side_effect = KeyError()
     response = read_source_data(cloud_event)
-    assert response.response == [b"Bad CloudEvent payload - 'name' or 'bucket' name was not included."]
+    assert response.response == [
+        b"Bad CloudEvent payload - 'name' or 'bucket' name was not included."
+    ]
+
 
 def test_not_source_data():
     cloud_event = mock.MagicMock()
     cloud_event.data.__getitem__.side_effect = ["some-filename", "some-bucket"]
     response = read_source_data(cloud_event)
-    assert response.response == [b"some-filename was not read because it does not begin with 'source-data/'."]
+    assert response.response == [
+        b"some-filename was not read because it does not begin with 'source-data/'."
+    ]
+
 
 def test_unknown_message():
     cloud_event = mock.MagicMock()
-    cloud_event.data.__getitem__.side_effect = ["source-data/unknown-message-type", "some-bucket"]
+    cloud_event.data.__getitem__.side_effect = [
+        "source-data/unknown-message-type",
+        "some-bucket",
+    ]
     response = read_source_data(cloud_event)
-    assert response.response == [b"Unknown message type: unknown-message-type. Messages should be ELR, VXU, or eCR."]
+    assert response.response == [
+        b"Unknown message type: unknown-message-type. Messages should be ELR, VXU, or eCR."
+    ]
+
 
 @mock.patch("main.pubsub_v1.PublisherClient")
 @mock.patch("main.storage.Client")
 @mock.patch("main.os.environ")
-def test_missing_environment_variables(patched_environ, patched_storage_client, patched_publisher_client):
+def test_missing_environment_variables(
+    patched_environ, patched_storage_client, patched_publisher_client
+):
     patched_environ.__getitem__.side_effect = KeyError()
     cloud_event = mock.MagicMock()
-    cloud_event.data.__getitem__.side_effect = ["source-data/elr/some-filename", "some-bucket"]
+    cloud_event.data.__getitem__.side_effect = [
+        "source-data/elr/some-filename",
+        "some-bucket",
+    ]
     response = read_source_data(cloud_event)
-    assert response.response == [b"Missing required environment variables. Values for PROJECT_ID and TOPIC_ID must be set."]
+    assert response.response == [
+        b"Missing required environment variables. Values for PROJECT_ID and TOPIC_ID must be set."
+    ]
+
 
 @mock.patch("main.pubsub_v1.PublisherClient")
 @mock.patch("main.convert_batch_messages_to_list")
 @mock.patch("main.storage.Client")
 @mock.patch("main.os.environ")
-def test_handle_batch_hl7(patched_environ, patched_storage_client, patched_batch_converter, patched_publisher_client):
+def test_handle_batch_hl7(
+    patched_environ,
+    patched_storage_client,
+    patched_batch_converter,
+    patched_publisher_client,
+):
     cloud_event = mock.MagicMock()
-    cloud_event.data.__getitem__.side_effect = ["source-data/elr/some-filename", "some-bucket"]
+    cloud_event.data.__getitem__.side_effect = [
+        "source-data/elr/some-filename",
+        "some-bucket",
+    ]
     patched_batch_converter.return_value = ["some-message"]
     read_source_data(cloud_event)
     patched_batch_converter.assert_called()
 
+
 @mock.patch("main.pubsub_v1.PublisherClient")
 @mock.patch("main.convert_batch_messages_to_list")
 @mock.patch("main.storage.Client")
 @mock.patch("main.os.environ")
-def test_publishing_initial_success(patched_environ, patched_storage_client, patched_batch_converter, patched_publisher_client):
-    for source_data_subdirectory in ["elr", "vxu", "ecr"]:  
+def test_publishing_initial_success(
+    patched_environ,
+    patched_storage_client,
+    patched_batch_converter,
+    patched_publisher_client,
+):
+    for source_data_subdirectory in ["elr", "vxu", "ecr"]:
 
         if source_data_subdirectory == "elr":
             message_type = "hl7v2"
@@ -65,9 +100,12 @@ def test_publishing_initial_success(patched_environ, patched_storage_client, pat
         elif source_data_subdirectory == "ecr":
             message_type = "ccda"
             root_template = "CCD"
-        
+
         cloud_event = mock.MagicMock()
-        cloud_event.data.__getitem__.side_effect = [f"source-data/{source_data_subdirectory}/some-filename", "some-bucket"]
+        cloud_event.data.__getitem__.side_effect = [
+            f"source-data/{source_data_subdirectory}/some-filename",
+            "some-bucket",
+        ]
         patched_batch_converter.return_value = ["some-message"]
 
         patched_storage_client_instance = patched_storage_client.return_value
@@ -82,23 +120,34 @@ def test_publishing_initial_success(patched_environ, patched_storage_client, pat
             "message": "some-message",
             "message_type": message_type,
             "root_template": root_template,
-            "filename": f"source-data/{source_data_subdirectory}/some-filename"
+            "filename": f"source-data/{source_data_subdirectory}/some-filename",
         }
         pubsub_message = json.dumps(pubsub_message).encode("utf-8")
 
         read_source_data(cloud_event)
-        patched_publisher_client_instance.publish.assert_called_with("some-pubsub-topic", pubsub_message, origin="read_source_data")
+        patched_publisher_client_instance.publish.assert_called_with(
+            "some-pubsub-topic", pubsub_message, origin="read_source_data"
+        )
+
 
 @mock.patch("main.pubsub_v1.PublisherClient")
 @mock.patch("main.convert_batch_messages_to_list")
 @mock.patch("main.storage.Client")
 @mock.patch("main.os.environ")
-def test_publishing_retry_success(patched_environ, patched_storage_client, patched_batch_converter, patched_publisher_client):
-    
+def test_publishing_retry_success(
+    patched_environ,
+    patched_storage_client,
+    patched_batch_converter,
+    patched_publisher_client,
+):
+
     cloud_event = mock.MagicMock()
-    cloud_event.data.__getitem__.side_effect = [f"source-data/elr/some-filename", "some-bucket"]
+    cloud_event.data.__getitem__.side_effect = [
+        f"source-data/elr/some-filename",
+        "some-bucket",
+    ]
     patched_batch_converter.return_value = ["some-message"]
-    
+
     patched_storage_client_instance = patched_storage_client.return_value
     patched_bucket = patched_storage_client_instance.get_bucket.return_value
     patched_blob = patched_bucket.blob.return_value
@@ -110,22 +159,34 @@ def test_publishing_retry_success(patched_environ, patched_storage_client, patch
     first_future.result.side_effect = Exception()
     second_future = mock.Mock()
     second_future.result.return_value = "some-message-id"
-    patched_publisher_client_instance.publish.side_effect = [first_future, second_future]
+    patched_publisher_client_instance.publish.side_effect = [
+        first_future,
+        second_future,
+    ]
 
     read_source_data(cloud_event)
     assert patched_publisher_client_instance.publish.call_count == 2
     assert not patched_blob.upload_from_string.called
 
+
 @mock.patch("main.pubsub_v1.PublisherClient")
 @mock.patch("main.convert_batch_messages_to_list")
 @mock.patch("main.storage.Client")
 @mock.patch("main.os.environ")
-def test_publishing_failure(patched_environ, patched_storage_client, patched_batch_converter, patched_publisher_client):
-    
+def test_publishing_failure(
+    patched_environ,
+    patched_storage_client,
+    patched_batch_converter,
+    patched_publisher_client,
+):
+
     cloud_event = mock.MagicMock()
-    cloud_event.data.__getitem__.side_effect = [f"source-data/elr/some-filename.txt", "some-bucket"]
+    cloud_event.data.__getitem__.side_effect = [
+        f"source-data/elr/some-filename.txt",
+        "some-bucket",
+    ]
     patched_batch_converter.return_value = ["some-message"]
-    
+
     patched_storage_client_instance = patched_storage_client.return_value
     patched_bucket = patched_storage_client_instance.get_bucket.return_value
     patched_blob = patched_bucket.blob.return_value
@@ -139,27 +200,48 @@ def test_publishing_failure(patched_environ, patched_storage_client, patched_bat
 
     read_source_data(cloud_event)
     assert patched_publisher_client_instance.publish.call_count == 2
-    patched_bucket.blob.assert_called_with("publishing-failures/elr/some-filename-0.txt")
+    patched_bucket.blob.assert_called_with(
+        "publishing-failures/elr/some-filename-0.txt"
+    )
     patched_blob.upload_from_string.assert_called_with("some-message")
+
 
 @mock.patch("main.pubsub_v1.PublisherClient")
 @mock.patch("main.convert_batch_messages_to_list")
 @mock.patch("main.storage.Client")
 @mock.patch("main.os.environ")
-def test_read_source_data(patched_environ, patched_storage_client, patched_batch_converter, patched_publisher_client):
-    
+def test_read_source_data(
+    patched_environ,
+    patched_storage_client,
+    patched_batch_converter,
+    patched_publisher_client,
+):
+
     cloud_event = mock.MagicMock()
-    cloud_event.data.__getitem__.side_effect = [f"source-data/elr/some-filename.txt", "some-bucket"]
+    cloud_event.data.__getitem__.side_effect = [
+        f"source-data/elr/some-filename.txt",
+        "some-bucket",
+    ]
     patched_batch_converter.return_value = ["some-message"]
-    
+
     patched_storage_client_instance = patched_storage_client.return_value
     patched_bucket = patched_storage_client_instance.get_bucket.return_value
     patched_blob = patched_bucket.blob.return_value
     patched_blob.download_as_text.return_value = "some-message"
 
     response = read_source_data(cloud_event)
-    assert response.response == log_info_and_generate_response("Processed source-data/elr/some-filename.txt, which contained 1 messages, of which 1 were successfully published, and 0 could not be published.", "200").response
+    assert (
+        response.response
+        == log_info_and_generate_response(
+            "Processed source-data/elr/some-filename.txt, which contained 1 messages, of which 1 were successfully published, and 0 could not be published.",
+            "200",
+        ).response
+    )
+
 
 def test_log_error_and_generate_response():
     response = log_info_and_generate_response("my-response", "200")
-    assert response.response == flask.Response(response="my-response", status="200").response
+    assert (
+        response.response
+        == flask.Response(response="my-response", status="200").response
+    )
