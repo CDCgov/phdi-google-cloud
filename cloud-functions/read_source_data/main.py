@@ -142,7 +142,7 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
             message_id = future.result()
             logging.info(
                 f"Message {idx} in {filename} was published to {topic_path} with"
-                "message ID {message_id}."
+                f"message ID {message_id}."
             )
         except Exception as error:
             error_message = str(error)
@@ -158,14 +158,14 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
                 message_id = future.result()
                 logging.info(
                     f"Message {idx} in {filename} was published to {topic_path} with "
-                    "message ID {message_id}."
+                    f"message ID {message_id}."
                 )
             # On second failure write the message to storage and continue.
             except Exception as error:
                 error_message = str(error)
                 logging.error(
                     f"Publishing message {idx} in {filename} failed because"
-                    "{error_message}."
+                    f"{error_message}."
                 )
                 failure_filename = filename.split("/")
                 failure_filename[0] = "publishing-failures"
@@ -176,14 +176,14 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
                 blob = bucket.blob(failure_filename)
                 blob.upload_from_string(message)
                 logging.info(
-                    "Message {idx} in {filename} was written to {failure_filename} in "
-                    "{bucket_name}."
+                    f"Message {idx} in {filename} was written to {failure_filename} in "
+                    f"{bucket_name}."
                 )
                 failure_count += 1
 
     response = (
         f"Processed {filename}, which contained {idx+1} messages, of which "
-        "{idx+1-failure_count} were successfully published, and {failure_count} "
+        f"{idx+1-failure_count} were successfully published, and {failure_count} "
         "could not be published."
     )
     response = log_info_and_generate_response(response=response, status="200")
