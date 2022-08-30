@@ -7,7 +7,7 @@ from phdi_cloud_function_utils import (
     _fail,
     _success,
     log_error_and_generate_response,
-    log_info_and_generate_response
+    log_info_and_generate_response,
 )
 from unittest import mock
 import flask
@@ -90,12 +90,14 @@ def test_utils_request():
     assert result.status_code == expected_result.status_code
     assert result.response == expected_result.response
 
+
 def test_log_info_and_generate_response():
     response = log_info_and_generate_response("my-response", "200")
     assert (
         response.response
         == flask.Response(response="my-response", status="200").response
     )
+
 
 def test_log_error_and_generate_response():
     response = log_error_and_generate_response("my-response", "400")
