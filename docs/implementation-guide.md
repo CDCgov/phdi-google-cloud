@@ -63,8 +63,8 @@ or
 
 If you do not meet either of these criteria contact the owner of your organization's GCP environment.
 
-### Step 2: Install the Gcloud CLI.
-The gcloud CLI is a command line tool provided by Google for working with GCP. We will use it to authenticate your local machine with your organization's GCP environment. Follow [this guide](https://cloud.google.com/sdk/docs/install) to install gcloud. Confirm that the installation was successful by running `gcloud --version`. If gcloud is installed properly you should get a response similar to what is shown below.
+### Step 2: Install the Gcloud and GitHub CLI tools
+The gcloud CLI is a command line tool provided by Google for working with GCP. We will use it to authenticate your local machine with your organization's GCP environment. Follow [this guide](https://cloud.google.com/sdk/docs/install) to install `gcloud`. Confirm that the installation was successful by running `gcloud --version`. If `gcloud` is installed properly you should get a response similar to what is shown below.
 
 ```bash
 ❯ gcloud --version
@@ -72,6 +72,14 @@ Google Cloud SDK 399.0.0
 bq 2.0.75
 core 2022.08.19
 gsutil 5.12
+```
+
+Optionally, you may also install the GitHub CLI tool (`gh`) to enable automatically setting secrets in your repository. Follow [this guide](https://cli.github.com/manual/installation) to install the tool. Confirm that the installation was successful by running `gh --version`. If `gh` is installed properly you should get a response similar to what is shown below.
+
+```bash
+❯ gh --version
+gh version 2.14.7 (2022-08-25)
+https://github.com/cli/cli/releases/tag/v2.14.7
 ```
 
 ### Step 3: Fork the phdi-google-cloud Repository
@@ -93,11 +101,13 @@ From your machine's command line:
 1. Navigate to the root directory of the repository you cloned in step 4.
 2. Run the quick start script and follow the prompts.
     - [quick-start.sh](../quick-start.sh) for Mac and Linux
-    - TODO: WRITE WINDOWS BATCH QUICK START SCRIPT
+    - [quick-start.ps1](../quick-start.ps1) for Windows
 
 If you plan to deploy to an existing project in your GCP environment, have the project name ready and provide it to the quick start script when prompted.
 
 ### Step 6: Set Repository Secrets
+If you installed the `gh` CLI and the quick start script set these secrets automatically, you may skip to Step 7.
+
 Set the following secret values in your forked phdi-google-cloud repository:
 - `PROJECT_ID` - Specified by the quick start script.
 - `SERVICE_ACCOUNT_ID` - Specified by the quick start script.
