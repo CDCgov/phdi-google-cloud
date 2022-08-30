@@ -6,9 +6,8 @@ setup(
     description="Utilities for GCP Cloud Functions in the phdi-google-cloud repository.",
     url="https://github.com/CDCgov/phdi-google-cloud/tree/main/cloud-functions/phdi_cloud_function_utils",
     author="PHDI",
-    author_email="flyingcircus@example.com",
     license="CC0 1.0 Universal",
-    packages=["phdi-cloud-function-utils"],
+    packages=["phdi_cloud_function_utils"],
     install_requires=["flask"],
     zip_safe=False,
 )
