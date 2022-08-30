@@ -5,7 +5,6 @@ import os
 from google.cloud import pubsub_v1
 from google.cloud import storage
 import json
-from phdi_cloud_function_utils import _fail
 import flask
 from cloudevents.http import CloudEvent
 
