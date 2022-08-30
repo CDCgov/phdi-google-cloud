@@ -1,7 +1,6 @@
 from main import read_source_data, log_info_and_generate_response
 from unittest import mock
 import json
-import flask
 
 
 def test_bad_cloud_event():
