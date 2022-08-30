@@ -1,9 +1,11 @@
 import logging
-from flask import Request, Response, make_response, jsonify
+import json
+from flask import Request, Response
 
 
 def _full_response(json_response: dict) -> Response:
-    response = make_response(jsonify(json_response), 200)
+    response = Response(status="OK", message=json.dumps(response=json_response))
+    response.status_code = 200
     return response
 
 
