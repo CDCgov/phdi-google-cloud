@@ -20,11 +20,14 @@ module "storage" {
 }
 
 module "cloud-functions" {
-  source                        = "../modules/cloud-functions"
-  functions_storage_bucket      = module.storage.functions_storage_bucket
-  upcase_source_zip             = module.storage.upcase_source_zip
-  upload_fhir_bundle_source_zip = module.storage.upload_fhir_bundle_source_zip
-  depends_on                    = [google_project_service.enable_google_apis]
+  source                           = "../modules/cloud-functions"
+  functions_storage_bucket         = module.storage.functions_storage_bucket
+  upcase_source_zip                = module.storage.upcase_source_zip
+  upload_fhir_bundle_source_zip    = module.storage.upload_fhir_bundle_source_zip
+  add_patient_hash_source_zip      = module.storage.add_patient_hash_source_zip
+  patient_hash_salt_secret_id      = module.secret-manager.patient_hash_salt_secret_id
+  patient_hash_salt_secret_version = module.secret-manager.patient_hash_salt_secret_version
+  depends_on                       = [google_project_service.enable_google_apis]
 }
 
 module "google-workflows" {
@@ -65,4 +68,11 @@ module "cloud-run" {
     google_project_service.enable_google_apis,
     module.artifact-registries.phdi-repo
   ]
+}
+
+module "secret-manager" {
+  source                         = "../modules/secret-manager"
+  project_id                     = var.project_id
+  workflow_service_account_email = module.google-workflows.workflow_service_account_email
+  depends_on                     = [google_project_service.enable_google_apis]
 }

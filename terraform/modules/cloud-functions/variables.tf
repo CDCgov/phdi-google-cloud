@@ -9,3 +9,11 @@ variable "upcase_source_zip" {
 variable "upload_fhir_bundle_source_zip" {
   description = "value of google_storage_bucket_object.upload_fhir_bundle_source_zip.name"
 }
+
+variable "patient_hash_salt_secret_id" {
+  description = "value of google_secret_manager_secret.salt.id"
+}
+
+variable "patient_hash_salt_secret_version" {
+  description = "value of google_secret_manager_secret_version.salt-version.name"
+}

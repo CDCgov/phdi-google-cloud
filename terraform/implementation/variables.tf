@@ -36,6 +36,7 @@ variable "gcp_services_list" {
     "oslogin.googleapis.com",
     "pubsub.googleapis.com",
     "run.googleapis.com",
+    "secretmanager.googleapis.com",
     "servicemanagement.googleapis.com",
     "sql-component.googleapis.com",
     "storage-api.googleapis.com",
