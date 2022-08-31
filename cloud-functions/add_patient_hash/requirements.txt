@@ -47,7 +47,7 @@ packaging==21.3
 pandas==1.4.3
 pathspec==0.9.0
 phdi
-phdi_cloud_function_utils @ git+https://github.com/CDCgov/phdi-google-cloud@main#subdirectory=cloud-functions/phdi_cloud_function_utils
+phdi_cloud_function_utils @ git+https://github.com/CDCgov/phdi-google-cloud@bdec84872ce35113618cc28f7126db4cd0c334c5#subdirectory=cloud-functions/phdi_cloud_function_utils
 phonenumbers==8.12.54
 platformdirs==2.5.2
 pluggy==1.0.0
