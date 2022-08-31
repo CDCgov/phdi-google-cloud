@@ -24,8 +24,8 @@ module "cloud-functions" {
   functions_storage_bucket      = module.storage.functions_storage_bucket
   upcase_source_zip             = module.storage.upcase_source_zip
   upload_fhir_bundle_source_zip = module.storage.upload_fhir_bundle_source_zip
-  http_standardize_phones_zip   = module.storage.http_standardize_phones_zip
-  http_standardize_names_zip    = module.storage.http_standardize_names_zip
+  standardize_phones_zip        = module.storage.standardize_phones_zip
+  standardize_names_zip         = module.storage.standardize_names_zip
   depends_on                    = [google_project_service.enable_google_apis]
 }
 

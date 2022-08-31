@@ -29,7 +29,7 @@ resource "google_cloudfunctions_function" "standardize-names" {
 
   available_memory_mb   = 128
   source_archive_bucket = var.functions_storage_bucket
-  source_archive_object = var.http_standardize_names_zip
+  source_archive_object = var.standardize_names_zip
   trigger_http          = true
   entry_point           = "http_standardize_names"
 }
@@ -41,7 +41,7 @@ resource "google_cloudfunctions_function" "standardize-phones" {
 
   available_memory_mb   = 128
   source_archive_bucket = var.functions_storage_bucket
-  source_archive_object = var.http_standardize_phones_zip
+  source_archive_object = var.standardize_phones_zip
   trigger_http          = true
   entry_point           = "http_standardize_phones"
 }

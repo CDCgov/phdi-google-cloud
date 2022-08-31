@@ -52,30 +52,30 @@ resource "google_storage_bucket_object" "upload_fhir_bundle_source_zip" {
 
 data "archive_file" "standardize_names" {
   type        = "zip"
-  source_dir  = "../../cloud-functions/http_standardize_names"
-  output_path = "../../cloud-functions/http_standardize_names.zip"
+  source_dir  = "../../cloud-functions/standardize_names"
+  output_path = "../../cloud-functions/standardize_names.zip"
 }
 
 # Add source code zip to the Cloud Function's bucket
-resource "google_storage_bucket_object" "http_standardize_names_zip" {
-  source       = data.archive_file.http_standardize_names.output_path
+resource "google_storage_bucket_object" "standardize_names_zip" {
+  source       = data.archive_file.standardize_names.output_path
   content_type = "application/zip"
 
   # Append to the MD5 checksum of the files's content
   # to force the zip to be updated as soon as a change occurs
-  name   = "src-${data.archive_file.http_standardize_names.output_md5}-${var.project_id}.zip"
+  name   = "src-${data.archive_file.standardize_names.output_md5}-${var.project_id}.zip"
   bucket = google_storage_bucket.functions.name
 }
 
 data "archive_file" "standardize_phones" {
   type        = "zip"
-  source_dir  = "../../cloud-functions/http_standardize_phones"
-  output_path = "../../cloud-functions/http_standardize_phones.zip"
+  source_dir  = "../../cloud-functions/standardize_phones"
+  output_path = "../../cloud-functions/standardize_phones.zip"
 }
 
 # Add source code zip to the Cloud Function's bucket
-resource "google_storage_bucket_object" "http_standardize_phones_zip" {
-  source       = data.archive_file.http_standardize_phones.output_path
+resource "google_storage_bucket_object" "standardize_phones_zip" {
+  source       = data.archive_file.standardize_phones.output_path
   content_type = "application/zip"
 
   # Append to the MD5 checksum of the files's content
