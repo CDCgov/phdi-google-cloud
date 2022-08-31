@@ -3,7 +3,9 @@ import json
 from flask import Request, Response
 
 
-def success(message="Validation Succeeded!", json_payload=None) -> Response:
+def success(
+    message="Validation Succeeded!", json_payload=None, status_code=200
+) -> Response:
     if json_payload is not None:
         result = Response(
             status="OK",
@@ -14,12 +16,13 @@ def success(message="Validation Succeeded!", json_payload=None) -> Response:
     else:
 
         result = Response(status="OK", response=message)
+    result.status_code = status_code
     return result
 
 
-def fail(message: str, status: str) -> Response:
+def fail(message, status, status_code=400) -> Response:
     result = Response(status=status, response=message)
-    result.status_code = 400
+    result.status_code = status_code
     return result
 
 
