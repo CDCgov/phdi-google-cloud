@@ -4,6 +4,7 @@ import os
 from phdi.fhir.linkage.link import add_patient_identifier
 from phdi_cloud_function_utils import (
     check_for_environment_variables,
+    success,
     validate_fhir_bundle_or_resource,
     validate_request_header,
 )
@@ -45,4 +46,4 @@ def add_patient_hash(request: flask.Request) -> flask.Response:
     request_json = request.get_json(silent=False)
     salt_str = os.environ.get("PATIENT_HASH_SALT")
     final_response = add_patient_identifier(request_json, salt_str)
-    return final_response
+    return success(json_payload=final_response)

@@ -56,7 +56,13 @@ def test_add_patient_hash_good_request(patched_os_environ):
     request = mock.Mock(headers={"Content-Type": "application/json"})
 
     expected_result = copy.deepcopy(test_request_body)
-    expected_result["entry"][0]["resource"]["identifier"] = [{"value": "somehash"}]
+    expected_result["entry"][0]["resource"]["identifier"] = [
+        {
+            "system": "urn:ietf:rfc:3986",
+            "use": "temp",
+            "value": "699d8585efcf84d1a03eb58e84cd1c157bf7b718d9257d7436e2ff0bd14b2834",
+        }
+    ]
     request.get_json.return_value = test_request_body
     actual_result = add_patient_hash(request)
 
