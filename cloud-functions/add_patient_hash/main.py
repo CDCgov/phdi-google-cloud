@@ -18,6 +18,9 @@ def add_patient_hash(request: flask.Request) -> flask.Response:
     * compute a unique hash string based on these fields
     * add the hash string to the list of identifiers held in that patient resource
 
+    For hashing consistency, we recommend calling this function after
+    standardizing the names and addresses of all patients in the bundle.
+
     :param request: A Flask POST request object. The header must contain
         'Content-Type:application/json' and the body must contain a FHIR bundle.
     :return: Returns a flask.Response object
