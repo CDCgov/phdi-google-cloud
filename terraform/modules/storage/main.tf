@@ -52,7 +52,7 @@ resource "google_storage_bucket_object" "upload_fhir_bundle_source_zip" {
 
 data "archive_file" "standardize_names" {
   type        = "zip"
-  source_dir  = "../../cloud-functions/standardize_names"
+  source_dir  = "../../cloud-functions/http_standardize_names"
   output_path = "../../cloud-functions/standardize_names.zip"
 }
 
@@ -69,7 +69,7 @@ resource "google_storage_bucket_object" "standardize_names_zip" {
 
 data "archive_file" "standardize_phones" {
   type        = "zip"
-  source_dir  = "../../cloud-functions/standardize_phones"
+  source_dir  = "../../cloud-functions/http_standardize_phones"
   output_path = "../../cloud-functions/standardize_phones.zip"
 }
 
