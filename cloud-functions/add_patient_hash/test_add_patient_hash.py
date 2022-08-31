@@ -54,7 +54,7 @@ def test_add_patient_hash_good_request():
     request = mock.Mock(headers={"Content-Type": "application/json"})
 
     expected_result = copy.deepcopy(test_request_body)
-    expected_result["entry"][0]["resource"]["identifier"][0]["value"] = "somehash"
+    expected_result["entry"][0]["resource"]["identifier"] = [{"value": "somehash"}]
     request.get_json.return_value = test_request_body
     actual_result = add_patient_hash(request)
 
