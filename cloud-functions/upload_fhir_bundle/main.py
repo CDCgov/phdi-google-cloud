@@ -1,9 +1,10 @@
 import logging
+import json
 import functions_framework
 import flask
 from pydantic import BaseModel, ValidationError, validator
 from phdi.fhir.transport.http import upload_bundle_to_fhir_server
-from phdi_cloud_function_utils import validate_request_header, _fail
+from phdi_cloud_function_utils import validate_request_header, fail
 from phdi.cloud.gcp import GcpCredentialManager
 
 
@@ -60,7 +61,10 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
         request_body = RequestBody.parse_obj(request_json)
     except ValidationError as error:
         logging.error(error)
-        error_response = _fail(message=error, status="Invalid request body")
+        error_as_dictionary = json.loads(error.json())[0]
+        error_response = fail(
+            message=error_as_dictionary, status="Invalid request body"
+        )
 
         return error_response
 

@@ -2,7 +2,7 @@ from main import RequestBody, upload_fhir_bundle
 from pydantic import ValidationError
 import pytest
 from unittest import mock
-from phdi_cloud_function_utils import _fail
+from phdi_cloud_function_utils import fail
 
 
 def test_request_body():
@@ -39,7 +39,7 @@ def test_request_body():
 def test_upload_fhir_bundle_bad_header():
     request = mock.Mock(headers={"Content-Type": "not-application/json"})
     result = upload_fhir_bundle(request)
-    expected_result = _fail(
+    expected_result = fail(
         "Header must include: 'Content-Type:application/json'.",
         "Bad Request",
     )
@@ -60,7 +60,7 @@ def test_upload_fhir_bundle_bad_body():
     }
 
     result = upload_fhir_bundle(request)
-    expected_result = _fail(
+    expected_result = fail(
         "{'loc': ['dataset_id'], 'msg': 'str type expected', 'type': 'type_error.str'}",
         "Bad Request",
     )
