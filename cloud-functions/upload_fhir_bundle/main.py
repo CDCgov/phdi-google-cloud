@@ -1,5 +1,4 @@
 import logging
-import json
 import functions_framework
 import flask
 from pydantic import BaseModel, ValidationError, validator
@@ -61,10 +60,7 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
         request_body = RequestBody.parse_obj(request_json)
     except ValidationError as error:
         logging.error(error)
-        error_as_dictionary = json.loads(error.json())[0]
-        error_response = _fail(
-            message=error_as_dictionary, status="Invalid request body"
-        )
+        error_response = _fail(message=error, status="Invalid request body")
 
         return error_response
 

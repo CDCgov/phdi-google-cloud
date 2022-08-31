@@ -36,9 +36,6 @@ def http_standardize_phones(request: flask.Request) -> flask.Response:
         # Perform the phone standardization
         request_json = request.get_json(silent=False)
         response = standardize_phones(request_json)
-        print("BLAH")
-        print(response)
-        print("YEAH")
         body_response = _full_response(response)
 
     return body_response
