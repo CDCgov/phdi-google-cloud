@@ -50,7 +50,9 @@ def test_add_patient_hash_bad_resource_type():
     assert result.response == expected_result.response
 
 
-def test_add_patient_hash_good_request():
+@mock.patch("main.os.environ")
+def test_add_patient_hash_good_request(patched_os_environ):
+    patched_os_environ.get.return_value = "test_hash"
     request = mock.Mock(headers={"Content-Type": "application/json"})
 
     expected_result = copy.deepcopy(test_request_body)
