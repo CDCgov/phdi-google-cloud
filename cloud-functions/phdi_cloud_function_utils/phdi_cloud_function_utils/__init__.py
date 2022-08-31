@@ -3,19 +3,21 @@ import json
 from flask import Request, Response
 
 
-def _full_response(json_response) -> Response:
-    response = Response(status="OK", response=json.dumps(json_response))
-    response.status_code = 200
-    return response
+def success(message="Validation Succeeded!", json_payload=None) -> Response:
+    if json_payload is not None:
+        result = Response(
+            status="OK",
+            response=json.dumps(json_payload),
+            mimetype="application/json",
+            headers={"Content-Type": "application/json"},
+        )
+    else:
 
-
-def _success() -> Response:
-    result = Response(status="OK", response="Validation Succeeded!")
-    result.status_code = 200
+        result = Response(status="OK", response=message)
     return result
 
 
-def _fail(message: str, status: str) -> Response:
+def fail(message: str, status: str) -> Response:
     result = Response(status=status, response=message)
     result.status_code = 400
     return result
@@ -33,12 +35,12 @@ def validate_request_header(request: Request, content_type: str) -> Response:
     """
     if request.headers.get("Content-Type") != content_type:
         logging.error("Header must include: 'Content-Type:{}'.".format(content_type))
-        return _fail(
+        return fail(
             "Header must include: 'Content-Type:{}'.".format(content_type),
             "Bad Request",
         )
 
-    return _success()
+    return success()
 
 
 def validate_request_body_json(request: Request) -> Response:
@@ -51,11 +53,9 @@ def validate_request_body_json(request: Request) -> Response:
     """
 
     if request.is_json():
-        return _success()
+        return success()
     else:
-        return _fail(
-            message="Invalid request body - Invalid JSON", status="Bad Request"
-        )
+        return fail(message="Invalid request body - Invalid JSON", status="Bad Request")
 
 
 def validate_fhir_bundle_or_resource(request: Request) -> Response:
@@ -78,6 +78,6 @@ def validate_fhir_bundle_or_resource(request: Request) -> Response:
             + "The request body must contain a valid FHIR bundle or resource."
         )
         logging.error(error_message)
-        return _fail(message=error_message, status="Bad Request")
+        return fail(message=error_message, status="Bad Request")
 
-    return _success()
+    return success()
