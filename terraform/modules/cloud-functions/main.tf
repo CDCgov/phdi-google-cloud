@@ -32,6 +32,12 @@ resource "google_cloudfunctions_function" "add-patient-hash" {
   source_archive_object = var.add_patient_hash_source_zip
   trigger_http          = true
   entry_point           = "add_patient_hash"
+
+  secret_environment_variables {
+    key     = "PATIENT_HASH_SALT"
+    secret  = var.patient_hash_salt_secret_id
+    version = var.patient_hash_salt_secret_version
+  }
 }
 
 resource "google_cloudfunctions_function" "standardize-names" {
@@ -56,10 +62,4 @@ resource "google_cloudfunctions_function" "standardize-phones" {
   source_archive_object = var.standardize_phones_zip
   trigger_http          = true
   entry_point           = "http_standardize_phones"
-}
-
-secret_environment_variables {
-  key     = "PATIENT_HASH_SALT"
-  secret  = var.patient_hash_salt_secret_id
-  version = var.patient_hash_salt_secret_version
 }
