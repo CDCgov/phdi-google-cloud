@@ -36,11 +36,12 @@ def test_make_response():
     assert response.response == expected_response.response
     assert response.status_code == expected_response.status_code
 
-    expected_response = flask.Response()
-    expected_response.response = json.dumps(json_payload)
+    expected_response = flask.Response(
+        response=json.dumps(json_payload),
+        mimetype="application/json",
+        headers={"Content-Type": "application/json"},
+    )
     expected_response.status_code = status_code
-    expected_response.mimetype = "application/json"
-    expected_response.headers = {"Content-Type": "application/json"}
 
     response = make_response(status_code=status_code, json_payload=json_payload)
     assert response.response == expected_response.response

@@ -28,14 +28,16 @@ def make_response(
             "Neither message nor json_payload were provided, but one is required."
         )
 
-    result = Response()
-    result.status_code = status_code
     if json_payload is not None:
-        result.response = json.dumps(json_payload)
-        result.mimetype = "application/json"
-        result.headers = {"Content-Type": "application/json"}
+        result = Response(
+            response=json.dumps(json_payload),
+            mimetype="application/json",
+            headers={"Content-Type": "application/json"},
+        )
     else:
+        result = Response(response=message)
         result.response = message
+    result.status_code = status_code
     return result
 
 
