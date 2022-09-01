@@ -1,9 +1,10 @@
 import copy
+from email import message
 import json
 from main import add_patient_hash
 from unittest import mock
 import pytest
-from phdi_cloud_function_utils import fail
+from phdi_cloud_function_utils import make_response
 
 
 test_request_body = json.load(open("../assets/single_patient_bundle.json", "r"))
@@ -13,9 +14,8 @@ def test_add_patient_hash_bad_header():
     request = mock.Mock(headers={"Content-Type": "not-application/json"})
 
     result = add_patient_hash(request)
-    expected_result = fail(
-        "Header must include: 'Content-Type:application/json'.",
-        "Bad Request",
+    expected_result = make_response(
+        status_code=400, message="Header must include: 'Content-Type:application/json'."
     )
     expected_result.status_code = 400
     assert result.status == expected_result.status
