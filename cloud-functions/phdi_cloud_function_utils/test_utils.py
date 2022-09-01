@@ -136,7 +136,7 @@ def test_check_for_environment_variables_success(patched_environ):
 
 
 @mock.patch("os.environ")
-def test_check_for_environment_variables_success(patched_environ):
+def test_check_for_environment_variables_failure(patched_environ):
     environment_variables = ["SOME-ENV-VAR"]
     patched_environ.get.return_value = None
     response = check_for_environment_variables(environment_variables)
