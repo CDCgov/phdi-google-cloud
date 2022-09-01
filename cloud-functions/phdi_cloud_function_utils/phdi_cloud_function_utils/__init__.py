@@ -1,6 +1,7 @@
 import logging
 import json
 from flask import Request, Response
+import os
 
 
 def make_response(
@@ -97,6 +98,28 @@ def validate_fhir_bundle_or_resource(request: Request) -> Response:
         return log_error_and_generate_response(status_code=400, message=error_message)
 
     return make_response(status_code=200, message="Validation Succeeded!")
+
+
+def check_for_environment_variables(environment_variables: list) -> Response:
+    """
+    Check that the environment variables are set.
+    :param environment_variables: A list of environment variables to check
+    :return: A flask.Response object containing the error if the environment
+        variables are not set or will return a generic 200 flask.Response
+    """
+    for environment_variable in environment_variables:
+        if os.environ.get(environment_variable) is None:
+            error_message = (
+                "Environment variable '{}' not set. "
+                + "The environment variable must be set."
+            ).format(environment_variable)
+            return log_error_and_generate_response(
+                status_code=500, message=error_message
+            )
+
+    return make_response(
+        status_code=200, message="All environment variables were found."
+    )
 
 
 def log_error_and_generate_response(status_code: int, message: str) -> Response:

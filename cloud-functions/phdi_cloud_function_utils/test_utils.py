@@ -5,6 +5,7 @@ from phdi_cloud_function_utils import (
     validate_fhir_bundle_or_resource,
     validate_request_body_json,
     validate_request_header,
+    check_for_environment_variables,
     log_error_and_generate_response,
     log_info_and_generate_response,
 )
@@ -120,6 +121,34 @@ def test_utils_request():
     assert result.status == expected_result.status
     assert result.status_code == expected_result.status_code
     assert result.response == expected_result.response
+
+
+@mock.patch("os.environ")
+def test_check_for_environment_variables_success(patched_environ):
+    environment_variables = ["SOME-ENV-VAR"]
+    patched_environ.get.return_value = "some-value"
+    response = check_for_environment_variables(environment_variables)
+    expected_response = make_response(
+        status_code=200, message="All environment variables were found."
+    )
+    assert response.response == expected_response.response
+    assert response.status_code == expected_response.status_code
+
+
+@mock.patch("os.environ")
+def test_check_for_environment_variables_success(patched_environ):
+    environment_variables = ["SOME-ENV-VAR"]
+    patched_environ.get.return_value = None
+    response = check_for_environment_variables(environment_variables)
+    expected_response = make_response(
+        status_code=500,
+        message=(
+            "Environment variable 'SOME-ENV-VAR' not set. "
+            "The environment variable must be set."
+        ),
+    )
+    assert response.response == expected_response.response
+    assert response.status_code == expected_response.status_code
 
 
 def test_log_info_and_generate_response():
