@@ -1,10 +1,11 @@
+import json
 import functions_framework
 import flask
 from phdi.fhir.harmonization.standardization import standardize_phones
 from phdi_cloud_function_utils import (
     validate_fhir_bundle_or_resource,
     validate_request_header,
-    success,
+    make_response,
 )
 
 
@@ -35,6 +36,9 @@ def http_standardize_phones(request: flask.Request) -> flask.Response:
     if body_response.status_code != 400:
         # Perform the phone standardization
         request_json = request.get_json(silent=False)
-        body_response = success(json_payload=standardize_phones(request_json))
+        # breakpoint()
+        body_response = make_response(
+            status_code=200, message=None, json_payload=standardize_phones(request_json)
+        )
 
     return body_response

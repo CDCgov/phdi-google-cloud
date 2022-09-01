@@ -2,7 +2,7 @@ import copy
 import json
 from main import http_standardize_names
 from unittest import mock
-from phdi_cloud_function_utils import fail
+from phdi_cloud_function_utils import make_response
 import pytest
 
 
@@ -12,11 +12,9 @@ test_request_body = json.load(open("../assets/single_patient_bundle.json", "r"))
 def test_standardize_names_bad_header():
     request = mock.Mock(headers={"Content-Type": "not-application/json"})
     result = http_standardize_names(request)
-    expected_result = fail(
-        "Header must include: 'Content-Type:application/json'.",
-        "Bad Request",
+    expected_result = make_response(
+        message="Header must include: 'Content-Type:application/json'.", status_code=400
     )
-    expected_result.status_code = 400
     assert result.status == expected_result.status
     assert result.status_code == expected_result.status_code
     assert result.response == expected_result.response
@@ -38,8 +36,7 @@ def test_standardize_names_bad_resource_type():
         + "The request body must contain a valid FHIR bundle or resource."
     )
     request.get_json.return_value = body_with_wrong_resource_type
-    expected_result = fail(message=error_message, status="Bad Request")
-    expected_result.status_code = 400
+    expected_result = make_response(message=error_message, status_code=400)
     result = http_standardize_names(request=request)
     assert result.status == expected_result.status
     assert result.status_code == expected_result.status_code
@@ -55,4 +52,4 @@ def test_standardize_names_good_request():
     request.get_json.return_value = test_request_body
     actual_result = http_standardize_names(request)
 
-    json.loads(actual_result.get_data()) == expected_result
+    actual_result.get_json() == expected_result

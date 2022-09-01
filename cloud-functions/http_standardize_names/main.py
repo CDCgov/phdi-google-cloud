@@ -4,7 +4,7 @@ from phdi.fhir.harmonization.standardization import standardize_names
 from phdi_cloud_function_utils import (
     validate_fhir_bundle_or_resource,
     validate_request_header,
-    success,
+    make_response,
 )
 
 
@@ -21,6 +21,7 @@ def http_standardize_names(request: flask.Request) -> flask.Response:
     content_type = "application/json"
     # Validate request header.
     header_response = validate_request_header(request, content_type)
+    print("BEFORE")
 
     # Check that the request body contains a FHIR bundle or resource.
     if header_response.status_code == 400:
@@ -30,6 +31,8 @@ def http_standardize_names(request: flask.Request) -> flask.Response:
     if body_response.status_code != 400:
         request_json = request.get_json(silent=False)
         # Perform the name standardization
-        body_response = success(json_payload=standardize_names(request_json))
+        body_response = make_response(
+            status_code=200, json_payload=standardize_names(request_json)
+        )
 
     return body_response
