@@ -18,3 +18,10 @@ output "toybucket" {
   value = google_storage_bucket.toybucket.name
 }
 
+output "standardize_names_zip" {
+  value = google_storage_bucket_object.standardize_names_zip.name
+}
+
+output "standardize_phones_zip" {
+  value = google_storage_bucket_object.standardize_phones_zip.name
+}

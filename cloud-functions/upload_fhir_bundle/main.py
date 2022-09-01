@@ -1,9 +1,11 @@
-import logging
-import json
 import functions_framework
 import flask
 from pydantic import BaseModel, ValidationError, validator
 from phdi.fhir.transport.http import upload_bundle_to_fhir_server
+from phdi_cloud_function_utils import (
+    validate_request_header,
+    log_error_and_generate_response,
+)
 from phdi.cloud.gcp import GcpCredentialManager
 
 
@@ -44,30 +46,26 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
     :return: Returns a flask.Response object containing and overall response from the
         FHIR store as well as for the upload of each individual resource in the bundle.
     """
-    # Validate request header.
-    if request.headers.get("Content-Type") != "application/json":
-        logging.error("Header must inclue: 'Content-Type:application/json'.")
-        return {
-            "status": 400,
-            "summary": "Bad request",
-            "description": "Header must inclue: 'Content-Type:application/json'.",
-        }
-    request_json = request.get_json(silent=False)
 
+    content_type = "application/json"
+    # Validate request header.
+    header_response = validate_request_header(request, content_type)
+
+    if header_response.status_code == 400:
+        return header_response
+
+    request_json = request.get_json(silent=False)
     # Validate request body.
     try:
         request_body = RequestBody.parse_obj(request_json)
     except ValidationError as error:
-        logging.error(error)
-        error_as_dictionary = json.loads(error.json())[0]
-        return {
-            "status": 400,
-            "summary": "Invalid request body",
-            "description": error_as_dictionary,
-        }
+        error_response = log_error_and_generate_response(
+            status_code=400, message=error.json()
+        )
+        return error_response
 
-    # Construct the FHIR store URL the base Cloud Healthcare API endpoint, project ID,
-    # location, dataset ID, and FHIR store ID.
+    # Construct the FHIR store URL the base Cloud Healthcare API endpoint,
+    #  project ID, location, dataset ID, and FHIR store ID.
     credential_manager = GcpCredentialManager()
     base_url = "https://healthcare.googleapis.com/v1/projects"
     fhir_store_url = [
@@ -85,9 +83,8 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
 
     # Upload bundle to the FHIR store using the GCP Crednetial Manager for
     # authentication.
-
     response = upload_bundle_to_fhir_server(
         request_body.bundle, credential_manager, fhir_store_url
     )
 
-    return response.json()
+    return response
