@@ -15,6 +15,8 @@ def make_response(
         json_payload.
     :param json_payload: A dictionary to be included as a JSON response, cannot be
         provided in addition to message.
+    :return: A flask.Response object containing the specified HTTP status code and 
+        response message.
     """
     if message is not None and json_payload is not None:
         raise ValueError(
