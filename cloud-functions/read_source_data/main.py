@@ -34,12 +34,12 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
         bucket_name = cloud_event.data["bucket"]
     except AttributeError:
         response = "Bad CloudEvent payload - 'data' attribute missing."
-        response = log_error_and_generate_response(response=response, status="400")
+        response = log_error_and_generate_response(message=response, status="400")
         return response
 
     except KeyError:
         response = "Bad CloudEvent payload - 'name' or 'bucket' name was not included."
-        response = log_error_and_generate_response(response=response, status="400")
+        response = log_error_and_generate_response(message=response, status="400")
         return response
 
     # Determine data type and root template.
@@ -63,13 +63,13 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
                 f"Unknown message type: {filename_parts[1]}. Messages should be "
                 "ELR, VXU, or eCR."
             )
-            response = log_error_and_generate_response(response=response, status="400")
+            response = log_error_and_generate_response(message=response, status="400")
             return response
     else:
         response = (
             f"{filename} was not read because it does not begin with 'source-data/'."
         )
-        response = log_info_and_generate_response(response=response, status="200")
+        response = log_info_and_generate_response(message=response, status="200")
         return response
 
     # Load environment variables.
@@ -82,7 +82,7 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
             "Missing required environment variables. Values for PROJECT_ID and "
             "TOPIC_ID must be set."
         )
-        response = log_error_and_generate_response(response=response, status="400")
+        response = log_error_and_generate_response(message=response, status="400")
         return response
 
     # Read file.
@@ -162,5 +162,5 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
         f"{idx+1-failure_count} were successfully published, and {failure_count} "
         "could not be published."
     )
-    response = log_info_and_generate_response(response=response, status="200")
+    response = log_info_and_generate_response(message=response, status="200")
     return response
