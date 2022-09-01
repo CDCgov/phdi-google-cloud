@@ -1,4 +1,3 @@
-import json
 import functions_framework
 import flask
 from phdi.fhir.harmonization.standardization import standardize_phones
