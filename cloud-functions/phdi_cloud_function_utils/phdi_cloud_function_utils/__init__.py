@@ -2,7 +2,6 @@ import logging
 import json
 import os
 from flask import Request, Response
-import os
 
 
 def make_response(
