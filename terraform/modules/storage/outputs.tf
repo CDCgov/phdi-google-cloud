@@ -18,6 +18,10 @@ output "phi_storage_bucket" {
   value = google_storage_bucket.phi_storage_bucket.name
 }
 
+output "add_patient_hash_source_zip" {
+  value = google_storage_bucket_object.add_patient_hash_source_zip.name
+}
+
 output "toybucket" {
   value = google_storage_bucket.toybucket.name
 }

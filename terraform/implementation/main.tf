@@ -28,7 +28,10 @@ module "cloud-functions" {
   upload_fhir_bundle_source_zip = module.storage.upload_fhir_bundle_source_zip
   read_source_data_source_zip   = module.storage.read_source_data_source_zip
   ingestion_topic               = module.pubsub.ingestion_topic
-  depends_on                    = [google_project_service.enable_google_apis]
+  add_patient_hash_source_zip      = module.storage.add_patient_hash_source_zip
+  patient_hash_salt_secret_id      = module.secret-manager.patient_hash_salt_secret_id
+  patient_hash_salt_secret_version = module.secret-manager.patient_hash_salt_secret_version
+  depends_on                       = [google_project_service.enable_google_apis]
 }
 
 module "google-workflows" {
@@ -73,4 +76,11 @@ module "cloud-run" {
 
 module "pubsub" {
   source = "../modules/pubsub"
+}
+
+module "secret-manager" {
+  source                         = "../modules/secret-manager"
+  project_id                     = var.project_id
+  workflow_service_account_email = module.google-workflows.workflow_service_account_email
+  depends_on                     = [google_project_service.enable_google_apis]
 }

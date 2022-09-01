@@ -68,6 +68,15 @@ data "archive_file" "read_source_data" {
 # Add source code zip to the Cloud Function's bucket
 resource "google_storage_bucket_object" "read_source_data_source_zip" {
   source       = data.archive_file.read_source_data.output_path
+data "archive_file" "add_patient_hash" {
+  type        = "zip"
+  source_dir  = "../../cloud-functions/add_patient_hash"
+  output_path = "../../cloud-functions/add_patient_hash.zip"
+}
+
+# Add source code zip to the Cloud Function's bucket
+resource "google_storage_bucket_object" "add_patient_hash_source_zip" {
+  source       = data.archive_file.add_patient_hash.output_path
   content_type = "application/zip"
 
   # Append to the MD5 checksum of the files's content

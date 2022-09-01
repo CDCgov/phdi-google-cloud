@@ -1,22 +1,45 @@
 import logging
-import flask
+import json
+import os
+from flask import Request, Response
 
 
-def _success() -> flask.Response:
-    result = flask.Response(status="OK", response="Validation Succeeded!")
-    result.status_code = 200
+def make_response(
+    status_code: int, message: str = None, json_payload: dict = None
+) -> Response:
+    """
+    Make a flask.Response object given an HTTP status code and a response message
+    provided as either a string or a dictionary.
+
+    :param status_code: The HTTP status code of the response.
+    :param message: A string response message, cannot be provided in addition to
+        json_payload.
+    :param json_payload: A dictionary to be included as a JSON response, cannot be
+        provided in addition to message.
+    :return: A flask.Response object containing the specified HTTP status code and
+        response message.
+    """
+    if message is not None and json_payload is not None:
+        raise ValueError(
+            "Both message and json_payload were provided, but only one is allowed."
+        )
+    elif message is None and json_payload is None:
+        raise ValueError(
+            "Neither message nor json_payload were provided, but one is required."
+        )
+
+    result = Response()
+    result.status_code = status_code
+    if json_payload is not None:
+        result.response = json.dumps(json_payload)
+        result.mimetype = "application/json"
+        result.headers = {"Content-Type": "application/json"}
+    else:
+        result.response = message
     return result
 
 
-def _fail(message: str, status: str) -> flask.Response:
-    result = flask.Response(status=status, response=message)
-    result.status_code = 400
-    return result
-
-
-def validate_request_header(
-    request: flask.Request, content_type: str
-) -> flask.Response:
+def validate_request_header(request: Request, content_type: str) -> Response:
     """
     Validate that the request header is of the correct type specified
     as one of the parameters.
@@ -28,15 +51,15 @@ def validate_request_header(
     """
     if request.headers.get("Content-Type") != content_type:
         logging.error("Header must include: 'Content-Type:{}'.".format(content_type))
-        return _fail(
-            "Header must include: 'Content-Type:{}'.".format(content_type),
-            "Bad Request",
+        return make_response(
+            status_code=400,
+            message="Header must include: 'Content-Type:{}'.".format(content_type),
         )
 
-    return _success()
+    return make_response(status_code=200, message="Validation Succeeded!")
 
 
-def validate_request_body_json(request: flask.Request) -> flask.Response:
+def validate_request_body_json(request: Request) -> Response:
     """
     Validate that the request body is proper JSON
 
@@ -46,14 +69,14 @@ def validate_request_body_json(request: flask.Request) -> flask.Response:
     """
 
     if request.is_json():
-        return _success()
+        return make_response(status_code=200, message="Validation Succeeded!")
     else:
-        return _fail(
-            message="Invalid request body - Invalid JSON", status="Bad Request"
+        return make_response(
+            status_code=400, message="Invalid request body - Invalid JSON"
         )
 
 
-def validate_fhir_bundle_or_resource(request: flask.Request) -> flask.Response:
+def validate_fhir_bundle_or_resource(request: Request) -> Response:
     """
     Validate that the request body is proper JSON with either a
     FHIR Bundle or other FHIR resource
@@ -72,17 +95,37 @@ def validate_fhir_bundle_or_resource(request: flask.Request) -> flask.Response:
             "FHIR Resource Type not specified. "
             + "The request body must contain a valid FHIR bundle or resource."
         )
-        logging.error(error_message)
-        return _fail(message=error_message, status="Bad Request")
+        return log_error_and_generate_response(status_code=400, message=error_message)
 
-    return _success()
+    return make_response(status_code=200, message="Validation Succeeded!")
 
 
-def log_error_and_generate_response(response: str, status: str) -> flask.Response:
+def check_for_environment_variables(environment_variables: list) -> Response:
+    """
+    Check that the environment variables are set.
+    :param environment_variables: A list of environment variables to check
+    :return: A flask.Response object containing the error if the environment
+        variables are not set or will return a generic 200 flask.Response
+    """
+    for environment_variable in environment_variables:
+        if os.environ.get(environment_variable) is None:
+            error_message = (
+                "Environment variable '{}' not set. "
+                + "The environment variable must be set."
+            ).format(environment_variable)
+            return log_error_and_generate_response(
+                status_code=500, message=error_message
+            )
+
+    return make_response(
+        status_code=200, message="All environment variables were found."
+    )
+
+
+def log_error_and_generate_response(status_code: int, message: str) -> Response:
     """
     Given an error message and and HTTP status code log the error and create a
-    flask.Response object containing the satus code and message.
-
+    flask. Response object containing the satus code and message.
     :param response: An error message to be logged and included in the
         returned flask.Response object.
     :param status: An HTTP status code to be included in the returned flask.Response
@@ -90,16 +133,15 @@ def log_error_and_generate_response(response: str, status: str) -> flask.Respons
     :return: A flask.Response object containing the specified response message and HTTP
         status code.
     """
-    logging.error(response)
-    response = flask.Response(response=response, status=status)
+    logging.error(message)
+    response = make_response(status_code=status_code, message=message)
     return response
 
 
-def log_info_and_generate_response(response: str, status: str) -> flask.Response:
+def log_info_and_generate_response(status_code: int, message: str) -> Response:
     """
     Given an info level message and and HTTP status code log the message and create a
-    flask.Response object containing the satus code and message.
-
+    flask. Response object containing the satus code and message.
     :param response: An info level message to be logged and included in the
         returned flask.Response object.
     :param status: An HTTP status code to be included in the returned flask.Response
@@ -107,6 +149,6 @@ def log_info_and_generate_response(response: str, status: str) -> flask.Response
     :return: A flask.Response object containing the specified response message and HTTP
         status code.
     """
-    logging.info(response)
-    response = flask.Response(response=response, status=status)
+    logging.info(message)
+    response = make_response(status_code=status_code, message=message)
     return response
