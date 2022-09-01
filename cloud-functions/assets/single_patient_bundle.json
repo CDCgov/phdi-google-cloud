@@ -34,17 +34,12 @@
                         "postalCode": "12345",
                         "country": "USA"
                     }
-                ]
+                ],
+                "birthDate": "1955-11-05"
             },
             "request": {
                 "method": "POST",
                 "url": "Patient"
-            }
-        },
-        {
-            "request": {
-                "method": "DELETE",
-                "url": "Patient/1234567890"
             }
         }
     ]

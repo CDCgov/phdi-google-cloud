@@ -12,8 +12,6 @@ from phdi.cloud.gcp import GcpCredentialManager
 class RequestBody(BaseModel):
     """A class to model the body of requests to the upload_fhir_bundle() function. The
     body of every request must contain:
-    :project_id: The ID of the GCP project containing the FHIR store that data will be
-        uploaded to.
     :dataset_id: The ID the GCP One Cloud Healthcare Dataset containing the FHIR store
         that data will be uploaded to.
     :location: The GCP location of the Dataset specified by dataset_id.
