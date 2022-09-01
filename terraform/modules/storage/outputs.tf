@@ -10,6 +10,10 @@ output "upload_fhir_bundle_source_zip" {
   value = google_storage_bucket_object.upload_fhir_bundle_source_zip.name
 }
 
+output "add_patient_hash_source_zip" {
+  value = google_storage_bucket_object.add_patient_hash_source_zip.name
+}
+
 output "toybucket" {
   value = google_storage_bucket.toybucket.name
 }
