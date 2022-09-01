@@ -1,5 +1,4 @@
 import copy
-from email import message
 import json
 from main import add_patient_hash
 from unittest import mock
@@ -39,10 +38,7 @@ def test_add_patient_hash_bad_resource_type():
         + "The request body must contain a valid FHIR bundle or resource."
     )
     request.get_json.return_value = body_with_wrong_resource_type
-    expected_result = fail(
-        error_message,
-        "Bad Request",
-    )
+    expected_result = make_response(status_code=400, message=error_message)
     expected_result.status_code = 400
     result = add_patient_hash(request=request)
     assert result.status == expected_result.status
