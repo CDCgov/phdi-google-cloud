@@ -1,6 +1,5 @@
 import copy
 import json
-import logging
 from main import http_standardize_names
 from unittest import mock
 from phdi_cloud_function_utils import make_response
