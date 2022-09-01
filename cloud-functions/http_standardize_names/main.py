@@ -21,7 +21,6 @@ def http_standardize_names(request: flask.Request) -> flask.Response:
     content_type = "application/json"
     # Validate request header.
     header_response = validate_request_header(request, content_type)
-    print("BEFORE")
 
     # Check that the request body contains a FHIR bundle or resource.
     if header_response.status_code == 400:

@@ -37,7 +37,7 @@ def http_standardize_phones(request: flask.Request) -> flask.Response:
         request_json = request.get_json(silent=False)
         # breakpoint()
         body_response = make_response(
-            status_code=200, message=None, json_payload=standardize_phones(request_json)
+            status_code=200, json_payload=standardize_phones(request_json)
         )
 
     return body_response
