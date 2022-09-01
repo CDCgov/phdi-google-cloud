@@ -52,4 +52,4 @@ def test_standardize_phones_good_request():
     request.get_json.return_value = test_request_body
     actual_result = http_standardize_phones(request)
 
-    assert json.loads(actual_result.get_data()) == expected_result
+    assert actual_result.get_json() == expected_result
