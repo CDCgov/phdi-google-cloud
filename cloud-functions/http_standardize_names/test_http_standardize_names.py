@@ -1,5 +1,6 @@
 import copy
 import json
+import logging
 from main import http_standardize_names
 from unittest import mock
 from phdi_cloud_function_utils import make_response
@@ -52,4 +53,4 @@ def test_standardize_names_good_request():
     request.get_json.return_value = test_request_body
     actual_result = http_standardize_names(request)
 
-    actual_result.get_json() == expected_result
+    assert json.loads(actual_result.get_data()) == expected_result
