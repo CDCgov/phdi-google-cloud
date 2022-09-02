@@ -33,7 +33,7 @@ module "cloud-functions" {
   patient_hash_salt_secret_version = module.secret-manager.patient_hash_salt_secret_version
   standardize_phones_zip           = module.storage.standardize_phones_zip
   standardize_names_zip            = module.storage.standardize_names_zip
-  workflow_service_account_email = module.google-workflows.workflow_service_account_email
+  workflow_service_account_email   = module.google-workflows.workflow_service_account_email
   depends_on                       = [google_project_service.enable_google_apis]
 }
 
