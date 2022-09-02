@@ -106,7 +106,7 @@ resource "google_storage_bucket_object" "add_patient_hash_source_zip" {
 
   # Append to the MD5 checksum of the files's content
   # to force the zip to be updated as soon as a change occurs
-  name   = "src-${terraform.workspace}-${data.archive_file.read_source_data.output_md5}.zip"
+  name   = "src-${terraform.workspace}-${data.archive_file.add_patient_hash.output_md5}.zip"
   bucket = google_storage_bucket.functions.name
 }
 
