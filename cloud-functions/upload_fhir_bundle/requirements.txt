@@ -29,7 +29,8 @@ numpy==1.23.2
 oauthlib==3.2.0
 packaging==21.3
 pandas==1.4.3
-phdi @ git+https://github.com/CDCgov/phdi@ebdd43120eec138373bc36900cf6ea7e25aedc29
+phdi 
+phdi_cloud_function_utils @ git+https://github.com/CDCgov/phdi-google-cloud@main#subdirectory=cloud-functions/phdi_cloud_function_utils 
 phonenumbers==8.12.53
 polling==0.3.2
 portalocker==2.5.1

@@ -1,7 +1,11 @@
-import logging
 import functions_framework
 import flask
 from phdi.fhir.harmonization.standardization import standardize_names
+from phdi_cloud_function_utils import (
+    validate_fhir_bundle_or_resource,
+    validate_request_header,
+    make_response,
+)
 
 
 @functions_framework.http
@@ -14,36 +18,20 @@ def http_standardize_names(request: flask.Request) -> flask.Response:
     :param data: Either a FHIR bundle or a FHIR-formatted JSON dict
     :return: The bundle or resource with names appropriately standardized
     """
+    content_type = "application/json"
     # Validate request header.
-    if request.headers.get("Content-Type") != "application/json":
-        logging.error("Header must inclue: 'Content-Type:application/json'.")
-        return {
-            "status": 400,
-            "summary": "Bad request",
-            "description": "Header must inclue: 'Content-Type:application/json'.",
-        }
-
-    try:
-        request_json = request.get_json(silent=False)
-    except AttributeError as error:
-        logging.error(error)
-
-        return {
-            "status": 400,
-            "summary": "Invalid request body",
-            "description": "Invalid JSON",
-        }
+    header_response = validate_request_header(request, content_type)
 
     # Check that the request body contains a FHIR bundle or resource.
-    if request_json.get("resourceType") is None:
-        error_message = (
-            "FHIR Resource Type not specified. "
-            + "The request body must contain a valid FHIR bundle or resource."
+    if header_response.status_code == 400:
+        return header_response
+
+    body_response = validate_fhir_bundle_or_resource(request)
+    if body_response.status_code != 400:
+        request_json = request.get_json(silent=False)
+        # Perform the name standardization
+        body_response = make_response(
+            status_code=200, json_payload=standardize_names(request_json)
         )
-        logging.error(error_message)
-        return {"status": 400, "summary": "Bad request", "description": error_message}
 
-    # Perform the name standardization
-    response = standardize_names(request_json)
-
-    return response
+    return body_response
