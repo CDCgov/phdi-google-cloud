@@ -24,9 +24,9 @@ resource "google_cloudfunctions_function" "upload-fhir-bundle" {
 
 
 resource "google_cloudfunctions_function" "read_source_data" {
-  name        = "phdi-${terraform.workspace}-read_source_data"
-  description = "Read source data from bucket and publish to pub/sub topic for ingestion."
-  runtime     = "python39"
+  name                  = "phdi-${terraform.workspace}-read_source_data"
+  description           = "Read source data from bucket and publish to pub/sub topic for ingestion."
+  runtime               = "python39"
   available_memory_mb   = 128
   source_archive_object = var.read_source_data_source_zip
   event_trigger {
@@ -44,9 +44,9 @@ resource "google_cloudfunctions_function" "read_source_data" {
 }
 
 resource "google_cloudfunctions_function" "add-patient-hash" {
-  name        = "phdi-${terraform.workspace}-add-patient-hash"
-  description = "Add a hash to the patient resource"
-  runtime     = "python39"
+  name                  = "phdi-${terraform.workspace}-add-patient-hash"
+  description           = "Add a hash to the patient resource"
+  runtime               = "python39"
   available_memory_mb   = 128
   source_archive_bucket = var.functions_storage_bucket
   source_archive_object = var.add_patient_hash_source_zip
