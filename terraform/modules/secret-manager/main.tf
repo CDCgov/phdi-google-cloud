@@ -4,7 +4,7 @@ resource "google_secret_manager_secret" "salt" {
   secret_id = "PATIENT_HASH_SALT"
 
   labels = {
-    label = "PATIENT_HASH_SALT"
+    label = "patient-hash-salt"
   }
 
   replication {
