@@ -52,6 +52,7 @@ resource "google_cloudfunctions_function" "add-patient-hash" {
   source_archive_object = var.add_patient_hash_source_zip
   trigger_http          = true
   entry_point           = "add_patient_hash"
+  service_account_email = var.workflow_service_account_email
 
   secret_environment_variables {
     key        = "PATIENT_HASH_SALT"
