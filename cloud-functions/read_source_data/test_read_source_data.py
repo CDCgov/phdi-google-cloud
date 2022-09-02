@@ -7,23 +7,23 @@ def test_bad_cloud_event():
     cloud_event = mock.MagicMock()
     cloud_event.data.__getitem__.side_effect = AttributeError()
     response = read_source_data(cloud_event)
-    assert response.response == [b"Bad CloudEvent payload - 'data' attribute missing."]
+    assert response.response == "Bad CloudEvent payload - 'data' attribute missing."
 
     cloud_event = mock.MagicMock()
     cloud_event.data.__getitem__.side_effect = KeyError()
     response = read_source_data(cloud_event)
-    assert response.response == [
-        b"Bad CloudEvent payload - 'name' or 'bucket' name was not included."
-    ]
+    assert response.response == (
+        "Bad CloudEvent payload - 'name' or 'bucket' name was " "not included."
+    )
 
 
 def test_not_source_data():
     cloud_event = mock.MagicMock()
     cloud_event.data.__getitem__.side_effect = ["some-filename", "some-bucket"]
     response = read_source_data(cloud_event)
-    assert response.response == [
-        b"some-filename was not read because it does not begin with 'source-data/'."
-    ]
+    assert response.response == (
+        "some-filename was not read because it does not begin " "with 'source-data/'."
+    )
 
 
 def test_unknown_message():
@@ -33,9 +33,10 @@ def test_unknown_message():
         "some-bucket",
     ]
     response = read_source_data(cloud_event)
-    assert response.response == [
-        b"Unknown message type: unknown-message-type. Messages should be ELR, VXU, or eCR."  # noqa
-    ]
+    assert response.response == (
+        "Unknown message type: unknown-message-type. Messages "
+        "should be ELR, VXU, or eCR."
+    )
 
 
 @mock.patch("main.pubsub_v1.PublisherClient")
@@ -51,9 +52,10 @@ def test_missing_environment_variables(
         "some-bucket",
     ]
     response = read_source_data(cloud_event)
-    assert response.response == [
-        b"Missing required environment variables. Values for PROJECT_ID and TOPIC_ID must be set."  # noqa
-    ]
+    assert response.response == (
+        "Missing required environment variables. Values for "
+        "PROJECT_ID and TOPIC_ID must be set."
+    )
 
 
 @mock.patch("main.pubsub_v1.PublisherClient")
@@ -229,14 +231,13 @@ def test_read_source_data(
     patched_blob.download_as_text.return_value = "some-message"
 
     response = read_source_data(cloud_event)
-    assert (
-        response.response
-        == log_info_and_generate_response(
-            (
-                "Processed source-data/elr/some-filename.txt, which contained 1 "
-                "messages, of which 1 were successfully published, and 0 could not be "
-                "published."
-            ),
-            "200",
-        ).response
+    expected_response = log_info_and_generate_response(
+        200,
+        (
+            "Processed source-data/elr/some-filename.txt, which contained 1 "
+            "messages, of which 1 were successfully published, and 0 could not be "
+            "published."
+        ),
     )
+    assert response.response == expected_response.response
+    assert response.status_code == expected_response.status_code
