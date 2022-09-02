@@ -36,7 +36,7 @@ resource "google_cloudfunctions_function" "add-patient-hash" {
   secret_environment_variables {
     key        = "PATIENT_HASH_SALT"
     secret     = var.patient_hash_salt_secret_id
-    version    = var.patient_hash_salt_secret_version
+    version    = "1"
     project_id = var.project_id
   }
 }
