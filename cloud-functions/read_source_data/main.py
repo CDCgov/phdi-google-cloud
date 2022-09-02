@@ -63,7 +63,9 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
                 f"Unknown message type: {filename_parts[1]}. Messages should be "
                 "ELR, VXU, or eCR."
             )
-            response = log_error_and_generate_response(message=response, status_code="400")
+            response = log_error_and_generate_response(
+                message=response, status_code="400"
+            )
             return response
     else:
         response = (
