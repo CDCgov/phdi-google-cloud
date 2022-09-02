@@ -21,9 +21,13 @@ module "storage" {
 
 module "cloud-functions" {
   source                           = "../modules/cloud-functions"
+  project_id                       = var.project_id
   functions_storage_bucket         = module.storage.functions_storage_bucket
+  phi_storage_bucket               = module.storage.phi_storage_bucket
   upcase_source_zip                = module.storage.upcase_source_zip
   upload_fhir_bundle_source_zip    = module.storage.upload_fhir_bundle_source_zip
+  read_source_data_source_zip      = module.storage.read_source_data_source_zip
+  ingestion_topic                  = module.pubsub.ingestion_topic
   add_patient_hash_source_zip      = module.storage.add_patient_hash_source_zip
   patient_hash_salt_secret_id      = module.secret-manager.patient_hash_salt_secret_id
   patient_hash_salt_secret_version = module.secret-manager.patient_hash_salt_secret_version
@@ -71,6 +75,10 @@ module "cloud-run" {
     google_project_service.enable_google_apis,
     module.artifact-registries.phdi-repo
   ]
+}
+
+module "pubsub" {
+  source = "../modules/pubsub"
 }
 
 module "secret-manager" {
