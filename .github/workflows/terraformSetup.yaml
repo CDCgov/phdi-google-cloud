@@ -30,14 +30,10 @@ jobs:
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
           REGION: ${{ secrets.REGION }}
           ZONE: ${{ secrets.ZONE }}
-          SMARTY_AUTH_ID: ${{ secrets.SMARY_AUTH_ID }}
-          SMARTY_AUTH_TOKEN: ${{ secrets.SMARY_AUTH_TOKEN }}
         run: |
           echo project_id=\""$PROJECT_ID"\" >> terraform.tfvars
           echo region=\""$REGION"\" >> terraform.tfvars
           echo zone=\""$ZONE"\" >> terraform.tfvars
-          echo smarty_auth_id=\""$SMARTY_AUTH_ID"\" >> terraform.tfvars
-          echo smarty_auth_token=\""$SMARTY_AUTH_TOKEN"\" >> terraform.tfvars
 
       - name: terraform init
         run: terraform init

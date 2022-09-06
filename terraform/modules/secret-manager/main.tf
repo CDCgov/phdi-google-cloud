@@ -12,7 +12,6 @@ resource "google_secret_manager_secret" "salt" {
   }
 }
 
-
 resource "google_secret_manager_secret_version" "salt-version" {
   secret = google_secret_manager_secret.salt.id
 
@@ -38,6 +37,12 @@ resource "google_secret_manager_secret" "smarty_auth_id" {
   }
 }
 
+resource "google_secret_manager_secret_version" "smarty-auth-id-version" {
+  secret = google_secret_manager_secret.smarty_auth_id.id
+
+  secret_data = var.smarty_auth_id
+}
+
 resource "google_secret_manager_secret_iam_member" "workflow-service-account-member" {
   project   = var.project_id
   secret_id = google_secret_manager_secret.smarty_auth_id.secret_id
@@ -55,6 +60,12 @@ resource "google_secret_manager_secret" "smarty_auth_token" {
   replication {
     automatic = true
   }
+}
+
+resource "google_secret_manager_secret_version" "smarty-auth-token-version" {
+  secret = google_secret_manager_secret.smarty_auth_token.id
+
+  secret_data = var.smarty_auth_token
 }
 
 resource "google_secret_manager_secret_iam_member" "workflow-service-account-member" {

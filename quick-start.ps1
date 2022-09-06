@@ -15,6 +15,8 @@ function Get-Variables {
     Write-Host "WORKLOAD_IDENTITY_PROVIDER: $WORKLOAD_IDENTITY_PROVIDER"
     Write-Host "REGION: us-central1 (or your preferred region)"
     Write-Host "ZONE: us-central1-a (or your preferred zone in the region above)"
+    Write-Host "SMARTY_AUTH_ID: Your Smarty Streets App Authorization ID"
+    Write-Host "SMARTY_AUTH_TOKEN: Your Smarty Streets App Authorization Token"
     Write-Host ""
     Write-Host "More info on regions and zones can be found at:"
     Write-Host "https://cloud.google.com/compute/docs/regions-zones/"
@@ -41,6 +43,14 @@ function Set-Variables {
     Write-Host "More info: https://cloud.google.com/compute/docs/regions-zones/regions-zones"
     $ZONE = Read-Host
 
+    Write-Host "Please enter the authorization id of your Smarty Street Account."
+    Write-Host "More info:   https://www.smarty.com/docs/cloud/authentication"
+    $SMARTY_AUTH_ID = Read-Host
+  
+    Write-Host "Please enter the authorization token of your Smarty Street Account."
+    Write-Host "More info:   https://www.smarty.com/docs/cloud/authentication"
+    $SMARTY_AUTH_TOKEN = Read-Host
+
     Write-Host "Logging in to GitHub..."
     gh auth login
 
@@ -50,6 +60,8 @@ function Set-Variables {
     gh secret -R "$GITHUB_REPO" set WORKLOAD_IDENTITY_PROVIDER --body "$WORKLOAD_IDENTITY_PROVIDER"
     gh secret -R "$GITHUB_REPO" set REGION --body "$REGION"
     gh secret -R "$GITHUB_REPO" set ZONE --body "$ZONE"
+    gh secret -R "$GITHUB_REPO" set SMARTY_AUTH_ID --body "$SMARTY_AUTH_ID"
+    gh secret -R "$GITHUB_REPO" set SMARTY_AUTH_TOKEN --body "$SMARTY_AUTH_TOKEN"
 
     Write-Host "Repository secrets set!"
     Write-Host "You can now continue with the Quick Start instructions in the README.md file."
