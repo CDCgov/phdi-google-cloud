@@ -31,8 +31,11 @@ module "cloud-functions" {
   add_patient_hash_source_zip      = module.storage.add_patient_hash_source_zip
   patient_hash_salt_secret_id      = module.secret-manager.patient_hash_salt_secret_id
   patient_hash_salt_secret_version = module.secret-manager.patient_hash_salt_secret_version
+  smarty_auth_id                   = module.secret-manager.smarty_auth_id
+  smarty_auth_token                = module.secret-manager.smarty_auth_token
   standardize_phones_zip           = module.storage.standardize_phones_zip
   standardize_names_zip            = module.storage.standardize_names_zip
+  geocode_patients_zip             = module.storage.geocode_patients_zip
   workflow_service_account_email   = module.google-workflows.workflow_service_account_email
   depends_on                       = [google_project_service.enable_google_apis]
 }

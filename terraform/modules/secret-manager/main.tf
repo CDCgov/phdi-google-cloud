@@ -25,3 +25,41 @@ resource "google_secret_manager_secret_iam_member" "workflow-service-account-mem
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${var.workflow_service_account_email}"
 }
+
+resource "google_secret_manager_secret" "smarty_auth_id" {
+  secret_id = "SMARTY_AUTH_ID"
+
+  labels = {
+    label = "smarty-auth-id"
+  }
+
+  replication {
+    automatic = true
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "workflow-service-account-member" {
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.smarty_auth_id.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${var.workflow_service_account_email}"
+}
+
+resource "google_secret_manager_secret" "smarty_auth_token" {
+  secret_id = "SMARTY_AUTH_TOKEN"
+
+  labels = {
+    label = "smarty-auth-token"
+  }
+
+  replication {
+    automatic = true
+  }
+}
+
+resource "google_secret_manager_secret_iam_member" "workflow-service-account-member" {
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.smarty_auth_token.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${var.workflow_service_account_email}"
+}
