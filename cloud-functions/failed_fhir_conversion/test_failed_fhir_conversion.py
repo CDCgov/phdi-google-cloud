@@ -1,8 +1,6 @@
-import copy
 import json
 from main import failed_fhir_conversion
 from unittest import mock
-import pytest
 from phdi_cloud_function_utils import make_response
 
 
@@ -43,7 +41,8 @@ def test_failed_fhir_conversion_missing_environment_variables(
     patched_environ.get.return_value = None
     response = failed_fhir_conversion(request)
     assert response.response == (
-        "Environment variable 'FAILED_FHIR_CONVERSION_BUCKET' not set. The environment variable must be set."
+        "Environment variable 'FAILED_FHIR_CONVERSION_BUCKET' not set. "
+        + "The environment variable must be set."
     )
 
 
@@ -56,10 +55,14 @@ def test_failed_fhir_conversion_good_request(patched_os_environ, mock_storage_cl
     expected_result = "File uploaded to failed_fhir_conversion_test_hash.hl7.json."
     request.get_json.return_value = json.dumps(
         {
-            "args": "dotnet run --project /build/FHIR-Converter/src/Microsoft.Health.Fhir.Liquid.Converter.Tool convert -- --TemplateDirectory /build/FHIR-Converter/data/Templates/Hl7v2 --RootTemplate ADT_A01 --InputDataFile /tmp/hl7v2-input.txt --OutputDataFile /tmp/output.json ",
+            "args": "dotnet run --project /build/FHIR-Converter/src/Microsoft"
+            + ".Health.Fhir.Liquid.Converter.Tool convert -- --TemplateDirectory"
+            + "/build/FHIR-Converter/data/Templates/Hl7v2 --RootTemplate ADT_A01"
+            + "--InputDataFile /tmp/hl7v2-input.txt --OutputDataFile /tmp/output.json",
             "returncode": 255,
             "stdout": "",
-            "stderr": "Process failed: The input data could not be parsed correctly: The HL7 v2 message is invalid, first segment id = bad.\n",
+            "stderr": "Process failed: The input data could not be parsed correctly: "
+            + "The HL7 v2 message is invalid, first segment id = bad.\n",
             "original_request": {
                 "input_data": "bad data",
                 "input_type": "hl7v2",
