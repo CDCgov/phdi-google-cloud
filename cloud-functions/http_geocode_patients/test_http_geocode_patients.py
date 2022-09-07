@@ -1,34 +1,35 @@
+from cmath import exp
 import copy
 import json
-from main import add_patient_hash
+from main import http_geocode_patients
 from unittest import mock
-import pytest
 from phdi_cloud_function_utils import make_response
+from smartystreets_python_sdk import us_street
+import pytest
 
 
 test_request_body = json.load(open("../assets/single_patient_bundle.json", "r"))
 
 
-def test_add_patient_hash_bad_header():
+def test_gecode_patients_bad_header():
     request = mock.Mock(headers={"Content-Type": "not-application/json"})
-
-    actual_result = add_patient_hash(request)
+    actual_result = http_geocode_patients(request)
     expected_result = make_response(
-        status_code=400, message="Header must include: 'Content-Type:application/json'."
+        message="Header must include: 'Content-Type:application/json'.", status_code=400
     )
     assert actual_result.status == expected_result.status
     assert actual_result.status_code == expected_result.status_code
     assert actual_result.response == expected_result.response
 
 
-def test_add_patient_hash_bad_body():
+def test_geocode_patients_bad_body():
     request = mock.Mock(headers={"Content-Type": "application/json"})
     request.get_json.return_value = ""
     with pytest.raises(AttributeError):
-        add_patient_hash(request=request)
+        http_geocode_patients(request=request)
 
 
-def test_add_patient_hash_bad_resource_type():
+def test_geocode_patients_bad_resource_type():
     request = mock.Mock(headers={"Content-Type": "application/json"})
     body_with_wrong_resource_type = copy.deepcopy(test_request_body)
     body_with_wrong_resource_type["resourceType"] = None
@@ -37,45 +38,45 @@ def test_add_patient_hash_bad_resource_type():
         + "The request body must contain a valid FHIR bundle or resource."
     )
     request.get_json.return_value = body_with_wrong_resource_type
-    expected_result = make_response(status_code=400, message=error_message)
-    actual_result = add_patient_hash(request=request)
+    expected_result = make_response(message=error_message, status_code=400)
+    actual_result = http_geocode_patients(request=request)
     assert actual_result.status == expected_result.status
     assert actual_result.status_code == expected_result.status_code
     assert actual_result.response == expected_result.response
 
 
 @mock.patch("main.os.environ")
-def test_add_patient_hash_good_request(patched_os_environ):
-    patched_os_environ.get.return_value = "test_hash"
+@mock.patch("phdi.geo")
+@mock.patch("main.http_geocode_patients")
+def test_geocode_patients_good_request(
+    patched_geocode_patients, patched_geo, patched_os_environ
+):
     request = mock.Mock(headers={"Content-Type": "application/json"})
-
-    expected_result = copy.deepcopy(test_request_body)
-    expected_result["entry"][0]["resource"]["identifier"] = [
-        {
-            "system": "urn:ietf:rfc:3986",
-            "use": "temp",
-            "value": "699d8585efcf84d1a03eb58e84cd1c157bf7b718d9257d7436e2ff0bd14b2834",
-        }
-    ]
+    patched_os_environ.get("SMARTY_AUTH_ID").return_value = "TEST_ID"
+    patched_os_environ.get("SMARTY_AUTH_TOKEN").return_value = "TEST_TOKEN"
+    patched_geo.get_smartystreets_client(
+        "TEST_ID", "TEST_TOKEN"
+    ).return_value = mock.MagicMock(spec=us_street.Client)
+    patched_geocode_patients.geocoder = mock.MagicMock(spec=us_street.Client)
+    patched_geo.geocode_patients.return_value = test_request_body
+    expected_result = make_response(status_code=200, json_payload=test_request_body)
     request.get_json.return_value = test_request_body
-    actual_result = add_patient_hash(request)
+    actual_result = http_geocode_patients(request)
 
-    assert actual_result.get_json() == expected_result
+    assert actual_result == expected_result
 
 
 @mock.patch("phdi_cloud_function_utils.check_for_environment_variables")
-def test_add_patient_hash_missing_environment(patched_environ_check):
+def test_geocode_patients_missing_environ_variables(patched_environ_check):
     error_message = (
-        "Environment variable 'PATIENT_HASH_SALT' not set."
+        "Environment variable 'SMARTY_AUTH_ID' not set."
         + " The environment variable must be set."
     )
     expected_result = make_response(status_code=500, message=error_message)
     patched_environ_check.return_value = expected_result
-
     request = mock.Mock(headers={"Content-Type": "application/json"})
 
-    request.get_json.return_value = test_request_body
-    actual_result = add_patient_hash(request)
+    actual_result = http_geocode_patients(request)
 
     assert actual_result.status == expected_result.status
     assert actual_result.status_code == expected_result.status_code

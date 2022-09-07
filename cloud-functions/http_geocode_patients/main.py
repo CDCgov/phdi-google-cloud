@@ -24,28 +24,33 @@ def http_geocode_patients(request: flask.Request) -> flask.Response:
     # Validate request header.
     header_response = validate_request_header(request, content_type)
 
-    # Check that the request body contains a FHIR bundle or resource.
     if header_response.status_code == 400:
         return header_response
 
-    environment_check_response_id = check_for_environment_variables(["SMARTY_AUTH_ID"])
-    environment_check_response_token = check_for_environment_variables(
-        ["SMARTY_AUTH_TOKEN"]
-    )
-    if environment_check_response_id.status_code == 400:
-        return environment_check_response_id
-    elif environment_check_response_token.status_code == 400:
-        return environment_check_response_token
-
-    geocoder = get_smartystreets_client(
-        os.environ.get("SMARTY_AUTH_ID"),
-        os.environ.get("SMARTY_AUTH_TOKEN"),
-    )
-
+    # Check that the request body contains a FHIR bundle or resource
     body_response = validate_fhir_bundle_or_resource(request)
     if body_response.status_code != 400:
+        # Ensure that the environment variables for the SMARTY app are set
+        environment_check_response_id = check_for_environment_variables(
+            ["SMARTY_AUTH_ID"]
+        )
+        environment_check_response_token = check_for_environment_variables(
+            ["SMARTY_AUTH_TOKEN"]
+        )
+        if environment_check_response_id.status_code == 500:
+            return environment_check_response_id
+        elif environment_check_response_token.status_code == 500:
+            return environment_check_response_token
+
+        # Using the environment variable values create a SMARTY client
+        geocoder = get_smartystreets_client(
+            os.environ.get("SMARTY_AUTH_ID"),
+            os.environ.get("SMARTY_AUTH_TOKEN"),
+        )
+
         request_json = request.get_json(silent=False)
-        # Perform the name standardization
+        # Perform the address standardization and geocoding and
+        # store results in flask response
         body_response = make_response(
             status_code=200,
             json_payload=geocode_patients(bundle=request_json, client=geocoder),
