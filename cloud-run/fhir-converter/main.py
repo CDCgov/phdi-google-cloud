@@ -92,6 +92,7 @@ class FhirConverterInput(BaseModel):
 
     input_data: str
     input_type: InputType
+    filename: str
     root_template: RootTemplate
 
 
@@ -108,6 +109,7 @@ async def convert(input: FhirConverterInput):
 def convert_to_fhir(
     input_data: str,
     input_type: str,
+    filename: str,
     root_template: str,
 ) -> dict:
     """
@@ -170,5 +172,12 @@ def convert_to_fhir(
         result = json.load(open(output_data_file_path))
     else:
         result = vars(converter_response)
+        # Include original input data in the result.
+        result["original_request"] = {
+            "input_data": input_data,
+            "input_type": input_type,
+            "filename": filename,
+            "root_template": root_template,
+        }
 
     return result

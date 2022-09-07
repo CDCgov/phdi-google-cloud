@@ -16,6 +16,15 @@ resource "google_storage_bucket" "phi_storage_bucket" {
   }
 }
 
+resource "google_storage_bucket" "failed_fhir_conversion_bucket" {
+  name          = "phdi-${terraform.workspace}-failed-fhir-conversions-bucket-${var.project_id}"
+  location      = "US"
+  force_destroy = true
+  versioning {
+    enabled = true
+  }
+}
+
 resource "google_storage_bucket" "functions" {
   name          = "phdi-${terraform.workspace}-functions-${var.project_id}"
   location      = "US"
@@ -124,5 +133,22 @@ resource "google_storage_bucket_object" "standardize_phones_zip" {
   # Append to the MD5 checksum of the files's content
   # to force the zip to be updated as soon as a change occurs
   name   = "src-${data.archive_file.standardize_phones.output_md5}-${var.project_id}.zip"
+  bucket = google_storage_bucket.functions.name
+}
+
+data "archive_file" "failed_fhir_conversion" {
+  type        = "zip"
+  source_dir  = "../../cloud-functions/failed_fhir_conversion"
+  output_path = "../../cloud-functions/failed_fhir_conversion.zip"
+}
+
+# Add source code zip to the Cloud Function's bucket
+resource "google_storage_bucket_object" "failed_fhir_conversion_zip" {
+  source       = data.archive_file.failed_fhir_conversion.output_path
+  content_type = "application/zip"
+
+  # Append to the MD5 checksum of the files's content
+  # to force the zip to be updated as soon as a change occurs
+  name   = "src-${data.archive_file.failed_fhir_conversion.output_md5}-${var.project_id}.zip"
   bucket = google_storage_bucket.functions.name
 }

@@ -48,3 +48,7 @@ variable "patient_hash_salt_secret_version" {
 variable "workflow_service_account_email" {
   description = "value of google_service_account.workflow_service_account.email"
 }
+
+variable "failed_fhir_conversion_bucket" {
+  description = "value of google_storage_bucket.failed_fhir_conversion_bucket.name"
+}
