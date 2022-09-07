@@ -46,24 +46,31 @@ def test_geocode_patients_bad_resource_type():
 
 
 @mock.patch("main.os.environ")
-@mock.patch("phdi.geo")
+@mock.patch("phdi.geo.geocode_patients")
+@mock.patch("phdi.geo.get_smartystreets_client")
 @mock.patch("main.http_geocode_patients")
 def test_geocode_patients_good_request(
-    patched_geocode_patients, patched_geo, patched_os_environ
+    patched_geocode_patients,
+    patched_get_geocoder,
+    patched_address_standard,
+    patched_os_environ,
 ):
+    patched_geocoder = mock.Mock()
+    patched_get_geocoder.return_value = patched_geocoder
+
+    patched_standardized_address_data = mock.Mock()
+    patched_address_standard.return_value = patched_standardized_address_data
+    patched_get_geocoder.assert_called_with("smarty-auth-id", "smarty-auth-token")
+
     request = mock.Mock(headers={"Content-Type": "application/json"})
+
     patched_os_environ.get("SMARTY_AUTH_ID").return_value = "TEST_ID"
     patched_os_environ.get("SMARTY_AUTH_TOKEN").return_value = "TEST_TOKEN"
-    patched_geo.get_smartystreets_client(
-        "TEST_ID", "TEST_TOKEN"
-    ).return_value = mock.MagicMock(spec=us_street.Client)
-    patched_geocode_patients.geocoder = mock.MagicMock(spec=us_street.Client)
-    patched_geo.geocode_patients.return_value = test_request_body
-    expected_result = make_response(status_code=200, json_payload=test_request_body)
-    request.get_json.return_value = test_request_body
-    actual_result = http_geocode_patients(request)
 
-    assert actual_result == expected_result
+    # expected_result = make_response(status_code=200, json_payload=test_request_body)
+    request.get_json.return_value = test_request_body
+    patched_geocode_patients(request)
+    patched_address_standard.assert_called_with(test_request_body, patched_geocoder)
 
 
 @mock.patch("phdi_cloud_function_utils.check_for_environment_variables")
