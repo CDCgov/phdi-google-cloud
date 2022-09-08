@@ -1,5 +1,4 @@
-import json
-import functions_framework
+]import functions_framework
 import flask
 import os
 from pydantic import BaseModel, ValidationError, validator
@@ -55,7 +54,7 @@ def failed_fhir_upload(request: flask.Request) -> flask.Response:
     request_json = request.get_json(silent=False)
     # Validate request body.
     try:
-        request_body = RequestBody.parse_obj(request_json)
+        RequestBody.parse_obj(request_json)
     except ValidationError as error:
         error_response = log_error_and_generate_response(
             status_code=400, message=error.json()
