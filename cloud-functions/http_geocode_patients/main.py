@@ -7,6 +7,7 @@ from phdi_cloud_function_utils import (
     validate_request_header,
     make_response,
     check_for_environment_variables,
+    log_error_and_generate_response,
 )
 
 
@@ -41,19 +42,24 @@ def http_geocode_patients(request: flask.Request) -> flask.Response:
             return environment_check_response_id
         elif environment_check_response_token.status_code == 500:
             return environment_check_response_token
+        try:
+            # Using the environment variable values create a SMARTY client
+            geocoder = get_smartystreets_client(
+                os.environ.get("SMARTY_AUTH_ID"),
+                os.environ.get("SMARTY_AUTH_TOKEN"),
+            )
 
-        # Using the environment variable values create a SMARTY client
-        geocoder = get_smartystreets_client(
-            os.environ.get("SMARTY_AUTH_ID"),
-            os.environ.get("SMARTY_AUTH_TOKEN"),
-        )
-
-        request_json = request.get_json(silent=False)
-        # Perform the address standardization and geocoding and
-        # store results in flask response
-        body_response = make_response(
-            status_code=200,
-            json_payload=geocode_patients(bundle=request_json, client=geocoder),
-        )
+            request_json = request.get_json(silent=False)
+            # Perform the address standardization and geocoding and
+            # store results in flask response
+            body_response = make_response(
+                status_code=200,
+                json_payload=geocode_patients(bundle=request_json, client=geocoder),
+            )
+        except Exception as error:
+            error_response = log_error_and_generate_response(
+                status_code=400, message=error.json()
+            )
+        return error_response
 
     return body_response
