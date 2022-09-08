@@ -117,6 +117,11 @@ Set the following secret values in your forked phdi-google-cloud repository:
 
 Information about GCP regions and zones is available [here](https://cloud.google.com/compute/docs/regions-zones).
 
+If your project will utilize the geocoding functionality you will need to set these secret values in your forked phdi-google-cloud repository:
+- `SMARTY_AUTH_ID` - Your SmartyStreet Authorization ID.
+- `SMARTY_AUTH_TOKEN` - Your SmartyStreet Authorization Token.
+
+
 To create a repository secret follow these steps.
 1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud` in your browser.
 2. Click on `Settings` in the top right.
