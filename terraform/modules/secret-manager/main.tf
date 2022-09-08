@@ -43,7 +43,7 @@ resource "google_secret_manager_secret_version" "smarty-auth-id-version" {
   secret_data = var.smarty_auth_id
 }
 
-resource "google_secret_manager_secret_iam_member" "workflow-service-account-member" {
+resource "google_secret_manager_secret_iam_member" "workflow-service-account-member-smarty-id" {
   project   = var.project_id
   secret_id = google_secret_manager_secret.smarty_auth_id.secret_id
   role      = "roles/secretmanager.secretAccessor"
@@ -68,7 +68,7 @@ resource "google_secret_manager_secret_version" "smarty-auth-token-version" {
   secret_data = var.smarty_auth_token
 }
 
-resource "google_secret_manager_secret_iam_member" "workflow-service-account-member" {
+resource "google_secret_manager_secret_iam_member" "workflow-service-account-member-smarty-token" {
   project   = var.project_id
   secret_id = google_secret_manager_secret.smarty_auth_token.secret_id
   role      = "roles/secretmanager.secretAccessor"
