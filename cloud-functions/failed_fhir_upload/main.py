@@ -1,4 +1,4 @@
-]import functions_framework
+import functions_framework
 import flask
 import os
 from pydantic import BaseModel, ValidationError, validator
