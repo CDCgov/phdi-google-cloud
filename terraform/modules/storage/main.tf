@@ -127,6 +127,23 @@ resource "google_storage_bucket_object" "standardize_phones_zip" {
   bucket = google_storage_bucket.functions.name
 }
 
+data "archive_file" "geocode_patients" {
+  type        = "zip"
+  source_dir  = "../../cloud-functions/http_geocode_patients"
+  output_path = "../../cloud-functions/geocode_patients.zip"
+}
+
+# Add source code zip to the Cloud Function's bucket
+resource "google_storage_bucket_object" "geocode_patients_zip" {
+  source       = data.archive_file.geocode_patients.output_path
+  content_type = "application/zip"
+
+  # Append to the MD5 checksum of the files's content
+  # to force the zip to be updated as soon as a change occurs
+  name   = "src-${data.archive_file.geocode_patients.output_md5}-${var.project_id}.zip"
+  bucket = google_storage_bucket.functions.name
+}
+
 data "archive_file" "failed_fhir_conversion" {
   type        = "zip"
   source_dir  = "../../cloud-functions/failed_fhir_conversion"

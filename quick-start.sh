@@ -17,6 +17,8 @@ print_variables() {
   echo "WORKLOAD_IDENTITY_PROVIDER: ${WORKLOAD_IDENTITY_PROVIDER}"
   echo "REGION: us-central1 (or your preferred region)"
   echo "ZONE: us-central1-a (or your preferred zone in the region above)"
+  echo "SMARTY_AUTH_ID: Your Smarty Streets App Authorization ID"
+  echo "SMARTY_AUTH_TOKEN: Your Smarty Streets App Authorization Token"
   echo
   echo "More info on regions and zones can be found at:"
   echo "https://cloud.google.com/compute/docs/regions-zones/"
@@ -42,6 +44,14 @@ set_variables() {
   echo "More info: https://cloud.google.com/compute/docs/regions-zones/regions-zones"
   read ZONE
 
+  echo "Please enter the authorization id of your Smarty Street Account."
+  echo "More info:   https://www.smarty.com/docs/cloud/authentication"
+  read SMARTY_AUTH_ID
+
+  echo "Please enter the authorization token of your Smarty Street Account."
+  echo "More info:   https://www.smarty.com/docs/cloud/authentication"
+  read SMARTY_AUTH_TOKEN
+
   echo "Logging in to GitHub..."
   gh auth login
 
@@ -51,6 +61,8 @@ set_variables() {
   gh secret -R "${GITHUB_REPO}" set WORKLOAD_IDENTITY_PROVIDER --body "${WORKLOAD_IDENTITY_PROVIDER}"
   gh secret -R "${GITHUB_REPO}" set REGION --body "${REGION}"
   gh secret -R "${GITHUB_REPO}" set ZONE --body "${ZONE}"
+  gh secret -R "${GITHUB_REPO}" set SMARTY_AUTH_ID --body "${SMARTY_AUTH_ID}"
+  gh secret -R "${GITHUB_REPO}" set SMARTY_AUTH_TOKEN --body "${SMARTY_AUTH_TOKEN}"
 
   echo "Repository secrets set!"
   echo "You can now continue with the Quick Start instructions in the README.md file."

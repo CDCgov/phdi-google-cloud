@@ -87,6 +87,32 @@ resource "google_cloudfunctions_function" "standardize-phones" {
   entry_point           = "http_standardize_phones"
 }
 
+resource "google_cloudfunctions_function" "geocode-patients" {
+  name                  = "phdi-${terraform.workspace}-geocode-patients"
+  description           = "Standardize and Geocode patient addresses"
+  runtime               = "python39"
+  available_memory_mb   = 128
+  source_archive_bucket = var.functions_storage_bucket
+  source_archive_object = var.geocode_patients_zip
+  trigger_http          = true
+  entry_point           = "http_geocode_patients"
+  service_account_email = var.workflow_service_account_email
+
+  secret_environment_variables {
+    key        = "SMARTY_AUTH_ID"
+    secret     = var.smarty_auth_id_secret_id
+    version    = "1"
+    project_id = var.project_id
+  }
+
+  secret_environment_variables {
+    key        = "SMARTY_AUTH_TOKEN"
+    secret     = var.smarty_auth_token_secret_id
+    version    = "1"
+    project_id = var.project_id
+  }
+}
+
 resource "google_cloudfunctions_function" "failed_fhir_conversion" {
   name        = "phdi-${terraform.workspace}-failed-fhir-conversion"
   description = "Upload failed FHIR conversion to GCS"

@@ -46,3 +46,11 @@ variable "gcp_services_list" {
     "workflows.googleapis.com"
   ]
 }
+
+variable "smarty_auth_id" {
+  description = "value of the Smarty Streets Authorization ID"
+}
+
+variable "smarty_auth_token" {
+  description = "value of the Smarty Streets Authorization Token"
+}

@@ -39,7 +39,7 @@ def add_patient_hash(request: flask.Request) -> flask.Response:
         return body_response
 
     environment_check_response = check_for_environment_variables(["PATIENT_HASH_SALT"])
-    if environment_check_response.status_code == 400:
+    if environment_check_response.status_code == 500:
         return environment_check_response
 
     # Add the patient hash

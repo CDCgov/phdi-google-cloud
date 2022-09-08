@@ -25,6 +25,7 @@ variable "upload_fhir_bundle_source_zip" {
 variable "read_source_data_source_zip" {
   description = "value of google_storage_bucket_object.read_source_data_source_zip.name"
 }
+
 variable "standardize_names_zip" {
   description = "value of google_storage_bucket_object.standardize_names_source_zip.name"
 }
@@ -51,4 +52,16 @@ variable "patient_hash_salt_secret_version" {
 
 variable "workflow_service_account_email" {
   description = "value of google_service_account.workflow_service_account.email"
+}
+
+variable "geocode_patients_zip" {
+  description = "value of google_storage_bucket_object.geocode_patients_source_zip.name"
+}
+
+variable "smarty_auth_id_secret_id" {
+  description = "value of google_secret_manager_secret.smarty_auth_id"
+}
+
+variable "smarty_auth_token_secret_id" {
+  description = "value of google_secret_manager_secret.smarty_auth_token"
 }
