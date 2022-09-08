@@ -41,7 +41,7 @@ def test_failed_fhir_conversion_missing_environment_variables(
     patched_environ.get.return_value = None
     response = failed_fhir_conversion(request)
     assert response.response == (
-        "Environment variable 'FAILED_FHIR_CONVERSION_BUCKET' not set. "
+        "Environment variable 'PHI_STORAGE_BUCKET' not set. "
         + "The environment variable must be set."
     )
 

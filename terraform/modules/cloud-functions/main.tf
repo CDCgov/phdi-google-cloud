@@ -99,6 +99,6 @@ resource "google_cloudfunctions_function" "failed_fhir_conversion" {
   entry_point           = "failed_fhir_conversion"
 
   environment_variables = {
-    FAILED_FHIR_CONVERSION_BUCKET = var.failed_fhir_conversion_bucket
+    PHI_STORAGE_BUCKET = var.phi_storage_bucket
   }
 }

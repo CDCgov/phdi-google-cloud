@@ -35,15 +35,13 @@ def failed_fhir_conversion(request: flask.Request) -> flask.Response:
         return body_response
 
     # Check for the required environment variables.
-    environment_check_response = check_for_environment_variables(
-        ["FAILED_FHIR_CONVERSION_BUCKET"]
-    )
+    environment_check_response = check_for_environment_variables(["PHI_STORAGE_BUCKET"])
     if environment_check_response.status_code == 500:
         return environment_check_response
 
     # Upload file to storage bucket.
     storage_client = storage.Client()
-    bucket = storage_client.bucket(os.environ.get("FAILED_FHIR_CONVERSION_BUCKET"))
+    bucket = storage_client.bucket(os.environ.get("PHI_STORAGE_BUCKET"))
     original_filename = (
         json.loads(request.get_json()).get("original_request").get("filename")
     )

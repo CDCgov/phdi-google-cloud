@@ -18,10 +18,6 @@ output "phi_storage_bucket" {
   value = google_storage_bucket.phi_storage_bucket.name
 }
 
-output "failed_fhir_conversion_bucket" {
-  value = google_storage_bucket.failed_fhir_conversion_bucket.name
-}
-
 output "add_patient_hash_source_zip" {
   value = google_storage_bucket_object.add_patient_hash_source_zip.name
 }

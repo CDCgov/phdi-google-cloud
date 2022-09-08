@@ -16,15 +16,6 @@ resource "google_storage_bucket" "phi_storage_bucket" {
   }
 }
 
-resource "google_storage_bucket" "failed_fhir_conversion_bucket" {
-  name          = "phdi-${terraform.workspace}-failed-fhir-conversions-bucket-${var.project_id}"
-  location      = "US"
-  force_destroy = true
-  versioning {
-    enabled = true
-  }
-}
-
 resource "google_storage_bucket" "functions" {
   name          = "phdi-${terraform.workspace}-functions-${var.project_id}"
   location      = "US"

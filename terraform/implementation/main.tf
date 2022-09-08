@@ -35,7 +35,6 @@ module "cloud-functions" {
   standardize_names_zip            = module.storage.standardize_names_zip
   failed_fhir_conversion_zip       = module.storage.failed_fhir_conversion_zip
   workflow_service_account_email   = module.google-workflows.workflow_service_account_email
-  failed_fhir_conversion_bucket    = module.storage.failed_fhir_conversion_bucket
   depends_on                       = [google_project_service.enable_google_apis]
 }
 
