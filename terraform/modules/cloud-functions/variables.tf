@@ -54,10 +54,10 @@ variable "geocode_patients_zip" {
   description = "value of google_storage_bucket_object.geocode_patients_source_zip.name"
 }
 
-variable "smary_auth_id" {
+variable "smarty_auth_id" {
   description = "value of google_secret_manager_secret.smarty_auth_id"
 }
 
-variable "smary_auth_token" {
+variable "smarty_auth_token" {
   description = "value of google_secret_manager_secret.smarty_auth_token"
 }
