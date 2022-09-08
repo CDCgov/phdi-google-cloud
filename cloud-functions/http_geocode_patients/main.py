@@ -60,6 +60,6 @@ def http_geocode_patients(request: flask.Request) -> flask.Response:
             error_response = log_error_and_generate_response(
                 status_code=400, message=error.json()
             )
-        return error_response
+            return error_response
 
     return body_response
