@@ -170,5 +170,11 @@ def convert_to_fhir(
         result = json.load(open(output_data_file_path))
     else:
         result = vars(converter_response)
+        # Include original input data in the result.
+        result["original_request"] = {
+            "input_data": input_data,
+            "input_type": input_type,
+            "root_template": root_template,
+        }
 
     return result

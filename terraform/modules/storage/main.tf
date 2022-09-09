@@ -143,3 +143,20 @@ resource "google_storage_bucket_object" "geocode_patients_zip" {
   name   = "src-${data.archive_file.geocode_patients.output_md5}-${var.project_id}.zip"
   bucket = google_storage_bucket.functions.name
 }
+
+data "archive_file" "failed_fhir_conversion" {
+  type        = "zip"
+  source_dir  = "../../cloud-functions/failed_fhir_conversion"
+  output_path = "../../cloud-functions/failed_fhir_conversion.zip"
+}
+
+# Add source code zip to the Cloud Function's bucket
+resource "google_storage_bucket_object" "failed_fhir_conversion_zip" {
+  source       = data.archive_file.failed_fhir_conversion.output_path
+  content_type = "application/zip"
+
+  # Append to the MD5 checksum of the files's content
+  # to force the zip to be updated as soon as a change occurs
+  name   = "src-${data.archive_file.failed_fhir_conversion.output_md5}-${var.project_id}.zip"
+  bucket = google_storage_bucket.functions.name
+}

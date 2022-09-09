@@ -38,6 +38,10 @@ variable "add_patient_hash_source_zip" {
   description = "value of google_storage_bucket_object.add_patient_hash_source_zip.name"
 }
 
+variable "failed_fhir_conversion_zip" {
+  description = "value of google_storage_bucket_object.failed_fhir_conversion_zip.name"
+}
+
 variable "patient_hash_salt_secret_id" {
   description = "value of google_secret_manager_secret.salt.id"
 }
