@@ -1,8 +1,12 @@
+import json
 from main import RequestBody, upload_fhir_bundle
 from pydantic import ValidationError
 import pytest
 from unittest import mock
 from phdi_cloud_function_utils import make_response
+
+
+test_request_body = json.load(open("../assets/multi_patient_obs_bundle.json", "r"))
 
 
 def test_request_body():
@@ -67,7 +71,9 @@ def test_upload_fhir_bundle_bad_body():
 
 @mock.patch("main.upload_bundle_to_fhir_server")
 @mock.patch("main.GcpCredentialManager")
+@mock.patch("main.make_response")
 def test_upload_fhir_bundle_good_request(
+    patched_make_response,
     patched_credential_manager,
     patched_upload_bundle_to_fhir_server,
 ):
@@ -93,6 +99,7 @@ def test_upload_fhir_bundle_good_request(
     ]
 
     fhir_store_url = "/".join(fhir_store_url)
+    patched_make_response.return_value = mock.Mock()
     upload_fhir_bundle(request)
 
     patched_upload_bundle_to_fhir_server.assert_called_with(
