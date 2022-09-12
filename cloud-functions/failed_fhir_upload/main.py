@@ -1,34 +1,18 @@
 import functions_framework
 import flask
 import os
-from pydantic import BaseModel, ValidationError, validator
+from datetime import datetime
 from google.cloud import storage
 from phdi_cloud_function_utils import (
     check_for_environment_variables,
     make_response,
     validate_request_header,
-    log_error_and_generate_response,
+    validate_fhir_bundle_or_resource,
 )
 
 
-class RequestBody(BaseModel):
-    """A class to model the body of requests to the failed_fhir_upload() function. The
-    body of every request must contain:
-    :failure_reason: The reason the FHIR bundle failed to upload.
-    :filename: The name of the original source data file
-    :bundle: A FHIR bundle to be uploaded to the GCP FHIR Store specified by
-        fhir_store_id.
-    """
-
-    failure_reason: str
-    bundle: dict
-
-    @validator("bundle")
-    def must_be_fhir_bundle(cls: object, value: dict) -> dict:
-        """Check to see if the value provided for 'bundle' is in fact a FHIR bundle."""
-
-        assert value.get("resourceType") == "Bundle", "Must be a FHIR bundle."
-        return value
+def get_timestamp():
+    return datetime.now().isoformat()
 
 
 @functions_framework.http
@@ -51,30 +35,40 @@ def failed_fhir_upload(request: flask.Request) -> flask.Response:
     if header_response.status_code == 400:
         return header_response
 
-    request_json = request.get_json(silent=False)
-    # Validate request body.
-    try:
-        RequestBody.parse_obj(request_json)
-    except ValidationError as error:
-        error_response = log_error_and_generate_response(
-            status_code=400, message=error.json()
-        )
-        return error_response
+    # Check that the request body contains a FHIR bundle or resource.
+    body_response = validate_fhir_bundle_or_resource(request)
+    if body_response.status_code == 400:
+        return body_response
 
     # Check for the required environment variables.
     environment_check_response = check_for_environment_variables(["PHI_STORAGE_BUCKET"])
     if environment_check_response.status_code == 500:
         return environment_check_response
 
-    # Upload file to storage bucket.
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(os.environ.get("PHI_STORAGE_BUCKET"))
-    original_filename = request_json["filename"]
-    destination_blob_name = f"failed_fhir_upload_{original_filename}.json"
-    blob = bucket.blob(destination_blob_name)
+    # Check to see if any entries in the FHIR bundle failed to upload.
+    # If so, upload the FHIR bundle to a storage bucket.
+    fhir_bundle = request.get_json()
+    failed_entries = [
+        entry
+        for entry in fhir_bundle["entry"]
+        if entry["response"]["status"] != "201 Created"
+    ]
+    if failed_entries:
+        timestamp = get_timestamp()
+        data = {
+            "entry": failed_entries,
+            "resourceType": "Bundle",
+            "type": "transaction-response",
+        }
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(os.environ.get("PHI_STORAGE_BUCKET"))
+        destination_blob_name = f"failed_fhir_upload_{timestamp}.json"
+        blob = bucket.blob(destination_blob_name)
+        blob.upload_from_string(data=data, content_type=content_type)
 
-    blob.upload_from_string(data=request, content_type=content_type)
+        return make_response(
+            status_code=200,
+            message=f"Failed entries found. File uploaded to {destination_blob_name}.",
+        )
 
-    return make_response(
-        status_code=200, message=f"File uploaded to {destination_blob_name}."
-    )
+    return make_response(status_code=200, message=f"No failed entries found!")

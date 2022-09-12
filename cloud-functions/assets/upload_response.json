@@ -1,0 +1,78 @@
+{
+    "entry": [
+        {
+            "response": {
+                "etag": "W/\"MTY2Mjc0NTkxNDY4NTAxNTAwMA\"",
+                "lastModified": "2022-09-09T17:51:54.685015+00:00",
+                "location": "https://healthcare.googleapis.com/v1/projects/phdi-357418/locations/us-west1/datasets/phdi-dev-dataset-phdi-357418/fhirStores/phdi-dev-fhirstore/fhir/Patient/3715438f-76f5-4254-ae68-2ab3cfa1e8e6/_history/MTY2Mjc0NTkxNDY4NTAxNTAwMA",
+                "status": "201 Created"
+            }
+        },
+        {
+            "response": {
+                "etag": "W/\"MTY2Mjc0NTkxNDY4NTAxNTAwMA\"",
+                "lastModified": "2022-09-09T17:51:54.685015+00:00",
+                "location": "https://healthcare.googleapis.com/v1/projects/phdi-357418/locations/us-west1/datasets/phdi-dev-dataset-phdi-357418/fhirStores/phdi-dev-fhirstore/fhir/Observation/2d097af2-37ad-43c4-8fd4-051602c554ad/_history/MTY2Mjc0NTkxNDY4NTAxNTAwMA",
+                "status": "201 Created"
+            }
+        },
+        {
+            "response": {
+                "etag": "W/\"MTY2Mjc0NTkxNDY4NTAxNTAwMA\"",
+                "lastModified": "2022-09-09T17:51:54.685015+00:00",
+                "location": "https://healthcare.googleapis.com/v1/projects/phdi-357418/locations/us-west1/datasets/phdi-dev-dataset-phdi-357418/fhirStores/phdi-dev-fhirstore/fhir/Observation/18bb27ad-0d1e-4a56-a4f0-14d0a8fa7d9e/_history/MTY2Mjc0NTkxNDY4NTAxNTAwMA",
+                "status": "201 Created"
+            }
+        },
+        {
+            "response": {
+                "etag": "W/\"MTY2Mjc0NTkxNDY4NTAxNTAwMA\"",
+                "lastModified": "2022-09-09T17:51:54.685015+00:00",
+                "location": "https://healthcare.googleapis.com/v1/projects/phdi-357418/locations/us-west1/datasets/phdi-dev-dataset-phdi-357418/fhirStores/phdi-dev-fhirstore/fhir/Observation/dd2d305a-f99b-4bb3-b73f-bfc56fc64bc5/_history/MTY2Mjc0NTkxNDY4NTAxNTAwMA",
+                "status": "201 Created"
+            }
+        },
+        {
+            "response": {
+                "etag": "W/\"MTY2Mjc0NTkxNDY4NTAxNTAwMA\"",
+                "lastModified": "2022-09-09T17:51:54.685015+00:00",
+                "location": "https://healthcare.googleapis.com/v1/projects/phdi-357418/locations/us-west1/datasets/phdi-dev-dataset-phdi-357418/fhirStores/phdi-dev-fhirstore/fhir/Observation/39029663-bb59-4658-aee8-65c87a80b411/_history/MTY2Mjc0NTkxNDY4NTAxNTAwMA",
+                "status": "201 Created"
+            }
+        },
+        {
+            "response": {
+                "etag": "W/\"MTY2Mjc0NTkxNDY4NTAxNTAwMA\"",
+                "lastModified": "2022-09-09T17:51:54.685015+00:00",
+                "location": "https://healthcare.googleapis.com/v1/projects/phdi-357418/locations/us-west1/datasets/phdi-dev-dataset-phdi-357418/fhirStores/phdi-dev-fhirstore/fhir/Observation/6bcbbacd-4bb8-4663-930e-1c87be60c2be/_history/MTY2Mjc0NTkxNDY4NTAxNTAwMA",
+                "status": "201 Created"
+            }
+        },
+        {
+            "response": {
+                "etag": "W/\"MTY2Mjc0NTkxNDY4NTAxNTAwMA\"",
+                "lastModified": "2022-09-09T17:51:54.685015+00:00",
+                "location": "https://healthcare.googleapis.com/v1/projects/phdi-357418/locations/us-west1/datasets/phdi-dev-dataset-phdi-357418/fhirStores/phdi-dev-fhirstore/fhir/Observation/0db0875c-fbef-4dc1-bab2-d6460f5a820e/_history/MTY2Mjc0NTkxNDY4NTAxNTAwMA",
+                "status": "201 Created"
+            }
+        },
+        {
+            "response": {
+                "etag": "W/\"MTY2Mjc0NTkxNDY4NTAxNTAwMA\"",
+                "lastModified": "2022-09-09T17:51:54.685015+00:00",
+                "location": "https://healthcare.googleapis.com/v1/projects/phdi-357418/locations/us-west1/datasets/phdi-dev-dataset-phdi-357418/fhirStores/phdi-dev-fhirstore/fhir/Observation/e9648954-e4c4-4884-8dac-0c717dc8f9ea/_history/MTY2Mjc0NTkxNDY4NTAxNTAwMA",
+                "status": "201 Created"
+            }
+        },
+        {
+            "response": {
+                "etag": "W/\"MTY2Mjc0NTkxNDY4NTAxNTAwMA\"",
+                "lastModified": "2022-09-09T17:51:54.685015+00:00",
+                "location": "https://healthcare.googleapis.com/v1/projects/phdi-357418/locations/us-west1/datasets/phdi-dev-dataset-phdi-357418/fhirStores/phdi-dev-fhirstore/fhir/Patient/67a0821e-e732-4a84-8018-fb3d8a5fdd70/_history/MTY2Mjc0NTkxNDY4NTAxNTAwMA",
+                "status": "201 Created"
+            }
+        }
+    ],
+    "resourceType": "Bundle",
+    "type": "transaction-response"
+}
