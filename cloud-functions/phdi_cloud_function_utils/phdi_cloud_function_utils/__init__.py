@@ -4,6 +4,12 @@ import os
 from flask import Request, Response
 
 
+single_patient_bundle = json.load(open("../assets/single_patient_bundle.json", "r"))
+multi_patient_obs_bundle = json.load(
+    open("../assets/multi_patient_obs_bundle.json", "r")
+)
+
+
 def make_response(
     status_code: int, message: str = None, json_payload: dict = None
 ) -> Response:

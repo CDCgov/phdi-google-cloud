@@ -32,9 +32,9 @@ def test_make_response():
     expected_response.response = message
     expected_response.status_code = status_code
 
-    response = make_response(status_code=status_code, message=message)
-    assert response.response == expected_response.response
-    assert response.status_code == expected_response.status_code
+    actual_response = make_response(status_code=status_code, message=message)
+    assert actual_response.response == expected_response.response
+    assert actual_response.status_code == expected_response.status_code
 
     expected_response = flask.Response(
         response=json.dumps(json_payload),
@@ -43,11 +43,11 @@ def test_make_response():
     )
     expected_response.status_code = status_code
 
-    response = make_response(status_code=status_code, json_payload=json_payload)
-    assert response.response == expected_response.response
-    assert response.status_code == expected_response.status_code
-    assert response.mimetype == expected_response.mimetype
-    assert response.headers == expected_response.headers
+    actual_response = make_response(status_code=status_code, json_payload=json_payload)
+    assert actual_response.response == expected_response.response
+    assert actual_response.status_code == expected_response.status_code
+    assert actual_response.mimetype == expected_response.mimetype
+    assert actual_response.headers == expected_response.headers
 
 
 def test_utils_bad_header():
@@ -57,30 +57,30 @@ def test_utils_bad_header():
         message="Header must include: 'Content-Type:application/json'.",
     )
 
-    result = validate_request_header(request, "application/json")
-    assert result.status == expected_result.status
-    assert result.status_code == expected_result.status_code
-    assert result.response == expected_result.response
+    actual_result = validate_request_header(request, "application/json")
+    assert actual_result.status == expected_result.status
+    assert actual_result.status_code == expected_result.status_code
+    assert actual_result.response == expected_result.response
 
 
 def test_utils_good_header():
     request = mock.Mock(headers={"Content-Type": "application/json"})
     expected_result = make_response(status_code=200, message="Validation Succeeded!")
 
-    result = validate_request_header(request, "application/json")
-    assert result.status == expected_result.status
-    assert result.status_code == expected_result.status_code
-    assert result.response == expected_result.response
+    actual_result = validate_request_header(request, "application/json")
+    assert actual_result.status == expected_result.status
+    assert actual_result.status_code == expected_result.status_code
+    assert actual_result.response == expected_result.response
 
 
 def test_utils_good_body():
     request = mock.Mock(headers={"Content-Type": "application/json"})
     request.get_json.return_value = test_request_body
     expected_result = make_response(status_code=200, message="Validation Succeeded!")
-    result = validate_request_body_json(request)
-    assert result.status == expected_result.status
-    assert result.status_code == expected_result.status_code
-    assert result.response == expected_result.response
+    actual_result = validate_request_body_json(request)
+    assert actual_result.status == expected_result.status
+    assert actual_result.status_code == expected_result.status_code
+    assert actual_result.response == expected_result.response
 
 
 def test_utils_bad_body():
@@ -89,10 +89,10 @@ def test_utils_bad_body():
     expected_result = make_response(
         status_code=400, message="Invalid request body - Invalid JSON"
     )
-    result = validate_request_body_json(request)
-    assert result.status == expected_result.status
-    assert result.status_code == expected_result.status_code
-    assert result.response == expected_result.response
+    actual_result = validate_request_body_json(request)
+    assert actual_result.status == expected_result.status
+    assert actual_result.status_code == expected_result.status_code
+    assert actual_result.response == expected_result.response
 
 
 def test_utils_bad_resource_type():
@@ -106,10 +106,10 @@ def test_utils_bad_resource_type():
     )
     mock_request.get_json.return_value = body_with_wrong_resource_type
     expected_result = make_response(status_code=400, message=error_message)
-    result = validate_fhir_bundle_or_resource(request=mock_request)
-    assert result.status == expected_result.status
-    assert result.status_code == expected_result.status_code
-    assert result.response == expected_result.response
+    actual_result = validate_fhir_bundle_or_resource(request=mock_request)
+    assert actual_result.status == expected_result.status
+    assert actual_result.status_code == expected_result.status_code
+    assert actual_result.response == expected_result.response
 
 
 def test_utils_request():
@@ -117,30 +117,30 @@ def test_utils_request():
 
     expected_result = make_response(status_code=200, message="Validation Succeeded!")
     request.get_json.return_value = test_request_body
-    result = validate_fhir_bundle_or_resource(request)
+    actual_result = validate_fhir_bundle_or_resource(request)
 
-    assert result.status == expected_result.status
-    assert result.status_code == expected_result.status_code
-    assert result.response == expected_result.response
+    assert actual_result.status == expected_result.status
+    assert actual_result.status_code == expected_result.status_code
+    assert actual_result.response == expected_result.response
 
 
 @mock.patch("os.environ")
 def test_check_for_environment_variables_success(patched_environ):
     environment_variables = ["SOME-ENV-VAR"]
     patched_environ.get.return_value = "some-value"
-    response = check_for_environment_variables(environment_variables)
+    actual_response = check_for_environment_variables(environment_variables)
     expected_response = make_response(
         status_code=200, message="All environment variables were found."
     )
-    assert response.response == expected_response.response
-    assert response.status_code == expected_response.status_code
+    assert actual_response.response == expected_response.response
+    assert actual_response.status_code == expected_response.status_code
 
 
 @mock.patch("os.environ")
 def test_check_for_environment_variables_failure(patched_environ):
     environment_variables = ["SOME-ENV-VAR"]
     patched_environ.get.return_value = None
-    response = check_for_environment_variables(environment_variables)
+    actual_response = check_for_environment_variables(environment_variables)
     expected_response = make_response(
         status_code=500,
         message=(
@@ -148,25 +148,25 @@ def test_check_for_environment_variables_failure(patched_environ):
             "The environment variable must be set."
         ),
     )
-    assert response.response == expected_response.response
-    assert response.status_code == expected_response.status_code
+    assert actual_response.response == expected_response.response
+    assert actual_response.status_code == expected_response.status_code
 
 
 def test_log_info_and_generate_response():
-    response = log_info_and_generate_response(200, "my-response")
+    actual_response = log_info_and_generate_response(200, "my-response")
     expected_response = flask.Response()
     expected_response.response = "my-response"
     expected_response.status_code = 200
 
-    assert response.response == expected_response.response
-    assert response.status_code == expected_response.status_code
+    assert actual_response.response == expected_response.response
+    assert actual_response.status_code == expected_response.status_code
 
 
 def test_log_error_and_generate_response():
-    response = log_error_and_generate_response(400, "my-response")
+    actual_response = log_error_and_generate_response(400, "my-response")
     expected_response = flask.Response()
     expected_response.response = "my-response"
     expected_response.status_code = 400
 
-    assert response.response == expected_response.response
-    assert response.status_code == expected_response.status_code
+    assert actual_response.response == expected_response.response
+    assert actual_response.status_code == expected_response.status_code

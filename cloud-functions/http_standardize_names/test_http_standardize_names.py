@@ -11,13 +11,13 @@ test_request_body = json.load(open("../assets/single_patient_bundle.json", "r"))
 
 def test_standardize_names_bad_header():
     request = mock.Mock(headers={"Content-Type": "not-application/json"})
-    result = http_standardize_names(request)
+    actual_result = http_standardize_names(request)
     expected_result = make_response(
         message="Header must include: 'Content-Type:application/json'.", status_code=400
     )
-    assert result.status == expected_result.status
-    assert result.status_code == expected_result.status_code
-    assert result.response == expected_result.response
+    assert actual_result.status == expected_result.status
+    assert actual_result.status_code == expected_result.status_code
+    assert actual_result.response == expected_result.response
 
 
 def test_standardize_names_bad_body():
@@ -37,10 +37,10 @@ def test_standardize_names_bad_resource_type():
     )
     request.get_json.return_value = body_with_wrong_resource_type
     expected_result = make_response(message=error_message, status_code=400)
-    result = http_standardize_names(request=request)
-    assert result.status == expected_result.status
-    assert result.status_code == expected_result.status_code
-    assert result.response == expected_result.response
+    actual_result = http_standardize_names(request=request)
+    assert actual_result.status == expected_result.status
+    assert actual_result.status_code == expected_result.status_code
+    assert actual_result.response == expected_result.response
 
 
 def test_standardize_names_good_request():

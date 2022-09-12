@@ -42,14 +42,14 @@ def test_request_body():
 
 def test_upload_fhir_bundle_bad_header():
     request = mock.Mock(headers={"Content-Type": "not-application/json"})
-    result = upload_fhir_bundle(request)
+    actual_result = upload_fhir_bundle(request)
     expected_result = make_response(
         status_code=400, message="Header must include: 'Content-Type:application/json'."
     )
 
-    assert result.status == expected_result.status
-    assert result.status_code == expected_result.status_code
-    assert result.response == expected_result.response
+    assert actual_result.status == expected_result.status
+    assert actual_result.status_code == expected_result.status_code
+    assert actual_result.response == expected_result.response
 
 
 def test_upload_fhir_bundle_bad_body():
@@ -62,11 +62,11 @@ def test_upload_fhir_bundle_bad_body():
         "bundle": {"resourceType": "Bundle"},
     }
 
-    result = upload_fhir_bundle(request)
+    actual_result = upload_fhir_bundle(request)
     expected_result = make_response(status_code=400, message="Unknown Error")
 
-    assert result.status == expected_result.status
-    assert result.status_code == expected_result.status_code
+    assert actual_result.status == expected_result.status
+    assert actual_result.status_code == expected_result.status_code
 
 
 @mock.patch("main.upload_bundle_to_fhir_server")

@@ -6,13 +6,15 @@ import json
 def test_bad_cloud_event():
     cloud_event = mock.MagicMock()
     cloud_event.data.__getitem__.side_effect = AttributeError()
-    response = read_source_data(cloud_event)
-    assert response.response == "Bad CloudEvent payload - 'data' attribute missing."
+    actual_response = read_source_data(cloud_event)
+    assert (
+        actual_response.response == "Bad CloudEvent payload - 'data' attribute missing."
+    )
 
     cloud_event = mock.MagicMock()
     cloud_event.data.__getitem__.side_effect = KeyError()
-    response = read_source_data(cloud_event)
-    assert response.response == (
+    actual_response = read_source_data(cloud_event)
+    assert actual_response.response == (
         "Bad CloudEvent payload - 'name' or 'bucket' name was " "not included."
     )
 
@@ -20,8 +22,8 @@ def test_bad_cloud_event():
 def test_not_source_data():
     cloud_event = mock.MagicMock()
     cloud_event.data.__getitem__.side_effect = ["some-filename", "some-bucket"]
-    response = read_source_data(cloud_event)
-    assert response.response == (
+    actual_response = read_source_data(cloud_event)
+    assert actual_response.response == (
         "some-filename was not read because it does not begin " "with 'source-data/'."
     )
 
@@ -32,8 +34,8 @@ def test_unknown_message():
         "source-data/unknown-message-type",
         "some-bucket",
     ]
-    response = read_source_data(cloud_event)
-    assert response.response == (
+    actual_response = read_source_data(cloud_event)
+    assert actual_response.response == (
         "Unknown message type: unknown-message-type. Messages "
         "should be ELR, VXU, or eCR."
     )
@@ -51,8 +53,8 @@ def test_missing_environment_variables(
         "source-data/elr/some-filename",
         "some-bucket",
     ]
-    response = read_source_data(cloud_event)
-    assert response.response == (
+    actual_response = read_source_data(cloud_event)
+    assert actual_response.response == (
         "Missing required environment variables. Values for "
         "PROJECT_ID and TOPIC_ID must be set."
     )
@@ -230,7 +232,7 @@ def test_read_source_data(
     patched_blob = patched_bucket.blob.return_value
     patched_blob.download_as_text.return_value = "some-message"
 
-    response = read_source_data(cloud_event)
+    actual_response = read_source_data(cloud_event)
     expected_response = log_info_and_generate_response(
         200,
         (
@@ -239,5 +241,5 @@ def test_read_source_data(
             "published."
         ),
     )
-    assert response.response == expected_response.response
-    assert response.status_code == expected_response.status_code
+    assert actual_response.response == expected_response.response
+    assert actual_response.status_code == expected_response.status_code
