@@ -70,7 +70,10 @@ def test_failed_fhir_upload_good_request_with_failed_entries(
     mock_get_timestamp.return_value = "2022-01-01T00:00:00"
     request = mock.Mock(headers={"Content-Type": "application/json"})
 
-    expected_result = "Failed entries found. File uploaded to failed_fhir_upload_2022-01-01T00:00:00.json."
+    expected_result = (
+        "Failed entries found. "
+        + "File uploaded to failed_fhir_upload_2022-01-01T00:00:00.json."
+    )
     request_with_failed_entries = copy.deepcopy(test_request_body)
     request_with_failed_entries["entry"][0]["response"]["status"] = "400 Bad Request"
     request.get_json.return_value = request_with_failed_entries

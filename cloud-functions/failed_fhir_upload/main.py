@@ -71,4 +71,4 @@ def failed_fhir_upload(request: flask.Request) -> flask.Response:
             message=f"Failed entries found. File uploaded to {destination_blob_name}.",
         )
 
-    return make_response(status_code=200, message=f"No failed entries found!")
+    return make_response(status_code=200, message="No failed entries found!")
