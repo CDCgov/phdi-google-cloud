@@ -4,12 +4,6 @@ import os
 from flask import Request, Response
 
 
-single_patient_bundle = json.load(open("../assets/single_patient_bundle.json", "r"))
-multi_patient_obs_bundle = json.load(
-    open("../assets/multi_patient_obs_bundle.json", "r")
-)
-
-
 def make_response(
     status_code: int, message: str = None, json_payload: dict = None
 ) -> Response:
@@ -160,3 +154,25 @@ def log_info_and_generate_response(status_code: int, message: str) -> Response:
     logging.info(message)
     response = make_response(status_code=status_code, message=message)
     return response
+
+
+def get_sample_single_patient_bundle():
+    """
+    Function to return a simple sample patient bundle
+    for a single patient
+    :return: A Json object of the single patient FHIR bundle
+    """
+    single_patient_bundle = json.load(open("../assets/single_patient_bundle.json", "r"))
+    return single_patient_bundle
+
+
+def get_sample_multi_patient_obs_bundle():
+    """
+    Function to return a simple sample patient and observation bundle
+    for a multiple patients and multiple observations
+    :return: A Json object of the multiple patients and observations FHIR bundle
+    """
+    multi_patient_obs_bundle = json.load(
+        open("../assets/multi_patient_obs_bundle.json", "r")
+    )
+    return multi_patient_obs_bundle
