@@ -8,6 +8,8 @@ from phdi_cloud_function_utils import (
     check_for_environment_variables,
     log_error_and_generate_response,
     log_info_and_generate_response,
+    get_sample_single_patient_bundle,
+    get_sample_multi_patient_obs_bundle,
 )
 from unittest import mock
 import pytest
@@ -170,3 +172,13 @@ def test_log_error_and_generate_response():
 
     assert actual_response.response == expected_response.response
     assert actual_response.status_code == expected_response.status_code
+
+
+def test_get_single_patient_bundle():
+    test_bundle = get_sample_single_patient_bundle()
+    assert test_bundle is not None
+
+
+def test_get_multi_patient_obs_bundle():
+    test_bundle = get_sample_multi_patient_obs_bundle()
+    assert test_bundle is not None
