@@ -128,3 +128,19 @@ resource "google_cloudfunctions_function" "failed_fhir_conversion" {
     PHI_STORAGE_BUCKET = var.phi_storage_bucket
   }
 }
+
+resource "google_cloudfunctions_function" "failed_fhir_upload" {
+  name        = "phdi-${terraform.workspace}-failed-fhir-upload"
+  description = "Upload failed FHIR upload to GCS"
+  runtime     = "python39"
+
+  available_memory_mb   = 128
+  source_archive_bucket = var.functions_storage_bucket
+  source_archive_object = var.failed_fhir_upload_zip
+  trigger_http          = true
+  entry_point           = "failed_fhir_upload"
+
+  environment_variables = {
+    PHI_STORAGE_BUCKET = var.phi_storage_bucket
+  }
+}
