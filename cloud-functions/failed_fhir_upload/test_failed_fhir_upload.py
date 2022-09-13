@@ -12,14 +12,14 @@ test_request_body = json.load(open("../assets/upload_response.json", "r"))
 def test_failed_fhir_upload_bad_header(mock_storage_client):
     request = mock.Mock(headers={"Content-Type": "not-application/json"})
 
-    result = failed_fhir_upload(request)
+    actual_result = failed_fhir_upload(request)
     expected_result = make_response(
         status_code=400, message="Header must include: 'Content-Type:application/json'."
     )
     expected_result.status_code = 400
-    assert result.status == expected_result.status
-    assert result.status_code == expected_result.status_code
-    assert result.response == expected_result.response
+    assert actual_result.status == expected_result.status
+    assert actual_result.status_code == expected_result.status_code
+    assert actual_result.response == expected_result.response
 
 
 def test_failed_fhir_upload_bad_body():
@@ -53,8 +53,8 @@ def test_failed_fhir_upload_missing_environment_variables(
     request = mock.Mock(headers={"Content-Type": "application/json"})
     request.get_json.return_value = test_request_body
     patched_environ.get.return_value = None
-    response = failed_fhir_upload(request)
-    assert response.response == (
+    actual_response = failed_fhir_upload(request)
+    assert actual_response.response == (
         "Environment variable 'PHI_STORAGE_BUCKET' not set. "
         + "The environment variable must be set."
     )
