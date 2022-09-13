@@ -37,3 +37,7 @@ output "standardize_phones_zip" {
 output "geocode_patients_zip" {
   value = google_storage_bucket_object.geocode_patients_zip.name
 }
+
+output "failed_fhir_conversion_zip" {
+  value = google_storage_bucket_object.failed_fhir_conversion_zip.name
+}

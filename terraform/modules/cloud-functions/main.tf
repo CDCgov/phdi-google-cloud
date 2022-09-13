@@ -112,3 +112,19 @@ resource "google_cloudfunctions_function" "geocode-patients" {
     project_id = var.project_id
   }
 }
+
+resource "google_cloudfunctions_function" "failed_fhir_conversion" {
+  name        = "phdi-${terraform.workspace}-failed-fhir-conversion"
+  description = "Upload failed FHIR conversion to GCS"
+  runtime     = "python39"
+
+  available_memory_mb   = 128
+  source_archive_bucket = var.functions_storage_bucket
+  source_archive_object = var.failed_fhir_conversion_zip
+  trigger_http          = true
+  entry_point           = "failed_fhir_conversion"
+
+  environment_variables = {
+    PHI_STORAGE_BUCKET = var.phi_storage_bucket
+  }
+}
