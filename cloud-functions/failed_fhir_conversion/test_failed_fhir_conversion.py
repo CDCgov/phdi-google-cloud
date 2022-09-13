@@ -49,7 +49,7 @@ def test_failed_fhir_conversion_missing_environment_variables(
 @mock.patch("main.storage.Client")
 @mock.patch("main.os.environ")
 def test_failed_fhir_conversion_good_request(patched_os_environ, mock_storage_client):
-    patched_os_environ.get.return_value = "test_hash"
+    patched_os_environ.get.return_value = "test_bucket"
     request = mock.Mock(headers={"Content-Type": "application/json"})
 
     expected_result = "File uploaded to failed_fhir_conversion_test_hash.hl7.json."

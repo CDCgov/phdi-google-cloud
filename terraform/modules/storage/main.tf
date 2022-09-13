@@ -160,3 +160,20 @@ resource "google_storage_bucket_object" "failed_fhir_conversion_zip" {
   name   = "src-${data.archive_file.failed_fhir_conversion.output_md5}-${var.project_id}.zip"
   bucket = google_storage_bucket.functions.name
 }
+
+data "archive_file" "failed_fhir_upload" {
+  type        = "zip"
+  source_dir  = "../../cloud-functions/failed_fhir_upload"
+  output_path = "../../cloud-functions/failed_fhir_upload.zip"
+}
+
+# Add source code zip to the Cloud Function's bucket
+resource "google_storage_bucket_object" "failed_fhir_upload_zip" {
+  source       = data.archive_file.failed_fhir_upload.output_path
+  content_type = "application/zip"
+
+  # Append to the MD5 checksum of the files's content
+  # to force the zip to be updated as soon as a change occurs
+  name   = "src-${data.archive_file.failed_fhir_upload.output_md5}-${var.project_id}.zip"
+  bucket = google_storage_bucket.functions.name
+}
