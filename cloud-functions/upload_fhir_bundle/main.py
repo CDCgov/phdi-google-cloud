@@ -5,6 +5,7 @@ from phdi.fhir.transport.http import upload_bundle_to_fhir_server
 from phdi_cloud_function_utils import (
     validate_request_header,
     log_error_and_generate_response,
+    make_response,
 )
 from phdi.cloud.gcp import GcpCredentialManager
 
@@ -86,5 +87,19 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
     response = upload_bundle_to_fhir_server(
         request_body.bundle, credential_manager, fhir_store_url
     )
+    # the response from PHDI is a request.Response which
+    #   then needs to be translated into a flask.Response object
+    #
+    # If the response is an error then grab the data and store as a message
+    # otherwise get the json and store in the json_payload of the
+    # flask response
+    if response.status_code == 200:
+        final_response = make_response(
+            status_code=response.status_code, json_payload=response.json()
+        )
+    else:
+        final_response = make_response(
+            status_code=response.status_code, message=response.text
+        )
 
-    return response
+    return final_response

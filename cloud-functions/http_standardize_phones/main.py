@@ -17,9 +17,11 @@ def http_standardize_phones(request: flask.Request) -> flask.Response:
     standardize_phone function in phdi.harmonization, so for more
     information on country-coding and parsing, see the relevant
     docstring.
-    :param data: A FHIR bundle or FHIR-formatted JSON dict
-    :return: The bundle or resource with phones appropriately
-      standardized
+    :param request: A Flask POST request object. The header must contain
+        'Content-Type:application/json' and the body must contain a valid
+        FHIR bundle.
+    :return flask.Response: A Flask response that contains The bundle or resource
+        with phone numbers are standardized
     """
 
     content_type = "application/json"

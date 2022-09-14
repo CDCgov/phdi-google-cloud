@@ -15,8 +15,11 @@ def http_standardize_names(request: flask.Request) -> flask.Response:
     behavior is our defined non-numeric, space-trimming, full
     capitalization standardization, but other modes may be specified.
 
-    :param data: Either a FHIR bundle or a FHIR-formatted JSON dict
-    :return: The bundle or resource with names appropriately standardized
+    :param request: A Flask POST request object. The header must contain
+        'Content-Type:application/json' and the body must contain a valid
+        FHIR bundle.
+    :return flask.Response: A Flask response that contains The bundle or resource
+        with names standardized
     """
     content_type = "application/json"
     # Validate request header.

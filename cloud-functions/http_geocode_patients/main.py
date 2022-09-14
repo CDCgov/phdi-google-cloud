@@ -17,7 +17,9 @@ def http_geocode_patients(request: flask.Request) -> flask.Response:
     Given a FHIR bundle and a SmartyStreets client, geocode all patient addresses
     across all patient resources in the bundle.
 
-    :param flask.Request request: An HTTP request that contains a FHIR resource bundle
+    :param request: A Flask POST request object. The header must contain
+        'Content-Type:application/json' and the body must contain a valid
+        FHIR bundle.
     :return flask.Response: A Flask response that contains The bundle or resource
         with addresses appropriately geocoded
     """
