@@ -10,7 +10,6 @@ from phdi_cloud_function_utils import (
     log_info_and_generate_response,
     get_sample_single_patient_bundle,
     get_sample_multi_patient_obs_bundle,
-    get_upload_response,
 )
 from unittest import mock
 import pytest
