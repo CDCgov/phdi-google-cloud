@@ -1,4 +1,3 @@
-import json
 from main import RequestBody, upload_fhir_bundle
 from pydantic import ValidationError
 import pytest
