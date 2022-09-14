@@ -3,10 +3,10 @@ from main import RequestBody, upload_fhir_bundle
 from pydantic import ValidationError
 import pytest
 from unittest import mock
-from phdi_cloud_function_utils import make_response
+from phdi_cloud_function_utils import make_response, get_sample_multi_patient_obs_bundle
 
 
-test_request_body = json.load(open("../assets/multi_patient_obs_bundle.json", "r"))
+test_request_body = get_sample_multi_patient_obs_bundle()
 
 
 def test_request_body():

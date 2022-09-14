@@ -15,7 +15,7 @@ from unittest import mock
 import pytest
 import flask
 
-test_request_body = json.load(open("../assets/single_patient_bundle.json", "r"))
+test_request_body = get_sample_single_patient_bundle()
 
 
 def test_make_response():
