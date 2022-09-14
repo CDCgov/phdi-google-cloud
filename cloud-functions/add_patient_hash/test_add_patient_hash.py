@@ -1,11 +1,12 @@
 import copy
+import json
 from main import add_patient_hash
 from unittest import mock
 import pytest
-from phdi_cloud_function_utils import make_response, get_sample_single_patient_bundle
+from phdi_cloud_function_utils import make_response
 
 
-test_request_body = get_sample_single_patient_bundle()
+test_request_body = json.load(open("../assets/single_patient_bundle.json", "r"))
 
 
 def test_add_patient_hash_bad_header():

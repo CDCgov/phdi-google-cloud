@@ -8,7 +8,13 @@ setup(
     author="PHDI",
     license="CC0 1.0 Universal",
     packages=["phdi_cloud_function_utils"],
-    package_data={"phdi_cloud_function_utils": ["./single_patient_bundle.json","./multi_patient_obs_bundle.json","upload_response.json"]}
+    package_data={
+        "phdi_cloud_function_utils": [
+            "./single_patient_bundle.json",
+            "./multi_patient_obs_bundle.json",
+            "upload_response.json",
+        ]
+    },
     install_requires=["flask"],
     zip_safe=False,
 )
