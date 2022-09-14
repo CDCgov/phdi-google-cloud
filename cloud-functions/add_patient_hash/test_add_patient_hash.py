@@ -1,5 +1,4 @@
 import copy
-import json
 from main import add_patient_hash
 from unittest import mock
 import pytest

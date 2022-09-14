@@ -178,3 +178,15 @@ def get_sample_multi_patient_obs_bundle() -> dict:
     file_path = Path(__file__).with_name("multi_patient_obs_bundle.json")
     multi_patient_obs_bundle = json.load(file_path.open("r"))
     return multi_patient_obs_bundle
+
+
+def get_upload_response() -> dict:
+    """
+    Function to return a simple sample of a valid upload response
+    for adding several resources to the FHIR Store
+    :return: A Json object of the flask response of multiple resource additions to the
+        FHIR Store
+    """
+    file_path = Path(__file__).with_name("upload_response.json")
+    upload_response = json.load(file_path.open("r"))
+    return upload_response
