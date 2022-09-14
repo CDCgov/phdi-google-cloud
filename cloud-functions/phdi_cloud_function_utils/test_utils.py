@@ -177,8 +177,10 @@ def test_log_error_and_generate_response():
 def test_get_single_patient_bundle():
     test_bundle = get_sample_single_patient_bundle()
     assert test_bundle is not None
+    assert test_bundle.get("resourceType") is not None
 
 
 def test_get_multi_patient_obs_bundle():
     test_bundle = get_sample_multi_patient_obs_bundle()
     assert test_bundle is not None
+    assert test_bundle.get("resourceType") is not None

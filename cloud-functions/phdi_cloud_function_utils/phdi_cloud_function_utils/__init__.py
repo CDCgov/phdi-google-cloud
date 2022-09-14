@@ -156,7 +156,7 @@ def log_info_and_generate_response(status_code: int, message: str) -> Response:
     return response
 
 
-def get_sample_single_patient_bundle():
+def get_sample_single_patient_bundle() -> dict:
     """
     Function to return a simple sample patient bundle
     for a single patient
@@ -166,7 +166,7 @@ def get_sample_single_patient_bundle():
     return single_patient_bundle
 
 
-def get_sample_multi_patient_obs_bundle():
+def get_sample_multi_patient_obs_bundle() -> dict:
     """
     Function to return a simple sample patient and observation bundle
     for a multiple patients and multiple observations
