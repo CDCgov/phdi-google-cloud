@@ -1,11 +1,10 @@
 import copy
-import json
 import pytest
 from main import failed_fhir_upload
 from unittest import mock
-from phdi_cloud_function_utils import make_response
+from phdi_cloud_function_utils import make_response, get_upload_response
 
-test_request_body = json.load(open("../assets/upload_response.json", "r"))
+test_request_body = get_upload_response()
 
 
 @mock.patch("main.storage.Client")

@@ -1,12 +1,11 @@
 import copy
-import json
 from main import http_geocode_patients
 from unittest import mock
-from phdi_cloud_function_utils import make_response
+from phdi_cloud_function_utils import make_response, get_sample_single_patient_bundle
 import pytest
 
 
-test_request_body = json.load(open("../assets/single_patient_bundle.json", "r"))
+test_request_body = get_sample_single_patient_bundle()
 
 
 def test_gecode_patients_bad_header():

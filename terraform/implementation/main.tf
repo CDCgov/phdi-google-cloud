@@ -92,5 +92,5 @@ module "secret-manager" {
   workflow_service_account_email = module.google-workflows.workflow_service_account_email
   depends_on                     = [google_project_service.enable_google_apis]
   smarty_auth_id                 = var.smarty_auth_id
-  smarty_auth_token              = var.smarty_auth_id
+  smarty_auth_token              = var.smarty_auth_token
 }
