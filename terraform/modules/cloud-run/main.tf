@@ -22,6 +22,7 @@ resource "google_cloud_run_service" "fhir_converter" {
 
     metadata {
       annotations = {
+        "autoscaling.knative.dev/maxScale" = "5"
         # Use the VPC Connector
         "run.googleapis.com/vpc-access-connector" = var.vpc_connector_name
         # all egress from the service should go through the VPC Connector

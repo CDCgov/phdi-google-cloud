@@ -60,10 +60,9 @@ resource "google_cloudfunctions_function" "add-patient-hash" {
   vpc_connector         = var.vpc_connector_name
 
   secret_environment_variables {
-    key        = "PATIENT_HASH_SALT"
-    secret     = var.patient_hash_salt_secret_id
-    version    = "1"
-    project_id = var.project_id
+    key     = "PATIENT_HASH_SALT"
+    secret  = var.patient_hash_salt_secret_id
+    version = "1"
   }
 }
 
@@ -106,17 +105,15 @@ resource "google_cloudfunctions_function" "geocode-patients" {
   vpc_connector         = var.vpc_connector_name
 
   secret_environment_variables {
-    key        = "SMARTY_AUTH_ID"
-    secret     = var.smarty_auth_id_secret_id
-    version    = "1"
-    project_id = var.project_id
+    key     = "SMARTY_AUTH_ID"
+    secret  = var.smarty_auth_id_secret_id
+    version = "1"
   }
 
   secret_environment_variables {
-    key        = "SMARTY_AUTH_TOKEN"
-    secret     = var.smarty_auth_token_secret_id
-    version    = "1"
-    project_id = var.project_id
+    key     = "SMARTY_AUTH_TOKEN"
+    secret  = var.smarty_auth_token_secret_id
+    version = "1"
   }
 }
 
