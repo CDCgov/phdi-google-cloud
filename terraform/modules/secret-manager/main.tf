@@ -2,6 +2,7 @@ resource "random_uuid" "salt" {}
 
 resource "google_secret_manager_secret" "salt" {
   secret_id = "PATIENT_HASH_SALT"
+  project   = var.project_id
 
   labels = {
     label = "patient-hash-salt"
@@ -27,6 +28,7 @@ resource "google_secret_manager_secret_iam_member" "workflow-service-account-mem
 
 resource "google_secret_manager_secret" "smarty_auth_id" {
   secret_id = "SMARTY_AUTH_ID"
+  project   = var.project_id
 
   labels = {
     label = "smarty-auth-id"
@@ -52,6 +54,7 @@ resource "google_secret_manager_secret_iam_member" "workflow-service-account-mem
 
 resource "google_secret_manager_secret" "smarty_auth_token" {
   secret_id = "SMARTY_AUTH_TOKEN"
+  project   = var.project_id
 
   labels = {
     label = "smarty-auth-token"

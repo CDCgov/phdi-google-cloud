@@ -38,8 +38,8 @@ resource "google_cloudfunctions_function" "read_source_data" {
       retry = true
     }
   }
-  entry_point = "read_source_data"
-  vpc_connector         = var.serverless_connector_name
+  entry_point   = "read_source_data"
+  vpc_connector = var.serverless_connector_name
 
   environment_variables = {
     PROJECT_ID      = var.project_id
@@ -107,7 +107,7 @@ resource "google_cloudfunctions_function" "geocode-patients" {
 
   secret_environment_variables {
     key        = "SMARTY_AUTH_ID"
-    secret     = var.smarty_auth_id_secret_id
+    secret     = "SMARTY_AUTH_ID"
     version    = "1"
     project_id = var.project_id
   }
