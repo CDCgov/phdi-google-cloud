@@ -42,6 +42,7 @@ variable "gcp_services_list" {
     "storage-api.googleapis.com",
     "storage-component.googleapis.com",
     "storage.googleapis.com",
+    "vpcaccess.googleapis.com",
     "workflowexecutions.googleapis.com",
     "workflows.googleapis.com"
   ]

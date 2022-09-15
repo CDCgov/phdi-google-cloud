@@ -69,3 +69,7 @@ variable "smarty_auth_id_secret_id" {
 variable "smarty_auth_token_secret_id" {
   description = "value of google_secret_manager_secret.smarty_auth_token"
 }
+
+variable "serverless_connector_name" {
+  description = "value of google_vpc_access_connector.phdi-serverless-connector.name"
+}
