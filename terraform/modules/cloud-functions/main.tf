@@ -20,7 +20,7 @@ resource "google_cloudfunctions_function" "upload-fhir-bundle" {
   source_archive_object = var.upload_fhir_bundle_source_zip
   trigger_http          = true
   entry_point           = "upload_fhir_bundle"
-  vpc_connector         = var.serverless_connector_name
+  vpc_connector         = var.vpc_connector_name
 }
 
 
@@ -39,7 +39,7 @@ resource "google_cloudfunctions_function" "read_source_data" {
     }
   }
   entry_point   = "read_source_data"
-  vpc_connector = var.serverless_connector_name
+  vpc_connector = var.vpc_connector_name
 
   environment_variables = {
     PROJECT_ID      = var.project_id
@@ -57,7 +57,7 @@ resource "google_cloudfunctions_function" "add-patient-hash" {
   trigger_http          = true
   entry_point           = "add_patient_hash"
   service_account_email = var.workflow_service_account_email
-  vpc_connector         = var.serverless_connector_name
+  vpc_connector         = var.vpc_connector_name
 
   secret_environment_variables {
     key        = "PATIENT_HASH_SALT"
@@ -77,7 +77,7 @@ resource "google_cloudfunctions_function" "standardize-names" {
   source_archive_object = var.standardize_names_zip
   trigger_http          = true
   entry_point           = "http_standardize_names"
-  vpc_connector         = var.serverless_connector_name
+  vpc_connector         = var.vpc_connector_name
 }
 
 resource "google_cloudfunctions_function" "standardize-phones" {
@@ -90,7 +90,7 @@ resource "google_cloudfunctions_function" "standardize-phones" {
   source_archive_object = var.standardize_phones_zip
   trigger_http          = true
   entry_point           = "http_standardize_phones"
-  vpc_connector         = var.serverless_connector_name
+  vpc_connector         = var.vpc_connector_name
 }
 
 resource "google_cloudfunctions_function" "geocode-patients" {
@@ -103,7 +103,7 @@ resource "google_cloudfunctions_function" "geocode-patients" {
   trigger_http          = true
   entry_point           = "http_geocode_patients"
   service_account_email = var.workflow_service_account_email
-  vpc_connector         = var.serverless_connector_name
+  vpc_connector         = var.vpc_connector_name
 
   secret_environment_variables {
     key        = "SMARTY_AUTH_ID"
@@ -130,7 +130,7 @@ resource "google_cloudfunctions_function" "failed_fhir_conversion" {
   source_archive_object = var.failed_fhir_conversion_zip
   trigger_http          = true
   entry_point           = "failed_fhir_conversion"
-  vpc_connector         = var.serverless_connector_name
+  vpc_connector         = var.vpc_connector_name
 
   environment_variables = {
     PHI_STORAGE_BUCKET = var.phi_storage_bucket
@@ -147,7 +147,7 @@ resource "google_cloudfunctions_function" "failed_fhir_upload" {
   source_archive_object = var.failed_fhir_upload_zip
   trigger_http          = true
   entry_point           = "failed_fhir_upload"
-  vpc_connector         = var.serverless_connector_name
+  vpc_connector         = var.vpc_connector_name
 
   environment_variables = {
     PHI_STORAGE_BUCKET = var.phi_storage_bucket

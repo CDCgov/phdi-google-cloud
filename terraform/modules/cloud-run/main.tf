@@ -23,7 +23,7 @@ resource "google_cloud_run_service" "fhir_converter" {
     metadata {
       annotations = {
         # Use the VPC Connector
-        "run.googleapis.com/vpc-access-connector" = var.serverless_connector_name
+        "run.googleapis.com/vpc-access-connector" = var.vpc_connector_name
         # all egress from the service should go through the VPC Connector
         "run.googleapis.com/vpc-access-egress" = "all-traffic"
       }

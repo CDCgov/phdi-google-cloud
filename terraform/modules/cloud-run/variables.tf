@@ -16,6 +16,6 @@ variable "git_sha" {
   description = "Git SHA of the current commit"
 }
 
-variable "serverless_connector_name" {
+variable "vpc_connector_name" {
   description = "Name of the serverless connector"
 }

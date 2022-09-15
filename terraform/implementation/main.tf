@@ -39,7 +39,7 @@ module "cloud-functions" {
   failed_fhir_upload_zip           = module.storage.failed_fhir_upload_zip
   geocode_patients_zip             = module.storage.geocode_patients_zip
   workflow_service_account_email   = module.google-workflows.workflow_service_account_email
-  serverless_connector_name        = module.network.serverless_connector_name
+  vpc_connector_name               = module.network.vpc_connector_name
   depends_on                       = [google_project_service.enable_google_apis]
 }
 
@@ -77,7 +77,7 @@ module "cloud-run" {
   project_id                     = var.project_id
   workflow_service_account_email = module.google-workflows.workflow_service_account_email
   git_sha                        = data.external.git_sha.result.sha
-  serverless_connector_name      = module.network.serverless_connector_name
+  vpc_connector_name             = module.network.vpc_connector_name
   depends_on = [
     google_project_service.enable_google_apis,
     module.artifact-registries.phdi-repo
