@@ -107,7 +107,7 @@ resource "google_cloudfunctions_function" "geocode-patients" {
 
   secret_environment_variables {
     key        = "SMARTY_AUTH_ID"
-    secret     = "SMARTY_AUTH_ID"
+    secret     = var.smarty_auth_id_secret_id
     version    = "1"
     project_id = var.project_id
   }
