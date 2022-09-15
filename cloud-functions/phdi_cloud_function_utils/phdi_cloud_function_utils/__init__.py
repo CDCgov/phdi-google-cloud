@@ -1,6 +1,7 @@
 import logging
 import json
 import os
+from pathlib import Path
 from flask import Request, Response
 
 
@@ -156,23 +157,36 @@ def log_info_and_generate_response(status_code: int, message: str) -> Response:
     return response
 
 
-def get_sample_single_patient_bundle():
+def get_sample_single_patient_bundle() -> dict:
     """
     Function to return a simple sample patient bundle
     for a single patient
     :return: A Json object of the single patient FHIR bundle
     """
-    single_patient_bundle = json.load(open("../assets/single_patient_bundle.json", "r"))
+    file_path = Path(__file__).with_name("single_patient_bundle.json")
+
+    single_patient_bundle = json.load(file_path.open("r"))
     return single_patient_bundle
 
 
-def get_sample_multi_patient_obs_bundle():
+def get_sample_multi_patient_obs_bundle() -> dict:
     """
     Function to return a simple sample patient and observation bundle
     for a multiple patients and multiple observations
     :return: A Json object of the multiple patients and observations FHIR bundle
     """
-    multi_patient_obs_bundle = json.load(
-        open("../assets/multi_patient_obs_bundle.json", "r")
-    )
+    file_path = Path(__file__).with_name("multi_patient_obs_bundle.json")
+    multi_patient_obs_bundle = json.load(file_path.open("r"))
     return multi_patient_obs_bundle
+
+
+def get_upload_response() -> dict:
+    """
+    Function to return a simple sample of a valid upload response
+    for adding several resources to the FHIR Store
+    :return: A Json object of the flask response of multiple resource additions to the
+        FHIR Store
+    """
+    file_path = Path(__file__).with_name("upload_response.json")
+    upload_response = json.load(file_path.open("r"))
+    return upload_response

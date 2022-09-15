@@ -60,7 +60,7 @@ def http_geocode_patients(request: flask.Request) -> flask.Response:
             )
         except Exception as error:
             error_response = log_error_and_generate_response(
-                status_code=400, message=error.json()
+                status_code=400, message=error
             )
             return error_response
 
