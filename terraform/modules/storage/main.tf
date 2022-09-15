@@ -5,6 +5,7 @@ resource "google_storage_bucket" "toybucket" {
   versioning {
     enabled = true
   }
+  storage_class = "MULTI_REGIONAL"
 }
 
 resource "google_storage_bucket" "phi_storage_bucket" {
@@ -14,6 +15,7 @@ resource "google_storage_bucket" "phi_storage_bucket" {
   versioning {
     enabled = true
   }
+  storage_class = "MULTI_REGIONAL"
 }
 
 resource "google_storage_bucket" "functions" {
@@ -23,6 +25,7 @@ resource "google_storage_bucket" "functions" {
   versioning {
     enabled = true
   }
+  storage_class = "MULTI_REGIONAL"
 }
 
 data "archive_file" "upcase_source" {

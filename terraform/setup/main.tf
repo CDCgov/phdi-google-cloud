@@ -18,4 +18,5 @@ resource "google_storage_bucket" "tfstate" {
   name          = "phdi-tfstate-${var.project_id}"
   force_destroy = true
   location      = "US"
+  storage_class = "MULTI_REGIONAL"
 }

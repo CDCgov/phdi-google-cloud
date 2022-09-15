@@ -12,8 +12,8 @@ resource "google_workflows_workflow" "workflow-1" {
 }
 
 resource "google_eventarc_trigger" "toy-bucket-new-file" {
-  name     = "phdi-${terraform.workspace}-toy-bucket-new-file"
-  location = "us"
+  name          = "phdi-${terraform.workspace}-toy-bucket-new-file"
+  location      = "us"
   matching_criteria {
     attribute = "type"
     value     = "google.cloud.storage.object.v1.finalized"
