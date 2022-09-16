@@ -46,3 +46,7 @@ variable "failed_fhir_upload_url" {
 variable "geocode_patients_url" {
   description = "URL of the geocode patients service"
 }
+
+variable "ingestion_topic" {
+  description = "Pub/Sub topic to listen for new messages"
+}
