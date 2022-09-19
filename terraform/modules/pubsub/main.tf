@@ -9,3 +9,9 @@ resource "google_pubsub_topic_iam_member" "ingestion_topic_member" {
   role    = "roles/viewer"
   member  = "serviceAccount:${var.workflow_service_account_email}"
 }
+
+resource "google_project_iam_member" "project" {
+  project = var.project_id
+  role    = "roles/eventarc.eventReceiver"
+  member  = "serviceAccount:${var.workflow_service_account_email}"
+}

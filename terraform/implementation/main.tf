@@ -94,8 +94,8 @@ module "cloud-run" {
 }
 
 module "pubsub" {
-  source = "../modules/pubsub"
-  project_id = var.project_id
+  source                         = "../modules/pubsub"
+  project_id                     = var.project_id
   workflow_service_account_email = module.google-workflows.workflow_service_account_email
   depends_on                     = [google_project_service.enable_google_apis]
 }
