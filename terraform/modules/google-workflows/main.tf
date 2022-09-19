@@ -33,6 +33,8 @@ resource "google_eventarc_trigger" "new-message" {
       topic = var.ingestion_topic
     }
   }
-  workflow        = google_workflows_workflow.ingestion-pipeline.id
+  destination {
+    workflow = google_workflows_workflow.ingestion-pipeline.id
+  }
   service_account = google_service_account.workflow_service_account.id
 }
