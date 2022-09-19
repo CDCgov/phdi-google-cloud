@@ -43,10 +43,21 @@ module "cloud-functions" {
 }
 
 module "google-workflows" {
-  source     = "../modules/google-workflows"
-  region     = var.region
-  toybucket  = module.storage.toybucket
-  depends_on = [google_project_service.enable_google_apis]
+  source                      = "../modules/google-workflows"
+  region                      = var.region
+  toybucket                   = module.storage.toybucket
+  fhir_converter_service_name = module.cloud-run.fhir_converter_service_name
+  fhir_converter_url          = module.cloud-run.fhir_converter_url
+  upload_fhir_bundle_url      = module.cloud-functions.upload_fhir_bundle_url
+  read_source_data_url        = module.cloud-functions.read_source_data_url
+  add_patient_hash_url        = module.cloud-functions.add_patient_hash_url
+  standardize_phones_url      = module.cloud-functions.standardize_phones_url
+  standardize_names_url       = module.cloud-functions.standardize_names_url
+  failed_fhir_conversion_url  = module.cloud-functions.failed_fhir_conversion_url
+  failed_fhir_upload_url      = module.cloud-functions.failed_fhir_upload_url
+  geocode_patients_url        = module.cloud-functions.geocode_patients_url
+  ingestion_topic             = module.pubsub.ingestion_topic
+  depends_on                  = [google_project_service.enable_google_apis]
 }
 
 module "network" {
