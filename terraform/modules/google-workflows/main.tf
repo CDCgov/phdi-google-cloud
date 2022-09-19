@@ -28,9 +28,10 @@ resource "google_eventarc_trigger" "new-message" {
     attribute = "type"
     value     = "google.cloud.pubsub.topic.v1.messagePublished"
   }
-  matching_criteria {
-    attribute = "topic"
-    value     = var.ingestion_topic
+  transport {
+    pubsub {
+      topic = var.ingestion_topic
+    }
   }
   destination {
     cloud_run_service {

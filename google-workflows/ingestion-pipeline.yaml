@@ -93,4 +93,3 @@ main:
             auth:
               type: OIDC
             body: $${error.body}
-          next: end
