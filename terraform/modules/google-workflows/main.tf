@@ -33,11 +33,6 @@ resource "google_eventarc_trigger" "new-message" {
       topic = var.ingestion_topic
     }
   }
-  destination {
-    cloud_run_service {
-      service = var.fhir_converter_service_name
-      region  = var.region
-    }
-  }
+  workflow        = google_workflows_workflow.ingestion-pipeline.id
   service_account = google_service_account.workflow_service_account.id
 }
