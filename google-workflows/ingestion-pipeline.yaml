@@ -22,13 +22,13 @@ main:
               root_template: $${root_template}
           result: fhir_converter_response
         except:
-          as: e
+          as: error
           call: http.post
           args:
             url: ${failed_fhir_conversion_url}
             auth:
               type: OIDC
-            body: $${e.body}
+            body: $${error.body}
           next: end
     - standardize_name:
         call: http.post
@@ -86,11 +86,11 @@ main:
               Content-Type: "application/json"
           result: upload_fhir_bundle_response
         except:
-          as: e
+          as: error
           call: http.post
           args:
             url: ${failed_fhir_upload_url}
             auth:
               type: OIDC
-            body: $${e.body}
+            body: $${error.body}
           next: end
