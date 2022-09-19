@@ -162,8 +162,8 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
 
     response = (
         f"Processed {filename}, which contained {message_count} messages, of which "
-        f"{message_count-failure_count} were successfully published, and {failure_count} "
-        "could not be published."
+        f"{message_count-failure_count} were successfully published, "
+        f"and {failure_count} could not be published."
     )
     response = log_info_and_generate_response(message=response, status_code="200")
     return response
