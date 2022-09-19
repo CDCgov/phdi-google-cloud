@@ -23,13 +23,15 @@ main:
           result: fhir_converter_response
         except:
           as: error
-          call: http.post
-          args:
-            url: ${failed_fhir_conversion_url}
-            auth:
-              type: OIDC
-            body: $${error.body}
-          next: end
+          steps:
+            - upload_failed_fhir_conversion:
+                call: http.post
+                args:
+                  url: ${failed_fhir_conversion_url}
+                  auth:
+                    type: OIDC
+                  body: $${error.body}
+                next: end
     - standardize_name:
         call: http.post
         args:
