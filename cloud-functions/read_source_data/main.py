@@ -104,6 +104,7 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
     publisher = pubsub_v1.PublisherClient()
     topic_path = publisher.topic_path(project_id, ingestion_topic)
     failure_count = 0
+    message_count = messages.__len__()
     for idx, message in enumerate(messages):
         pubsub_message = {
             "message": message,
@@ -160,8 +161,8 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
                 failure_count += 1
 
     response = (
-        f"Processed {filename}, which contained {idx+1} messages, of which "
-        f"{idx+1-failure_count} were successfully published, and {failure_count} "
+        f"Processed {filename}, which contained {message_count} messages, of which "
+        f"{message_count-failure_count} were successfully published, and {failure_count} "
         "could not be published."
     )
     response = log_info_and_generate_response(message=response, status_code="200")
