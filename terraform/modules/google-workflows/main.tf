@@ -38,3 +38,21 @@ resource "google_eventarc_trigger" "new-message" {
   }
   service_account = google_service_account.workflow_service_account.id
 }
+
+resource "google_project_iam_member" "workflow_invoker" {
+  project = var.project_id
+  role    = "roles/workflows.invoker"
+  member  = "serviceAccount:${google_service_account.workflow_service_account.email}"
+}
+
+resource "google_project_iam_member" "event_receiver" {
+  project = var.project_id
+  role    = "roles/eventarc.eventReceiver"
+  member  = "serviceAccount:${google_service_account.workflow_service_account.email}"
+}
+
+resource "google_project_iam_member" "log_writer" {
+  project = var.project_id
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:${google_service_account.workflow_service_account.email}"
+}
