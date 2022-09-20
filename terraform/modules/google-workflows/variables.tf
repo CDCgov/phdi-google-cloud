@@ -1,5 +1,6 @@
-variable "toybucket" {
-  description = "Storage account for proof of concept pipeline."
+variable "project_id" {
+  type        = string
+  description = "value of the GCP project ID to use"
 }
 
 variable "region" {

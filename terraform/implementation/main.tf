@@ -45,7 +45,7 @@ module "cloud-functions" {
 module "google-workflows" {
   source                      = "../modules/google-workflows"
   region                      = var.region
-  toybucket                   = module.storage.toybucket
+  project_id                  = var.project_id
   fhir_converter_service_name = module.cloud-run.fhir_converter_service_name
   fhir_converter_url          = module.cloud-run.fhir_converter_url
   upload_fhir_bundle_url      = module.cloud-functions.upload_fhir_bundle_url
