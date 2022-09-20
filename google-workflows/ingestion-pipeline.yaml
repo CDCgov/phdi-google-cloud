@@ -13,7 +13,7 @@ main:
         try:
           call: http.post
           args:
-            url: ${fhir_converter_url}
+            url: ${fhir_converter_url}/convert-to-fhir
             auth:
               type: OIDC
             body:
