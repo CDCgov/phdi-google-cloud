@@ -45,6 +45,12 @@ resource "google_project_iam_member" "workflow_invoker" {
   member  = "serviceAccount:${google_service_account.workflow_service_account.email}"
 }
 
+resource "google_project_iam_member" "function_invoker" {
+  project = var.project_id
+  role    = "roles/cloudfunctions.invoker"
+  member  = "serviceAccount:${google_service_account.workflow_service_account.email}"
+}
+
 resource "google_project_iam_member" "event_receiver" {
   project = var.project_id
   role    = "roles/eventarc.eventReceiver"
