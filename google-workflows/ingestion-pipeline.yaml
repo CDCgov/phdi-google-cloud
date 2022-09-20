@@ -27,7 +27,7 @@ main:
             - upload_failed_fhir_conversion:
                 call: http.post
                 args:
-                  url: ${failed_fhir_conversion_url}
+                  url: ${failed_fhir_conversion_url}/failed_fhir_conversion
                   auth:
                     type: OIDC
                   body: $${error.body}
@@ -35,7 +35,7 @@ main:
     - standardize_name:
         call: http.post
         args:
-          url: ${standardize_names_url}
+          url: ${standardize_names_url}/http_standardize_names
           auth:
             type: OIDC
           body: $${fhir_converter_response.body.FhirResource}
@@ -45,7 +45,7 @@ main:
     - standardize_phone:
         call: http.post
         args:
-          url: ${standardize_phones_url}
+          url: ${standardize_phones_url}/http_standardize_phones
           auth:
             type: OIDC
           body: $${standardize_names_response.body}
@@ -55,7 +55,7 @@ main:
     - geocode_patients:
         call: http.post
         args:
-          url: ${geocode_patients_url}
+          url: ${geocode_patients_url}/http_geocode_patients
           auth:
             type: OIDC
           body: $${standardize_phones_response.body}
@@ -65,7 +65,7 @@ main:
     - add_patient_hash:
         call: http.post
         args:
-          url: ${add_patient_hash_url}
+          url: ${add_patient_hash_url}/add_patient_hash
           auth:
             type: OIDC
           body: $${geocode_patients_response.body}
@@ -76,7 +76,7 @@ main:
         try:
           call: http.post
           args:
-            url: ${upload_fhir_bundle_url}
+            url: ${upload_fhir_bundle_url}/upload_fhir_bundle
             auth:
               type: OIDC
             body:
@@ -91,7 +91,7 @@ main:
           as: error
           call: http.post
           args:
-            url: ${failed_fhir_upload_url}
+            url: ${failed_fhir_upload_url}/failed_fhir_upload
             auth:
               type: OIDC
             body: $${error.body}
