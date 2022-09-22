@@ -15,3 +15,9 @@ resource "google_healthcare_fhir_store" "default" {
   enable_history_import         = false
 
 }
+
+resource "google_healthcare_fhir_store_iam_member" "fhir_store_editor" {
+  fhir_store_id = "your-fhir-store-id"
+  role          = "roles/editor"
+  member        = "serviceAccount:${var.workflow_service_account_email}"
+}
