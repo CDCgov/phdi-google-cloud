@@ -67,12 +67,13 @@ module "network" {
 }
 
 module "fhir" {
-  source       = "../modules/fhir"
-  region       = var.region
-  time_zone    = "UTC"
-  fhir_version = "R4"
-  project_id   = var.project_id
-  depends_on   = [google_project_service.enable_google_apis]
+  source                         = "../modules/fhir"
+  region                         = var.region
+  time_zone                      = "UTC"
+  fhir_version                   = "R4"
+  project_id                     = var.project_id
+  workflow_service_account_email = module.google-workflows.workflow_service_account_email
+  depends_on                     = [google_project_service.enable_google_apis]
 }
 
 module "artifact-registries" {
