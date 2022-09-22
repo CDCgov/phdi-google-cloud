@@ -24,6 +24,37 @@ valid_response = {
     },
 }
 
+conversion_failure_response = {
+    "_mock_call_args": None,
+    "_mock_call_args_list": [],
+    "_mock_call_count": 0,
+    "_mock_called": False,
+    "_mock_children": {},
+    "_mock_delegate": None,
+    "_mock_methods": None,
+    "_mock_mock_calls": [],
+    "_mock_name": None,
+    "_mock_new_name": "()",
+    "_mock_new_parent": {},
+    "_mock_parent": None,
+    "_mock_return_value": {"name": "DEFAULT"},
+    "_mock_sealed": False,
+    "_mock_side_effect": None,
+    "_mock_unsafe": False,
+    "_mock_wraps": None,
+    "_spec_asyncs": [],
+    "_spec_class": None,
+    "_spec_set": None,
+    "_spec_signature": None,
+    "method_calls": [],
+    "original_request": {
+        "input_data": "VALID_INPUT_DATA",
+        "input_type": "hl7v2",
+        "root_template": "ADT_A01",
+    },
+    "returncode": 1,
+}
+
 missing_input_data_request = {"input_type": "hl7v2", "root_template": "ADT_A01"}
 
 missing_input_data_response = {
@@ -159,6 +190,22 @@ def test_convert_valid_request(patched_subprocess_run, patched_open, patched_jso
     )
     assert actual_response.status_code == 200
     assert actual_response.json() == valid_response
+
+
+@mock.patch("main.json.load")
+@mock.patch("main.open")
+@mock.patch("main.subprocess.run")
+def test_convert_conversion_failure(
+    patched_subprocess_run, patched_open, patched_json_load
+):
+    patched_subprocess_run.return_value = mock.Mock(returncode=1)
+    patched_json_load.return_value = valid_response
+    actual_response = client.post(
+        "/convert-to-fhir",
+        json=valid_request,
+    )
+    assert actual_response.status_code == 400
+    assert actual_response.json() == conversion_failure_response
 
 
 @mock.patch("main.subprocess.run")
