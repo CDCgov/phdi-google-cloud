@@ -51,3 +51,11 @@ variable "geocode_patients_url" {
 variable "ingestion_topic" {
   description = "Pub/Sub topic to listen for new messages"
 }
+
+variable "fhir_dataset_id" {
+  description = "The ID for the Dataset where the FHIR Store is part of"
+}
+
+variable "fhir_store_id" {
+  description = "The ID for the FHIR Store"
+}

@@ -56,6 +56,8 @@ module "google-workflows" {
   failed_fhir_upload_url      = module.cloud-functions.failed_fhir_upload_url
   geocode_patients_url        = module.cloud-functions.geocode_patients_url
   ingestion_topic             = module.pubsub.ingestion_topic
+  fhir_dataset_id             = module.fhir.fhir_dataset_id
+  fhir_store_id               = module.fhir.fhir_store_id
   depends_on                  = [google_project_service.enable_google_apis]
 }
 
