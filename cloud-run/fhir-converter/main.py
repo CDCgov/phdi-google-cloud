@@ -3,7 +3,7 @@ import subprocess
 import json
 
 from enum import Enum
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 from pydantic import BaseModel
 
 
@@ -100,9 +100,14 @@ async def health_check():
     return {"status": "OK"}
 
 
-@api.post("/convert-to-fhir")
-async def convert(input: FhirConverterInput):
-    return convert_to_fhir(**dict(input))
+@api.post("/convert-to-fhir", status_code=200)
+async def convert(input: FhirConverterInput, response: Response):
+    
+    result = convert_to_fhir(**dict(input))
+    if "original_request" in result:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+
+    return result
 
 
 def convert_to_fhir(
