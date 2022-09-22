@@ -3,6 +3,12 @@ resource "google_service_account" "workflow_service_account" {
   display_name = "Service Account for Google Workflows"
 }
 
+resource "google_project_iam_member" "workflow_sa_project_editor" {
+  project = var.project_id
+  role    = "roles/editor"
+  member  = "serviceAccount:${google_service_account.workflow_service_account.email}"
+}
+
 resource "google_workflows_workflow" "ingestion-pipeline" {
   name            = "phdi-${terraform.workspace}-ingestion-pipeline"
   region          = var.region
