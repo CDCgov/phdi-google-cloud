@@ -79,10 +79,10 @@ main:
           auth:
             type: OIDC
           body:
-            bundle: ${add_patient_hash_response.body}
-            dataset_id: phdi-dev-dataset-phdi-357418
-            location: us-west1
-            fhir_store_id: phdi-dev-fhirstore
+            bundle: $${add_patient_hash_response.body}
+            dataset_id: ${fhir_dataset_id}
+            location: ${fhir_location}
+            fhir_store_id: ${fhir_store_id}
           headers:
             Content-Type: "application/json"
         result: upload_fhir_bundle_response
