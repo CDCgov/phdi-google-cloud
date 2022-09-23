@@ -87,7 +87,7 @@ def test_utils_good_body():
 
 def test_utils_bad_body():
     request = mock.Mock(headers={"Content-Type": "application/json"})
-    request.is_json.return_value = False
+    request.is_json = False
     expected_result = make_response(
         status_code=400, message="Invalid request body - Invalid JSON"
     )
