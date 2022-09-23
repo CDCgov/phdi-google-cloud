@@ -73,25 +73,25 @@ main:
             Content-Type: "application/json"
         result: add_patient_hash_response
     - upload_fhir_bundle:
-        try:
-          call: http.post
-          args:
-            url: ${upload_fhir_bundle_url}
-            auth:
-              type: OIDC
-            body:
-              bundle: $${add_patient_hash_response.body}
-              dataset_id: ${fhir_dataset_id}
-              location: ${fhir_location}
-              fhir_store_id: ${fhir_store_id}
-            headers:
-              Content-Type: "application/json"
-          result: upload_fhir_bundle_response
-        except:
-          as: error
-          call: http.post
-          args:
-            url: ${failed_fhir_upload_url}
-            auth:
-              type: OIDC
-            body: $${error.body}
+        call: http.post
+        args:
+          url: https://us-west1-phdi-357418.cloudfunctions.net/phdi-dev-upload-fhir-bundle
+          auth:
+            type: OIDC
+          body:
+            bundle: $${add_patient_hash_response.body}
+            dataset_id: ${fhir_dataset_id}
+            location: ${fhir_location}
+            fhir_store_id: ${fhir_store_id}
+          headers:
+            Content-Type: "application/json"
+        result: upload_fhir_bundle_response
+    - failed_fhir_upload:
+        call: http.post
+        args:
+          url: https://us-west1-phdi-357418.cloudfunctions.net/phdi-dev-failed-fhir-upload
+          auth:
+            type: OIDC
+          body: $${upload_fhir_bundle_response.body}
+          headers:
+            Content-Type: "application/json"

@@ -25,7 +25,7 @@ resource "google_workflows_workflow" "ingestion-pipeline" {
     failed_fhir_upload_url     = var.failed_fhir_upload_url,
     geocode_patients_url       = var.geocode_patients_url,
     fhir_dataset_id            = var.fhir_dataset_id,
-    fhir_location              = var.region
+    fhir_location              = var.region,
     fhir_store_id              = var.fhir_store_id
   })
 }

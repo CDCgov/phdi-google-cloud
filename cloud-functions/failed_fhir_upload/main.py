@@ -1,3 +1,4 @@
+import json
 import functions_framework
 import flask
 import os
@@ -64,7 +65,7 @@ def failed_fhir_upload(request: flask.Request) -> flask.Response:
         bucket = storage_client.bucket(os.environ.get("PHI_STORAGE_BUCKET"))
         destination_blob_name = f"failed_fhir_upload_{timestamp}.json"
         blob = bucket.blob(destination_blob_name)
-        blob.upload_from_string(data=data, content_type=content_type)
+        blob.upload_from_string(data=json.dumps(data), content_type=content_type)
 
         return make_response(
             status_code=200,
