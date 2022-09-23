@@ -46,7 +46,7 @@ def failed_fhir_conversion(request: flask.Request) -> flask.Response:
     destination_blob_name = f"failed_fhir_conversion/{original_filename}.json"
     blob = bucket.blob(destination_blob_name)
 
-    blob.upload_from_string(data=request, content_type=content_type)
+    blob.upload_from_string(data=json.dumps(request), content_type=content_type)
 
     return make_response(
         status_code=200, message=f"File uploaded to {destination_blob_name}."
