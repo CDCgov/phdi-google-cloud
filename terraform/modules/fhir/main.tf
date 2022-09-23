@@ -9,8 +9,8 @@ resource "google_healthcare_fhir_store" "default" {
   dataset = google_healthcare_dataset.dataset.id
   version = var.fhir_version
 
-  enable_update_create          = false
-  disable_referential_integrity = false
+  enable_update_create          = true
+  disable_referential_integrity = true
   disable_resource_versioning   = false
   enable_history_import         = false
 
