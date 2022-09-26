@@ -40,9 +40,9 @@ def test_failed_fhir_conversion_missing_environment_variables(
     request = mock.Mock(headers={"Content-Type": "application/json"})
     patched_environ.get.return_value = None
     response = failed_fhir_conversion(request)
-    assert response.response == (
-        "Environment variable 'PHI_STORAGE_BUCKET' not set. "
-        + "The environment variable must be set."
+    assert response.response[0] == (
+        b"Environment variable 'PHI_STORAGE_BUCKET' not set. "
+        b"The environment variable must be set."
     )
 
 
