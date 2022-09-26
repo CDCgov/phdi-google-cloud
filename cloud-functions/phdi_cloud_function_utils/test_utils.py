@@ -30,11 +30,11 @@ def test_make_response():
     with pytest.raises(ValueError):
         make_response(status_code=status_code)
 
-    expected_response = flask.Response()
-    expected_response.response = message
+    expected_response = flask.Response(response=message)
     expected_response.status_code = status_code
 
     actual_response = make_response(status_code=status_code, message=message)
+    # breakpoint()
     assert actual_response.response == expected_response.response
     assert actual_response.status_code == expected_response.status_code
 
@@ -87,7 +87,7 @@ def test_utils_good_body():
 
 def test_utils_bad_body():
     request = mock.Mock(headers={"Content-Type": "application/json"})
-    request.is_json.return_value = False
+    request.is_json = False
     expected_result = make_response(
         status_code=400, message="Invalid request body - Invalid JSON"
     )
@@ -156,8 +156,7 @@ def test_check_for_environment_variables_failure(patched_environ):
 
 def test_log_info_and_generate_response():
     actual_response = log_info_and_generate_response(200, "my-response")
-    expected_response = flask.Response()
-    expected_response.response = "my-response"
+    expected_response = flask.Response(response="my-response")
     expected_response.status_code = 200
 
     assert actual_response.response == expected_response.response
@@ -166,8 +165,7 @@ def test_log_info_and_generate_response():
 
 def test_log_error_and_generate_response():
     actual_response = log_error_and_generate_response(400, "my-response")
-    expected_response = flask.Response()
-    expected_response.response = "my-response"
+    expected_response = flask.Response(response="my-response")
     expected_response.status_code = 400
 
     assert actual_response.response == expected_response.response
