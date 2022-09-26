@@ -42,8 +42,8 @@ def failed_fhir_conversion(request: flask.Request) -> flask.Response:
     # Upload file to storage bucket.
     storage_client = storage.Client()
     bucket = storage_client.bucket(os.environ.get("PHI_STORAGE_BUCKET"))
-    original_filename = request.get_json().get("original_request").get("filename")
-    destination_blob_name = f"failed_fhir_conversion/{original_filename}.json"
+    source_filename = request.get_json().get("source_filename")
+    destination_blob_name = f"failed_fhir_conversion/{source_filename}.json"
     blob = bucket.blob(destination_blob_name)
 
     blob.upload_from_string(data=json.dumps(request.get_json()), content_type=content_type)

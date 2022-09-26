@@ -9,6 +9,7 @@ main:
           - input_data: $${message.message}
           - input_type: $${message.message_type}
           - root_template: $${message.root_template}
+          - filename: $${message.filename}
     - convert_to_fhir:
         try:
           call: http.post
@@ -30,7 +31,11 @@ main:
                   url: ${failed_fhir_conversion_url}
                   auth:
                     type: OIDC
-                  body: $${error.body}
+                  body: 
+                    fhir_converter_response: $${error.body}
+                    source_filename: $${filename}
+                  headers:
+                    Content-Type: "application/json"
                 next: end
     - standardize_name:
         call: http.post
