@@ -8,14 +8,15 @@ def test_bad_cloud_event():
     cloud_event.data.__getitem__.side_effect = AttributeError()
     actual_response = read_source_data(cloud_event)
     assert (
-        actual_response.response == "Bad CloudEvent payload - 'data' attribute missing."
+        actual_response.response[0]
+        == b"Bad CloudEvent payload - 'data' attribute missing."
     )
 
     cloud_event = mock.MagicMock()
     cloud_event.data.__getitem__.side_effect = KeyError()
     actual_response = read_source_data(cloud_event)
-    assert actual_response.response == (
-        "Bad CloudEvent payload - 'name' or 'bucket' name was " "not included."
+    assert actual_response.response[0] == (
+        b"Bad CloudEvent payload - 'name' or 'bucket' name was not included."
     )
 
 
@@ -23,8 +24,8 @@ def test_not_source_data():
     cloud_event = mock.MagicMock()
     cloud_event.data.__getitem__.side_effect = ["some-filename", "some-bucket"]
     actual_response = read_source_data(cloud_event)
-    assert actual_response.response == (
-        "some-filename was not read because it does not begin " "with 'source-data/'."
+    assert actual_response.response[0] == (
+        b"some-filename was not read because it does not begin with 'source-data/'."
     )
 
 
@@ -35,9 +36,9 @@ def test_unknown_message():
         "some-bucket",
     ]
     actual_response = read_source_data(cloud_event)
-    assert actual_response.response == (
-        "Unknown message type: unknown-message-type. Messages "
-        "should be ELR, VXU, or eCR."
+    assert actual_response.response[0] == (
+        b"Unknown message type: unknown-message-type. Messages "
+        b"should be ELR, VXU, or eCR."
     )
 
 
@@ -54,9 +55,9 @@ def test_missing_environment_variables(
         "some-bucket",
     ]
     actual_response = read_source_data(cloud_event)
-    assert actual_response.response == (
-        "Missing required environment variables. Values for "
-        "PROJECT_ID and TOPIC_ID must be set."
+    assert actual_response.response[0] == (
+        b"Missing required environment variables. Values for "
+        b"PROJECT_ID and TOPIC_ID must be set."
     )
 
 
