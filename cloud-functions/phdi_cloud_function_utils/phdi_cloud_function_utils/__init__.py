@@ -37,7 +37,6 @@ def make_response(
         )
     else:
         result = Response(response=message)
-        result.response = message
     result.status_code = status_code
     return result
 

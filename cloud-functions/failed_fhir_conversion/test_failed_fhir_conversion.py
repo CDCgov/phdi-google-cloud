@@ -21,7 +21,7 @@ def test_failed_fhir_conversion_bad_header(mock_storage_client):
 @mock.patch("main.storage.Client")
 def test_failed_fhir_conversion_bad_body(mock_storage_client):
     request = mock.Mock(headers={"Content-Type": "application/json"})
-    request.is_json.return_value = False
+    request.is_json = False
     result = failed_fhir_conversion(request=request)
     expected_result = make_response(
         status_code=400, message="Invalid request body - Invalid JSON"
@@ -52,25 +52,11 @@ def test_failed_fhir_conversion_good_request(patched_os_environ, mock_storage_cl
     patched_os_environ.get.return_value = "test_bucket"
     request = mock.Mock(headers={"Content-Type": "application/json"})
 
-    expected_result = "File uploaded to failed_fhir_conversion_test_hash.hl7.json."
-    request.get_json.return_value = json.dumps(
-        {
-            "args": "dotnet run --project /build/FHIR-Converter/src/Microsoft"
-            + ".Health.Fhir.Liquid.Converter.Tool convert -- --TemplateDirectory"
-            + "/build/FHIR-Converter/data/Templates/Hl7v2 --RootTemplate ADT_A01"
-            + "--InputDataFile /tmp/hl7v2-input.txt --OutputDataFile /tmp/output.json",
-            "returncode": 255,
-            "stdout": "",
-            "stderr": "Process failed: The input data could not be parsed correctly: "
-            + "The HL7 v2 message is invalid, first segment id = bad.\n",
-            "original_request": {
-                "input_data": "bad data",
-                "input_type": "hl7v2",
-                "filename": "test_hash.hl7",
-                "root_template": "ADT_A01",
-            },
-        }
-    )
+    request.get_json.return_value = {
+        "fhir_converter_response": "Some response from converter",
+        "source_filename": "source-data/some_file.hl7",
+    }
+    expected_result = "File uploaded to failed_fhir_conversion/some_file.hl7.json."
     actual_result = failed_fhir_conversion(request)
 
     assert actual_result.get_data().decode("utf-8") == expected_result
