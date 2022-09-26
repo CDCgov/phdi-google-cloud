@@ -37,7 +37,6 @@ def make_response(
         )
     else:
         result = Response(response=message)
-        result.response = message
     result.status_code = status_code
     return result
 
@@ -71,7 +70,7 @@ def validate_request_body_json(request: Request) -> Response:
         proper JSON or will return a generic 200 flask.Response
     """
 
-    if request.is_json():
+    if request.is_json:
         return make_response(status_code=200, message="Validation Succeeded!")
     else:
         return make_response(
