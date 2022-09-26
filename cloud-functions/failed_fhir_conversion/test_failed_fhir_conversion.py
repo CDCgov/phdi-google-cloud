@@ -1,4 +1,3 @@
-import json
 from main import failed_fhir_conversion
 from unittest import mock
 from phdi_cloud_function_utils import make_response
