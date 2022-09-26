@@ -53,9 +53,9 @@ def test_failed_fhir_upload_missing_environment_variables(
     request.get_json.return_value = test_request_body
     patched_environ.get.return_value = None
     actual_response = failed_fhir_upload(request)
-    assert actual_response.response == (
-        "Environment variable 'PHI_STORAGE_BUCKET' not set. "
-        + "The environment variable must be set."
+    assert actual_response.response[0] == (
+        b"Environment variable 'PHI_STORAGE_BUCKET' not set. "
+        b"The environment variable must be set."
     )
 
 
