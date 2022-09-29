@@ -52,7 +52,6 @@ module "google-workflows" {
   standardize_phones_url      = module.cloud-functions.standardize_phones_url
   standardize_names_url       = module.cloud-functions.standardize_names_url
   failed_fhir_conversion_url  = module.cloud-functions.failed_fhir_conversion_url
-  failed_fhir_upload_url      = module.cloud-functions.failed_fhir_upload_url
   geocode_patients_url        = module.cloud-functions.geocode_patients_url
   ingestion_topic             = module.pubsub.ingestion_topic
   fhir_dataset_id             = module.fhir.fhir_dataset_id
