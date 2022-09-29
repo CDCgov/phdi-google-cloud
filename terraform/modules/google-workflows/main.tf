@@ -22,7 +22,6 @@ resource "google_workflows_workflow" "ingestion-pipeline" {
     standardize_phones_url     = var.standardize_phones_url,
     standardize_names_url      = var.standardize_names_url,
     failed_fhir_conversion_url = var.failed_fhir_conversion_url,
-    failed_fhir_upload_url     = var.failed_fhir_upload_url,
     geocode_patients_url       = var.geocode_patients_url,
     fhir_dataset_id            = var.fhir_dataset_id,
     fhir_location              = var.region,

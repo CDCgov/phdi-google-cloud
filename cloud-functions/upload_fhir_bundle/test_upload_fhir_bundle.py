@@ -151,7 +151,17 @@ def test_upload_fhir_bundle_good_request_good_upload(
     ]
 
     fhir_store_url = "/".join(fhir_store_url)
-    patched_upload_bundle_to_fhir_server.return_value = mock.Mock(status_code=200)
+    fhir_store_response = mock.Mock(status_code=200)
+    fhir_store_response.json.return_value = {
+        "entry": [
+            {
+                "response": {
+                    "status": "200 OK",
+                }
+            }
+        ]
+    }
+    patched_upload_bundle_to_fhir_server.return_value = fhir_store_response
     patched_make_response.return_value = mock.Mock()
     upload_fhir_bundle(request)
 

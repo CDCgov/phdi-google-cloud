@@ -92,20 +92,36 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
     ]
     fhir_store_url = "/".join(fhir_store_url)
 
-    # Upload bundle to the FHIR store using the GCP Crednetial Manager for
+    # Upload bundle to the FHIR store using the GCP Credential Manager for
     # authentication.
     fhir_store_response = upload_bundle_to_fhir_server(
         request_body.bundle, credential_manager, fhir_store_url
     )
+    fhir_store_response_body = fhir_store_response.json()
     # the response from PHDI is a request.Response which
     #   then needs to be translated into a flask.Response object
-    #
-    # If the response is an error then grab the data and store as a message
-    # otherwise get the json and store in the json_payload of the
-    # flask response
 
+    # If the FHIR store responds with a 200 check if any individual resources failed to
+    # upload.
+    failed_resources = []
+    if fhir_store_response.status_code == 200:
+        failed_resources = [
+            entry
+            for entry in fhir_store_response_body["entry"]
+            if entry["response"]["status"] not in ["200 OK", "201 Created"]
+        ]
+
+        fhir_store_response_body = {
+            "entry": failed_resources,
+            "resourceType": "Bundle",
+            "type": "transaction-response",
+        }
+        if failed_resources != []:
+            fhir_store_response.status_code = 400
+
+    # If the FHIR store does not return a 200 or failed resources were found write the
+    # FHIR bundle and relevant FHIR store response to storage.
     if fhir_store_response.status_code != 200:
-        # Upload file to storage bucket.
         storage_client = storage.Client()
         bucket = storage_client.bucket(os.environ.get("PHI_STORAGE_BUCKET"))
         destination_blob_name = request_body.source_filename.replace(
@@ -115,7 +131,7 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
         blob = bucket.blob(destination_blob_name)
         upload_failure_info = {
             "fhir_store_response_status_code": fhir_store_response.status_code,
-            "fhir_store_response": fhir_store_response.json(),
+            "fhir_store_response_body": fhir_store_response_body,
             "bundle": request_body.bundle,
         }
         blob.upload_from_string(

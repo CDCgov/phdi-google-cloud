@@ -92,12 +92,3 @@ main:
           headers:
             Content-Type: "application/json"
         result: upload_fhir_bundle_response
-    - failed_fhir_upload:
-        call: http.post
-        args:
-          url: https://us-west1-phdi-357418.cloudfunctions.net/phdi-dev-failed-fhir-upload
-          auth:
-            type: OIDC
-          body: $${upload_fhir_bundle_response.body}
-          headers:
-            Content-Type: "application/json"
