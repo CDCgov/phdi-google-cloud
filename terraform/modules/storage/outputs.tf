@@ -33,7 +33,3 @@ output "geocode_patients_zip" {
 output "failed_fhir_conversion_zip" {
   value = google_storage_bucket_object.failed_fhir_conversion_zip.name
 }
-
-output "failed_fhir_upload_zip" {
-  value = google_storage_bucket_object.failed_fhir_upload_zip.name
-}
