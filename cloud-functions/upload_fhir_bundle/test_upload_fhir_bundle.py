@@ -213,5 +213,5 @@ def test_upload_fhir_bundle_good_request_bad_upload(
     upload_fhir_bundle(request)
     patched_make_response.assert_called_with(
         status_code=400,
-        message="Upload failed. Bundle and FHIR store response written to some_file.json.",
+        message="Upload failed. Bundle and FHIR store response written to some_file.json.", #noqa
     )
