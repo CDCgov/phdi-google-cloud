@@ -65,19 +65,23 @@ def test_request_body():
     except Exception as exception:
         assert False, f"The following exception was raised: {exception}."
 
+
 def test_upload_fhir_bundle_missing_bucket():
-    
+
     request = mock.Mock(headers={"Content-Type": "not-application/json"})
     actual_result = upload_fhir_bundle(request)
     expected_result = make_response(
-        status_code=500, message=("Environment variable 'PHI_STORAGE_BUCKET' not set. " + 
-        "The environment variable must be set."
-        )
+        status_code=500,
+        message=(
+            "Environment variable 'PHI_STORAGE_BUCKET' not set. "
+            + "The environment variable must be set."
+        ),
     )
 
     assert actual_result.status == expected_result.status
     assert actual_result.status_code == expected_result.status_code
     assert actual_result.response == expected_result.response
+
 
 @mock.patch("main.os.environ")
 def test_upload_fhir_bundle_bad_header(patched_environ):
@@ -91,6 +95,7 @@ def test_upload_fhir_bundle_bad_header(patched_environ):
     assert actual_result.status == expected_result.status
     assert actual_result.status_code == expected_result.status_code
     assert actual_result.response == expected_result.response
+
 
 @mock.patch("main.os.environ")
 def test_upload_fhir_bundle_bad_body(patched_environ):
@@ -154,7 +159,8 @@ def test_upload_fhir_bundle_good_request_good_upload(
         request.get_json()["bundle"], patched_credential_manager(), fhir_store_url
     )
 
-@mock.patch("main.json")    
+
+@mock.patch("main.json")
 @mock.patch("main.storage.Client")
 @mock.patch("main.upload_bundle_to_fhir_server")
 @mock.patch("main.GcpCredentialManager")
@@ -166,7 +172,7 @@ def test_upload_fhir_bundle_good_request_bad_upload(
     patched_credential_manager,
     patched_upload_bundle_to_fhir_server,
     patched_gcp_storage,
-    patched_json
+    patched_json,
 ):
     patched_environ.get.return_value = "test_bucket"
     request = mock.Mock(headers={"Content-Type": "application/json"})
@@ -196,5 +202,6 @@ def test_upload_fhir_bundle_good_request_bad_upload(
     patched_make_response.return_value = mock.Mock()
     upload_fhir_bundle(request)
     patched_make_response.assert_called_with(
-        status_code=400, message="Upload failed. Bundle and FHIR store response written to some_file.json."
+        status_code=400,
+        message="Upload failed. Bundle and FHIR store response written to some_file.json.",
     )
