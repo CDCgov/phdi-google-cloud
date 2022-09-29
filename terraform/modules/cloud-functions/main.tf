@@ -9,8 +9,11 @@ resource "google_cloudfunctions_function" "upload-fhir-bundle" {
   trigger_http          = true
   entry_point           = "upload_fhir_bundle"
   service_account_email = var.workflow_service_account_email
-}
 
+  environment_variables = {
+    PHI_STORAGE_BUCKET = var.phi_storage_bucket
+  }
+}
 
 resource "google_cloudfunctions_function" "read_source_data" {
   name                  = "phdi-${terraform.workspace}-read_source_data"

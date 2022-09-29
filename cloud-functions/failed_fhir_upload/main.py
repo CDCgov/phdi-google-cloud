@@ -48,13 +48,14 @@ def failed_fhir_upload(request: flask.Request) -> flask.Response:
 
     # Check to see if any entries in the FHIR bundle failed to upload.
     # If so, upload the FHIR bundle to a storage bucket.
+
     fhir_bundle = request.get_json()
     failed_entries = [
         entry
         for entry in fhir_bundle["entry"]
-        if entry["response"]["status"] != "201 Created"
+        if entry["response"]["status"] not in ["200 OK", "201 Created"]
     ]
-    if failed_entries:
+    if failed_entries is not None:
         timestamp = get_timestamp()
         data = {
             "entry": failed_entries,

@@ -1,8 +1,12 @@
 import functions_framework
 import flask
+import json
+import os
 from pydantic import BaseModel, ValidationError, validator
+from google.cloud import storage
 from phdi.fhir.transport.http import upload_bundle_to_fhir_server
 from phdi_cloud_function_utils import (
+    check_for_environment_variables,
     validate_request_header,
     log_error_and_generate_response,
     make_response,
@@ -24,6 +28,7 @@ class RequestBody(BaseModel):
     dataset_id: str
     location: str
     fhir_store_id: str
+    source_filename: str
     bundle: dict
 
     @validator("bundle")
@@ -47,6 +52,11 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
     :return: Returns a flask.Response object containing and overall response from the
         FHIR store as well as for the upload of each individual resource in the bundle.
     """
+
+    # Check for the required environment variables.
+    environment_check_response = check_for_environment_variables(["PHI_STORAGE_BUCKET"])
+    if environment_check_response.status_code == 500:
+        return environment_check_response
 
     content_type = "application/json"
     # Validate request header.
@@ -84,7 +94,7 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
 
     # Upload bundle to the FHIR store using the GCP Crednetial Manager for
     # authentication.
-    response = upload_bundle_to_fhir_server(
+    fhir_store_response = upload_bundle_to_fhir_server(
         request_body.bundle, credential_manager, fhir_store_url
     )
     # the response from PHDI is a request.Response which
@@ -93,13 +103,22 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
     # If the response is an error then grab the data and store as a message
     # otherwise get the json and store in the json_payload of the
     # flask response
-    if response.status_code == 200:
-        final_response = make_response(
-            status_code=response.status_code, json_payload=response.json()
+    message="Bundle sucessfully uploaded to the FHIR store."
+    
+    if fhir_store_response.status_code != 200:
+        # Upload file to storage bucket.
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(os.environ.get("PHI_STORAGE_BUCKET"))
+        destination_blob_name = request_body.source_filename.replace(
+            "source-data", "failed_fhir_upload"
         )
-    else:
-        final_response = make_response(
-            status_code=response.status_code, message=response.text
+        destination_blob_name = destination_blob_name + ".json"
+        blob = bucket.blob(destination_blob_name)
+        upload_failure_info = {"fhir_store_response_status_code": fhir_store_response.status_code, "fhir_store_response": fhir_store_response.json()}
+        blob.upload_from_string(
+        data=json.dumps(upload_failure_info), content_type=content_type
         )
 
-    return final_response
+        message=f"Upload failed. Bundle and FHIR store response written to {destination_blob_name}."
+
+    return make_response(status_code=fhir_store_response.status_code, message=message)
