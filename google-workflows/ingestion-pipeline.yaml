@@ -87,6 +87,7 @@ main:
             bundle: $${add_patient_hash_response.body}
             dataset_id: ${fhir_dataset_id}
             location: ${fhir_location}
+            source_filename: $${filename}
             fhir_store_id: ${fhir_store_id}
           headers:
             Content-Type: "application/json"

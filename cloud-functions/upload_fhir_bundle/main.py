@@ -103,7 +103,6 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
     # If the response is an error then grab the data and store as a message
     # otherwise get the json and store in the json_payload of the
     # flask response
-    message = "Bundle sucessfully uploaded to the FHIR store."
 
     if fhir_store_response.status_code != 200:
         # Upload file to storage bucket.
@@ -117,11 +116,20 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
         upload_failure_info = {
             "fhir_store_response_status_code": fhir_store_response.status_code,
             "fhir_store_response": fhir_store_response.json(),
+            "bundle": request_body.bundle,
         }
         blob.upload_from_string(
             data=json.dumps(upload_failure_info), content_type=content_type
         )
 
-        message = f"Upload failed. Bundle and FHIR store response written to {destination_blob_name}."
+        message = f"Upload failed. Bundle and FHIR store response written to {destination_blob_name}."  # noqa
+        response = make_response(
+            status_code=fhir_store_response.status_code, message=message
+        )
+    else:
+        response = make_response(
+            status_code=fhir_store_response.status_code,
+            json_payload=fhir_store_response.json(),
+        )
 
-    return make_response(status_code=fhir_store_response.status_code, message=message)
+    return response
