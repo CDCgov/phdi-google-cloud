@@ -40,10 +40,6 @@ variable "failed_fhir_conversion_url" {
   description = "URL of the failed FHIR conversion service"
 }
 
-variable "failed_fhir_upload_url" {
-  description = "URL of the failed FHIR upload service"
-}
-
 variable "geocode_patients_url" {
   description = "URL of the geocode patients service"
 }

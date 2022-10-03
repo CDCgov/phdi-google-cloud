@@ -1,8 +1,12 @@
 import functions_framework
 import flask
+import json
+import os
 from pydantic import BaseModel, ValidationError, validator
+from google.cloud import storage
 from phdi.fhir.transport.http import upload_bundle_to_fhir_server
 from phdi_cloud_function_utils import (
+    check_for_environment_variables,
     validate_request_header,
     log_error_and_generate_response,
     make_response,
@@ -24,6 +28,7 @@ class RequestBody(BaseModel):
     dataset_id: str
     location: str
     fhir_store_id: str
+    source_filename: str
     bundle: dict
 
     @validator("bundle")
@@ -47,6 +52,11 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
     :return: Returns a flask.Response object containing and overall response from the
         FHIR store as well as for the upload of each individual resource in the bundle.
     """
+
+    # Check for the required environment variables.
+    environment_check_response = check_for_environment_variables(["PHI_STORAGE_BUCKET"])
+    if environment_check_response.status_code == 500:
+        return environment_check_response
 
     content_type = "application/json"
     # Validate request header.
@@ -82,24 +92,60 @@ def upload_fhir_bundle(request: flask.Request) -> flask.Response:
     ]
     fhir_store_url = "/".join(fhir_store_url)
 
-    # Upload bundle to the FHIR store using the GCP Crednetial Manager for
+    # Upload bundle to the FHIR store using the GCP Credential Manager for
     # authentication.
-    response = upload_bundle_to_fhir_server(
+    fhir_store_response = upload_bundle_to_fhir_server(
         request_body.bundle, credential_manager, fhir_store_url
     )
+    fhir_store_response_body = fhir_store_response.json()
     # the response from PHDI is a request.Response which
     #   then needs to be translated into a flask.Response object
-    #
-    # If the response is an error then grab the data and store as a message
-    # otherwise get the json and store in the json_payload of the
-    # flask response
-    if response.status_code == 200:
-        final_response = make_response(
-            status_code=response.status_code, json_payload=response.json()
+
+    # If the FHIR store responds with a 200 check if any individual resources failed to
+    # upload.
+    failed_resources = []
+    if fhir_store_response.status_code == 200:
+        failed_resources = [
+            entry
+            for entry in fhir_store_response_body["entry"]
+            if entry["response"]["status"] not in ["200 OK", "201 Created"]
+        ]
+
+        fhir_store_response_body = {
+            "entry": failed_resources,
+            "resourceType": "Bundle",
+            "type": "transaction-response",
+        }
+        if failed_resources != []:
+            fhir_store_response.status_code = 400
+
+    # If the FHIR store does not return a 200 or failed resources were found write the
+    # FHIR bundle and relevant FHIR store response to storage.
+    if fhir_store_response.status_code != 200:
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(os.environ.get("PHI_STORAGE_BUCKET"))
+        destination_blob_name = request_body.source_filename.replace(
+            "source-data", "failed_fhir_upload"
         )
-    else:
-        final_response = make_response(
-            status_code=response.status_code, message=response.text
+        destination_blob_name = destination_blob_name + ".json"
+        blob = bucket.blob(destination_blob_name)
+        upload_failure_info = {
+            "fhir_store_response_status_code": fhir_store_response.status_code,
+            "fhir_store_response_body": fhir_store_response_body,
+            "bundle": request_body.bundle,
+        }
+        blob.upload_from_string(
+            data=json.dumps(upload_failure_info), content_type=content_type
         )
 
-    return final_response
+        message = f"Upload failed. Bundle and FHIR store response written to {destination_blob_name}."  # noqa
+        response = make_response(
+            status_code=fhir_store_response.status_code, message=message
+        )
+    else:
+        response = make_response(
+            status_code=fhir_store_response.status_code,
+            json_payload=fhir_store_response.json(),
+        )
+
+    return response

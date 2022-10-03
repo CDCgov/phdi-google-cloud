@@ -9,8 +9,11 @@ resource "google_cloudfunctions_function" "upload-fhir-bundle" {
   trigger_http          = true
   entry_point           = "upload_fhir_bundle"
   service_account_email = var.workflow_service_account_email
-}
 
+  environment_variables = {
+    PHI_STORAGE_BUCKET = var.phi_storage_bucket
+  }
+}
 
 resource "google_cloudfunctions_function" "read_source_data" {
   name                  = "phdi-${terraform.workspace}-read_source_data"
@@ -123,19 +126,3 @@ resource "google_cloudfunctions_function" "failed_fhir_conversion" {
   }
 }
 
-resource "google_cloudfunctions_function" "failed_fhir_upload" {
-  name        = "phdi-${terraform.workspace}-failed-fhir-upload"
-  description = "Upload failed FHIR upload to GCS"
-  runtime     = "python39"
-
-  available_memory_mb   = 128
-  source_archive_bucket = var.functions_storage_bucket
-  source_archive_object = var.failed_fhir_upload_zip
-  trigger_http          = true
-  entry_point           = "failed_fhir_upload"
-  service_account_email = var.workflow_service_account_email
-
-  environment_variables = {
-    PHI_STORAGE_BUCKET = var.phi_storage_bucket
-  }
-}

@@ -35,7 +35,6 @@ module "cloud-functions" {
   standardize_phones_zip           = module.storage.standardize_phones_zip
   standardize_names_zip            = module.storage.standardize_names_zip
   failed_fhir_conversion_zip       = module.storage.failed_fhir_conversion_zip
-  failed_fhir_upload_zip           = module.storage.failed_fhir_upload_zip
   geocode_patients_zip             = module.storage.geocode_patients_zip
   workflow_service_account_email   = module.google-workflows.workflow_service_account_email
   depends_on                       = [google_project_service.enable_google_apis]
@@ -53,7 +52,6 @@ module "google-workflows" {
   standardize_phones_url      = module.cloud-functions.standardize_phones_url
   standardize_names_url       = module.cloud-functions.standardize_names_url
   failed_fhir_conversion_url  = module.cloud-functions.failed_fhir_conversion_url
-  failed_fhir_upload_url      = module.cloud-functions.failed_fhir_upload_url
   geocode_patients_url        = module.cloud-functions.geocode_patients_url
   ingestion_topic             = module.pubsub.ingestion_topic
   fhir_dataset_id             = module.fhir.fhir_dataset_id
