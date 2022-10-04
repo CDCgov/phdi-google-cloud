@@ -1,6 +1,6 @@
 import functions_framework
 import logging
-from phdi.conversion import convert_batch_messages_to_list
+from phdi.harmonization.hl7 import convert_hl7_batch_messages_to_list
 import os
 from google.cloud import pubsub_v1
 from google.cloud import storage
@@ -95,7 +95,7 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
 
     # Handle batch Hl7v2 messages.
     if message_type == "hl7v2":
-        messages = convert_batch_messages_to_list(file_contents)
+        messages = convert_hl7_batch_messages_to_list(message=file_contents)
 
     else:
         messages = [file_contents]
