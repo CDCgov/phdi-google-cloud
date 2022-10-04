@@ -14,7 +14,8 @@
                         "family": "Smith",
                         "given": [
                             "DeeDee"
-                        ]
+                        ],
+                        "use": "official"
                     }
                 ],
                 "gender": "female",
