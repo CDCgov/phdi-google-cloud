@@ -43,13 +43,11 @@ def test_geocode_patients_bad_resource_type():
 
 
 @mock.patch("main.os.environ")
-@mock.patch("main.geocode_patients")
-@mock.patch("main.get_smartystreets_client")
+@mock.patch("main.SmartyFhirGeocodeClient")
 @mock.patch("main.make_response")
 def test_geocode_patients_good_request(
     patched_make_response,
     patched_get_geocoder,
-    patched_address_standard,
     patched_os_environ,
 ):
     patched_os_environ.get("SMARTY_AUTH_ID").return_value = "TEST_ID"
@@ -58,16 +56,16 @@ def test_geocode_patients_good_request(
     patched_get_geocoder.return_value = geocoder
 
     standardized_address_data = mock.Mock()
-    patched_address_standard.return_value = standardized_address_data
+    patched_get_geocoder.geocode_bundle(
+        bundle=test_request_body
+    ).return_value = standardized_address_data
 
     request = mock.Mock(headers={"Content-Type": "application/json"})
 
     # expected_result = make_response(status_code=200, json_payload=test_request_body)
     request.get_json.return_value = test_request_body
     http_geocode_patients(request)
-    patched_address_standard.assert_called_with(
-        bundle=test_request_body, client=geocoder
-    )
+    patched_get_geocoder.geocode_bundle.assert_called_with(bundle=test_request_body)
 
 
 @mock.patch("phdi_cloud_function_utils.check_for_environment_variables")

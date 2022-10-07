@@ -44,22 +44,21 @@ def test_add_patient_hash_bad_resource_type():
 
 
 @mock.patch("main.os.environ")
-def test_add_patient_hash_good_request(patched_os_environ):
-    patched_os_environ.get.return_value = "test_hash"
+@mock.patch("main.add_patient_identifier")
+@mock.patch("main.make_response")
+def test_add_patient_hash_good_request(
+    patched_make_response, patched_add_patient_identifier, patched_os_environ
+):
+    test_hash = "test_hash"
+    patched_os_environ.get.return_value = test_hash
     request = mock.Mock(headers={"Content-Type": "application/json"})
 
-    expected_result = copy.deepcopy(test_request_body)
-    expected_result["entry"][0]["resource"]["identifier"] = [
-        {
-            "system": "urn:ietf:rfc:3986",
-            "use": "temp",
-            "value": "699d8585efcf84d1a03eb58e84cd1c157bf7b718d9257d7436e2ff0bd14b2834",
-        }
-    ]
+    patched_add_patient_identifier.return_value = test_request_body
     request.get_json.return_value = test_request_body
-    actual_result = add_patient_hash(request)
 
-    assert actual_result.get_json() == expected_result
+    add_patient_hash(request)
+
+    patched_add_patient_identifier.assert_called_with(test_request_body, test_hash)
 
 
 @mock.patch("phdi_cloud_function_utils.check_for_environment_variables")

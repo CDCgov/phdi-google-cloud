@@ -1,7 +1,7 @@
 import os
 import functions_framework
 import flask
-from phdi.geo import get_smartystreets_client, geocode_patients
+from phdi.fhir.geospatial import SmartyFhirGeocodeClient
 from phdi_cloud_function_utils import (
     validate_fhir_bundle_or_resource,
     validate_request_header,
@@ -46,7 +46,7 @@ def http_geocode_patients(request: flask.Request) -> flask.Response:
             return environment_check_response_token
         try:
             # Using the environment variable values create a SMARTY client
-            geocoder = get_smartystreets_client(
+            geocoder = SmartyFhirGeocodeClient(
                 os.environ.get("SMARTY_AUTH_ID"),
                 os.environ.get("SMARTY_AUTH_TOKEN"),
             )
@@ -56,7 +56,7 @@ def http_geocode_patients(request: flask.Request) -> flask.Response:
             # store results in flask response
             body_response = make_response(
                 status_code=200,
-                json_payload=geocode_patients(bundle=request_json, client=geocoder),
+                json_payload=geocoder.geocode_bundle(bundle=request_json),
             )
         except Exception as error:
             error_response = log_error_and_generate_response(

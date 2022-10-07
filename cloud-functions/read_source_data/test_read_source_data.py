@@ -62,7 +62,7 @@ def test_missing_environment_variables(
 
 
 @mock.patch("main.pubsub_v1.PublisherClient")
-@mock.patch("main.convert_batch_messages_to_list")
+@mock.patch("main.convert_hl7_batch_messages_to_list")
 @mock.patch("main.storage.Client")
 @mock.patch("main.os.environ")
 def test_handle_batch_hl7(
@@ -82,7 +82,7 @@ def test_handle_batch_hl7(
 
 
 @mock.patch("main.pubsub_v1.PublisherClient")
-@mock.patch("main.convert_batch_messages_to_list")
+@mock.patch("main.convert_hl7_batch_messages_to_list")
 @mock.patch("main.storage.Client")
 @mock.patch("main.os.environ")
 def test_publishing_initial_success(
@@ -135,7 +135,7 @@ def test_publishing_initial_success(
 
 
 @mock.patch("main.pubsub_v1.PublisherClient")
-@mock.patch("main.convert_batch_messages_to_list")
+@mock.patch("main.convert_hl7_batch_messages_to_list")
 @mock.patch("main.storage.Client")
 @mock.patch("main.os.environ")
 def test_publishing_retry_success(
@@ -174,7 +174,7 @@ def test_publishing_retry_success(
 
 
 @mock.patch("main.pubsub_v1.PublisherClient")
-@mock.patch("main.convert_batch_messages_to_list")
+@mock.patch("main.convert_hl7_batch_messages_to_list")
 @mock.patch("main.storage.Client")
 @mock.patch("main.os.environ")
 def test_publishing_failure(
@@ -211,7 +211,7 @@ def test_publishing_failure(
 
 
 @mock.patch("main.pubsub_v1.PublisherClient")
-@mock.patch("main.convert_batch_messages_to_list")
+@mock.patch("main.convert_hl7_batch_messages_to_list")
 @mock.patch("main.storage.Client")
 @mock.patch("main.os.environ")
 def test_read_source_data(
