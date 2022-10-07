@@ -95,7 +95,7 @@ def read_source_data(cloud_event: CloudEvent) -> flask.Response:
 
     # Handle batch Hl7v2 messages.
     if message_type == "hl7v2":
-        messages = convert_hl7_batch_messages_to_list(message=file_contents)
+        messages = convert_hl7_batch_messages_to_list(content=file_contents)
 
     else:
         messages = [file_contents]
