@@ -44,7 +44,7 @@ def test_add_patient_hash_bad_resource_type():
 
 
 @mock.patch("main.os.environ")
-@mock.patch("main.add_patient_identifier")
+@mock.patch("main.add_patient_identifier_in_bundle")
 @mock.patch("main.make_response")
 def test_add_patient_hash_good_request(
     patched_make_response, patched_add_patient_identifier, patched_os_environ
