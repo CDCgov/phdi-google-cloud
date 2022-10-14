@@ -43,7 +43,13 @@ To deploy this pipeline to your own Google Cloud environment, follow these steps
 
   1. Authenticate the gcloud CLI by running:
 
+      for Unix based systems
+
          ./quick-start.sh
+
+      for Windows based systems
+
+         quick-start.ps1
 
   1. Follow [these steps](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) to set the secrets output by the previous step in your repository.
   1. Setup a storage bucket for Terraform state by running the GitHub Action at this URL:  
