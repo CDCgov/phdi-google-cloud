@@ -8,6 +8,20 @@ resource "google_storage_bucket" "phi_storage_bucket" {
   storage_class = "MULTI_REGIONAL"
 }
 
+locals {
+  pipeline_modes = ["source-data", "failed_fhir_conversion", "failed_fhir_upload"]
+  message_types = ["elr", "vxu", "ecr"]
+  
+  phi_directories = {for directory in setproduct(local.pipeline_modes, local.message_types):
+                "${directory[0]}/${directory[1]}/" => directory}  
+}
+
+resource "google_storage_bucket_object" "phi_folders" {
+  for_each      = local.phi_directories 
+  name          = "${each.key}"
+  bucket        = "${google_storage_bucket.phi_storage_bucket.name}"
+}
+
 resource "google_storage_bucket" "functions" {
   name          = "phdi-${terraform.workspace}-functions-${var.project_id}"
   location      = "US"
