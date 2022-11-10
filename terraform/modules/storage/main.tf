@@ -20,6 +20,7 @@ resource "google_storage_bucket_object" "phi_folders" {
   for_each      = local.phi_directories 
   name          = "${each.key}"
   bucket        = "${google_storage_bucket.phi_storage_bucket.name}"
+  content       = "" 
 }
 
 resource "google_storage_bucket" "functions" {
