@@ -175,7 +175,15 @@ At this point we have completed all of the necessary setup. We are now ready to 
 ![deployment-3](./images/deployment-3.png)
 
 ### Step 10: Run End-to-end Functional Tests
-TODO: Design some basic tests and describe how to run them here.
+Now that the pipelines have been deployed we can conduct some basic manual tests to try them out. The [sample-data](../sample-data/) directory contains some dummy VXU messages that will test the sucess and failure modes of the ingestion pipeline. You may upload these files to the `source-data/vxu/` directory in the PHI storage bucket to test the ingestion pipeline. The precise name of the storage bucket will have the form `phdi-ENVIRONMENT-NAME-phi-bucket-PROJECT-ID`. The table below describes the contents and expected ingestion pipeline behavior for each test message.
+
+| Test File | File Contents | Expected Outcome |
+| --------- | --------------| ---------------- |
+|VXU-V04-01_success_single.hl7| A single valid VXU message.|The ingestion pipeline will process a single message and upload it to the FHIR server.|
+|VXU-V04-02_failedConversion.hl7| A single invalid VXU message that cannot be converted to FHIR.| The ingestion process will fail during the initial conversion to FHIR step. Information about the failure is written to `failed_fhir_conversion\vxu\`.
+|VXU-V04-02_failedUpload.hl7| A single VXU message that converts to an invalid FHIR bundle.| The ingestion pipeline will fail during the final step when it attempts to upload the data to the FHIR server. Information about the failure is written to `failed_fhir_uploads\vxu\`.|
+|VXU-V04-02_success_batch.hl7| A batch Hl7 message containing two valid VXU messages.| The ingestion pipeline is triggered twice and runs successfully to completion both times.|
+|VXU-V04-03_batch_1_success_1_failConversion.hl7| A batch Hl7 message containing one valid and one invalid VXU message.| The ingestion pipeline will run twice. On one execution it successfully process the data and uploads to the FHIR server. On the other execution it fails.|
 
 ## Estimated Costs
 TODO: Conduct cost analysis for the ingestion pipeline.
