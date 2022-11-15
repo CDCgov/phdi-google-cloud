@@ -13,6 +13,10 @@ resource "google_cloudfunctions_function" "upload-fhir-bundle" {
   environment_variables = {
     PHI_STORAGE_BUCKET = var.phi_storage_bucket
   }
+  timeouts {
+    create = "30m"
+    delete = "30m"
+  }
 }
 
 resource "google_cloudfunctions_function" "read_source_data" {
@@ -36,6 +40,10 @@ resource "google_cloudfunctions_function" "read_source_data" {
     PROJECT_ID      = var.project_id
     INGESTION_TOPIC = var.ingestion_topic
   }
+  timeouts {
+    create = "30m"
+    delete = "30m"
+  }
 }
 
 resource "google_cloudfunctions_function" "add-patient-hash" {
@@ -55,6 +63,10 @@ resource "google_cloudfunctions_function" "add-patient-hash" {
     version    = "1"
     project_id = var.project_id
   }
+  timeouts {
+    create = "30m"
+    delete = "30m"
+  }
 }
 
 resource "google_cloudfunctions_function" "standardize-names" {
@@ -68,6 +80,10 @@ resource "google_cloudfunctions_function" "standardize-names" {
   trigger_http          = true
   entry_point           = "http_standardize_names"
   service_account_email = var.workflow_service_account_email
+  timeouts {
+    create = "30m"
+    delete = "30m"
+  }
 }
 
 resource "google_cloudfunctions_function" "standardize-phones" {
@@ -81,6 +97,10 @@ resource "google_cloudfunctions_function" "standardize-phones" {
   trigger_http          = true
   entry_point           = "http_standardize_phones"
   service_account_email = var.workflow_service_account_email
+  timeouts {
+    create = "30m"
+    delete = "30m"
+  }
 }
 
 resource "google_cloudfunctions_function" "geocode-patients" {
@@ -107,6 +127,10 @@ resource "google_cloudfunctions_function" "geocode-patients" {
     version    = "1"
     project_id = var.project_id
   }
+  timeouts {
+    create = "30m"
+    delete = "30m"
+  }
 }
 
 resource "google_cloudfunctions_function" "failed_fhir_conversion" {
@@ -123,6 +147,10 @@ resource "google_cloudfunctions_function" "failed_fhir_conversion" {
 
   environment_variables = {
     PHI_STORAGE_BUCKET = var.phi_storage_bucket
+  }
+  timeouts {
+    create = "30m"
+    delete = "30m"
   }
 }
 
