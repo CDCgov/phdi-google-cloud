@@ -80,7 +80,7 @@ main:
     - upload_fhir_bundle:
         call: http.post
         args:
-          url: https://us-west1-phdi-357418.cloudfunctions.net/phdi-dev-upload-fhir-bundle
+          url: ${upload_fhir_bundle_url}
           auth:
             type: OIDC
           body:
