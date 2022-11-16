@@ -99,9 +99,9 @@ In this step we will work through GCP's [Workload Identity Federation](https://c
 
 From your machine's command line:
 1. Navigate to the root directory of the repository you cloned in step 4.
-2. Run the quick start script and follow the prompts.
-    - [quick-start.sh](../quick-start.sh) for Mac and Linux
-    - [quick-start.ps1](../quick-start.ps1) for Windows
+2. Run the quick start script by executing one of the two commands below that matches your operating system.
+    - `./quick-start.sh` for Mac and Linux
+    - `./quick-start.ps1` for Windows
 
 If you plan to deploy to an existing project in your GCP environment, have the project name ready and provide it to the quick start script when prompted.
 
