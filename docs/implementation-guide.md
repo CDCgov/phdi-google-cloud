@@ -184,8 +184,3 @@ Now that the pipelines have been deployed we can conduct some basic manual tests
 |VXU-V04-02_failedUpload.hl7| A single VXU message that converts to an invalid FHIR bundle.| The ingestion pipeline will fail during the final step when it attempts to upload the data to the FHIR server. Information about the failure is written to `failed_fhir_uploads\vxu\`.|
 |VXU-V04-02_success_batch.hl7| A batch Hl7 message containing two valid VXU messages.| The ingestion pipeline is triggered twice and runs successfully to completion both times.|
 |VXU-V04-03_batch_1_success_1_failConversion.hl7| A batch Hl7 message containing one valid and one invalid VXU message.| The ingestion pipeline will run twice. On one execution it successfully process the data and uploads to the FHIR server. On the other execution it fails.|
-
-## Estimated Costs
-TODO: Conduct cost analysis for the ingestion pipeline.
-
-
