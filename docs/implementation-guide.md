@@ -9,6 +9,7 @@
             - [Analytics Pipeline](#analytics-pipeline)
         - [Additional References](#additional-references)
     - [Implementing the PHDI Google Cloud Platform Pipelines](#implementing-the-phdi-google-cloud-platform-pipelines)
+        - [User Assumptions](#user-assumptions)
         - [Step 1: Prepare Your GCP Environment](#step-1-prepare-your-gcp-environment)
         - [Step 2: Install the Gcloud CLI](#step-2-install-the-gcloud-cli)
         - [Step 3: Fork the phdi-google-cloud Repository](#step-3-fork-the-phdi-google-cloud-repository)
@@ -18,7 +19,7 @@
         - [Step 7: Run the Terraform Setup GitHub Workflow](#step-7-run-the-terraform-setup-github-workflow)
         - [Step 8: Create a Development Environment](#step-8-create-a-development-environment)
         - [Step 9: Run the Deployment GitHub Workflow](#step-9-run-the-deployment-github-workflow)
-        - [Step 10: Run End-to-end Functional Tests](#step-10-run-an-hl7v2-vaccination-message-through-the-pipeline)
+        - [Step 10: Run an Hl7v2 vaccination message through the pipeline ](#step-10-run-an-hl7v2-vaccination-message-through-the-pipeline)
 
 ## Introduction
 This document provides a detailed guide for implementing the PHDI pipelines provided in this repository.
