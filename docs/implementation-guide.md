@@ -190,7 +190,15 @@ Now that the starter kit has been deployed we can run some data through it! The 
 2. The patient's phone number is not in a standard format.
 3. The patient's address is non-standard and has not been geocoded.
 
-`PID|1|7777555^4^M11^test^MR^University Hospital^19241011^19241012|PATID7755^5^M11^test1|PATID7758^^^test5`**`|doe .^ John1 ^A.|`** `TEST^Mother, of^L|198505101126+0215|M||2106-3^White^HL70005`**`|555 E. 3065 S.^^Salt Lake CIty^ut^84106^USA||801-540-3661^^CP|`**`||M^Married||4880776||||N^NOT HISPANIC OR LATINO^HL70189||N||US^United States of America^ISO3166_1||||N|||20080110015014+0315|||||||`
+```diff
+PID|1|7777555^4^M11^test^MR^University Hospital^19241011^19241012|PATID7755^5^M11^test1|PATID7758^^^test5|
+- doe .^ John1 ^A.
+|TEST^Mother, of^L|198505101126+0215|M||2106-3^White^HL70005|
+- 555 E. 3065 S.^^Salt Lake CIty^ut^84106^USA
+||
+- 801-540-3661^^CP
+|||M^Married||4880776||||N^NOT HISPANIC OR LATINO^HL70189||N||US^United States of America^ISO3166_1||||N|||20080110015014+0315|||||||
+```
 
 If you would like feel free to confirm that this is the case by inspecting the file directly in the text editor of your choice.
 
