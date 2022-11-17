@@ -201,9 +201,9 @@ If you would like feel free to confirm that this is the case by inspecting the f
  13. Go the `SEARCH` tab, paste `Patient?family=DOE&given=JOHN` into the `NEW SEARCH` window, and click `RUN SEARCH`. This executes a search on the FHIR store for all Patient resources named John Doe.![gcp-search-fhir-store](./images/gcp-search-fhir-store.png)
  14. Select the Patient resource returned by the search and go to the `JSON` tab. ![gcp-select-patient](./images/gcp-select-patient.png)
  15. Scrolling through the JSON: 
-    - Lines 10 through 34 show that the patient's address was standardized and enriched with latitude and longitude as a result of geocoding.![gcp-review-patient-address](./images/gcp-review-patient-address.png)
-    - Lines 144 through 152 show that the patient's name was standardized to upper case letters and all non-alpha characters were removed.
-    - Lines 154 through 160 show that the patient's phone number was standardized to the ISO E.164 format. All spaces and other punctuation were removed and the country code was included preceeded by a `+`.![gcp-review-patient-name-and-phone](./images/gcp-review-patient-name-and-phone.png)
+    * Lines 10 through 35 show that the patient's address was standardized and enriched with latitude and longitude as a result of geocoding.![gcp-review-patient-address](./images/gcp-review-patient-address.png)
+    * Lines 144 through 152 show that the patient's name was standardized to upper case letters and all non-alpha characters were removed.
+    * Lines 154 through 160 show that the patient's phone number was standardized to the ISO E.164 format. All spaces and other punctuation were removed and the country code was included preceeded by a `+`.![gcp-review-patient-name-and-phone](./images/gcp-review-patient-name-and-phone.png)
 
 | Test File | File Contents | Expected Outcome |
 | --------- | --------------| ---------------- |
