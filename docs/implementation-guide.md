@@ -182,8 +182,20 @@ Now that the starter kit has been deployed we can run some data through it! The 
 
 `PID|1|7777555^4^M11^test^MR^University Hospital^19241011^19241012|PATID7755^5^M11^test1|PATID7758^^^test5`**`|doe .^ John1 ^A.|`** `TEST^Mother, of^L|198505101126+0215|M||2106-3^White^HL70005`**`|555 E. 3065 S.^^Salt Lake CIty^ut^84106^USA||801-540-3661^^CP|`**`||M^Married||4880776||||N^NOT HISPANIC OR LATINO^HL70189||N||US^United States of America^ISO3166_1||||N|||20080110015014+0315|||||||`
 
+If you would like feel free to confirm that this is the case by inspecting the file directly in the text editor of your choice.
 
- You may upload these files to the `source-data/vxu/` directory in the PHI storage bucket to test the ingestion pipeline. The precise name of the storage bucket will have the form `phdi-ENVIRONMENT-NAME-phi-bucket-PROJECT-ID`. The table below describes the contents and expected ingestion pipeline behavior for each test message.
+ To run this message through the ingestion pipeline follow the steps below.You may upload these files to the `source-data/vxu/` directory in the PHI storage bucket to test the ingestion pipeline. The precise name of the storage bucket will have the form `phdi-ENVIRONMENT-NAME-phi-bucket-PROJECT-ID`. The table below describes the contents and expected ingestion pipeline behavior for each test message.
+
+ 1. Open [https://console.cloud.google.com/getting-started](https://console.cloud.google.com/getting-started) in your browser.![gcp-getting-started](./images/gcp-getting-started.png)
+ 2. Ensure that you are using the google account that has access to the GCP project we have used so far.![gcp-getting-started-check-account](./images/gcp-getting-started-check-account.png)
+ 3. Select your project.![gcp-getting-started-select-project](./images/gcp-getting-started-select-project.png)
+ 4. Search for `Storage` and navigate all of GCP storage buckets we have deployed.
+ 5. Select the the PHI bucket, which is where all Protect Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi-ENVIRONMENT-NAME-phi-bucket-PROJECT-ID`.
+ 6. Upload the `VXU_single_messy_demo.hl7` file from the `sample-data/` directory of your forked version of the repository to the `source-data/vxu/` directory of your PHI bucket. Note that because the ingestion pipeline is event-driven simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI for file creation events.
+ 7. To see that the pipeline as executed search for `Workflows` and go to the Workflows page.
+ 8. Select the ingestion pipeline workflow.
+ 9. We should now see that the ingestion pipeline has processed one message successfully.
+ 10. To view the YAML configuration for the pipeline and a visualization of the process go to the `Source` tab. 
 
 | Test File | File Contents | Expected Outcome |
 | --------- | --------------| ---------------- |
