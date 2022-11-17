@@ -19,7 +19,6 @@
         - [Step 8: Create a Development Environment](#step-8-create-a-development-environment)
         - [Step 9: Run the Deployment GitHub Workflow](#step-9-run-the-deployment-github-workflow)
         - [Step 10: Run End-to-end Functional Tests](#step-10-run-an-hl7v2-vaccination-message-through-the-pipeline)
-    - [Estimated Costs](#estimated-costs)
 
 ## Introduction
 This document provides a detailed guide for implementing the PHDI pipelines provided in this repository.
@@ -54,6 +53,16 @@ We have only provided a brief overview of PHDI, Building Blocks, and the pipelin
 
 ## Implementing the PHDI Google Cloud Platform Pipelines
 In this section we describe how a STLT can take this repository and use it to spin up all of the functionality that it offers in their own GCP environment.
+
+### User Assumptions
+The steps below assume that a user:
+1. Has some familiarity working in a command line environment on their local machine.
+2. Has a basic familiarity with Git, and has a GitHub account.
+   - Instructions for installing Git can be found [here](https://github.com/git-guides/install-git).
+   - If you do not have a GitHub account you can create one [here](https://github.com/join).
+   - If you are unfamiliar with git [here](https://www.w3schools.com/git/) is a tutorial to get you started.
+3. Has a basic familiarity with GCP.
+   - The GCP getting started docs are available [here](https://cloud.google.com/docs/get-started).   
 
 ### Step 1: Prepare Your GCP Environment
 In order to proceed you will need either:
@@ -92,7 +101,7 @@ Fork the phdi-google-cloud repository into your organization's, or your personal
 ![fork-repo-2](./images/fork-repo-2.png)
 
 ### Step 4: Clone the Forked Repository
-Clone the forked version of the phdi-google-cloud repository by running `git clone https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git`. If you do not have `git` installed please follow [this guide](https://github.com/git-guides/install-git) to install it.
+Clone the forked version of the phdi-google-cloud repository by running `git clone https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git`.
 
 ### Step 5: Run the Quick Start Script
 In this step we will work through GCP's [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation) to grant your phdi-google-cloud repo access to deploy the pipelines to your organization's GCP environment. We have provided a script to automate most of this process that we recommend you use. However, if you prefer to work through it manually you may follow [this guide](https://github.com/google-github-actions/auth#setup).
@@ -203,7 +212,9 @@ If you would like feel free to confirm that this is the case by inspecting the f
 15. Scrolling through the JSON: 
    * Lines 10 through 35 show that the patient's address was standardized and enriched with latitude and longitude as a result of geocoding.![gcp-review-patient-address](./images/gcp-review-patient-address.png)
    * Lines 144 through 152 show that the patient's name was standardized to upper case letters and all non-alpha characters were removed.
-   * Lines 154 through 160 show that the patient's phone number was standardized to the ISO E.164 format. All spaces and other punctuation were removed and the country code was included preceeded by a `+`.![gcp-review-patient-name-and-phone](./images/gcp-review-patient-name-and-phone.png)
+   * Lines 154 through 160 show that the patient's phone number was standardized to the ISO E.164 format. All spaces and other punctuation were removed and the country code was included preceeded by a "+".![gcp-review-patient-name-and-phone](./images/gcp-review-patient-name-and-phone.png)
+
+The table below describes the contents and expected ingestion pipeline behavior for each of the other files include in `sample-data/`. Feel free to try them out for yourself! 
 
 | Test File | File Contents | Expected Outcome |
 | --------- | --------------| ---------------- |
