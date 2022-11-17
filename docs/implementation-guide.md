@@ -174,8 +174,16 @@ At this point we have completed all of the necessary setup. We are now ready to 
 5. Ensure the `main` branch is selected and choose the environment you wish to deploy to and click the green `Run workflow` button. In the screenshot below we are deploying to our development environment which we have called `dev` 
 ![deployment-3](./images/deployment-3.png)
 
-### Step 10: Run End-to-end Functional Tests
-Now that the pipelines have been deployed we can conduct some basic manual tests to try them out. The [sample-data](../sample-data/) directory contains some dummy VXU messages that will test the sucess and failure modes of the ingestion pipeline. You may upload these files to the `source-data/vxu/` directory in the PHI storage bucket to test the ingestion pipeline. The precise name of the storage bucket will have the form `phdi-ENVIRONMENT-NAME-phi-bucket-PROJECT-ID`. The table below describes the contents and expected ingestion pipeline behavior for each test message.
+### Step 10: Run an Hl7v2 vaccination message through the pipeline 
+Now that the starter kit has been deployed we can run some data through it! The `sample-data/` directory in your forked version of the repository contains some dummy VXU messages that can be used to test the sucess and failure modes of the ingestion pipeline. To start let's lets use `VXU_single_messy_demo.hl7` file that has a single VXU message. The PID segment of this message (shown below) contains some dirty data:
+1. The patient's name is mixed case and contains a numeric character.
+2. The patient's phone number is not in a standard format.
+3. The patient's address is non-standard and has not been geocoded.
+
+`PID|1|7777555^4^M11^test^MR^University Hospital^19241011^19241012|PATID7755^5^M11^test1|PATID7758^^^test5`*`|doe .^ John1 ^A.|`*`TEST^Mother, of^L|198505101126+0215|M||2106-3^White^HL70005`*`|555 E. 3065 S.^^Salt Lake CIty^ut^84106^USA||801-540-3661^^CP|`*`||M^Married||4880776||||N^NOT HISPANIC OR LATINO^HL70189||N||US^United States of America^ISO3166_1||||N|||20080110015014+0315|||||||`
+
+
+ You may upload these files to the `source-data/vxu/` directory in the PHI storage bucket to test the ingestion pipeline. The precise name of the storage bucket will have the form `phdi-ENVIRONMENT-NAME-phi-bucket-PROJECT-ID`. The table below describes the contents and expected ingestion pipeline behavior for each test message.
 
 | Test File | File Contents | Expected Outcome |
 | --------- | --------------| ---------------- |
