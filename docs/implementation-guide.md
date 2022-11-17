@@ -189,13 +189,13 @@ If you would like feel free to confirm that this is the case by inspecting the f
  1. Open [https://console.cloud.google.com/getting-started](https://console.cloud.google.com/getting-started) in your browser.![gcp-getting-started](./images/gcp-getting-started.png)
  2. Ensure that you are using the google account that has access to the GCP project we have used so far.![gcp-getting-started-check-account](./images/gcp-getting-started-check-account.png)
  3. Select your project.![gcp-getting-started-select-project](./images/gcp-getting-started-select-project.png)
- 4. Search for `Storage` and navigate all of GCP storage buckets we have deployed.
- 5. Select the the PHI bucket, which is where all Protect Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi-ENVIRONMENT-NAME-phi-bucket-PROJECT-ID`.
- 6. Upload the `VXU_single_messy_demo.hl7` file from the `sample-data/` directory of your forked version of the repository to the `source-data/vxu/` directory of your PHI bucket. Note that because the ingestion pipeline is event-driven simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI for file creation events.
- 7. To see that the pipeline as executed search for `Workflows` and go to the Workflows page.
- 8. Select the ingestion pipeline workflow.
- 9. We should now see that the ingestion pipeline has processed one message successfully.
- 10. To view the YAML configuration for the pipeline and a visualization of the process go to the `Source` tab. 
+ 4. Search for `Cloud Storage` and navigate all of GCP storage buckets we have deployed.![gcp-search-cloud-storage](./images/gcp-search-cloud-storage.png)
+ 5. Select the the PHI bucket, which is where all Protect Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi-ENVIRONMENT-NAME-phi-bucket-PROJECT-ID`.[gcp-select-phi-bucket](./images/gcp-select-phi-bucket.png)
+ 6. Upload the `VXU_single_messy_demo.hl7` file from the `sample-data/` directory of your forked version of the repository to the `source-data/vxu/` directory of your PHI bucket. This can be done easily with the `UPLOAD` button, or by clicking and dragging the file into the bucket. Note that because the ingestion pipeline is event-driven simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI for file creation events.[gcp-upload-file](./images/gcp-upload-file.png)
+ 7. To see that the pipeline has executed search for `Workflows` and go to the Workflows page.[gcp-search-workflows](./images/gcp-search-workflows.png)
+ 8. Select the ingestion pipeline workflow.[gcp-select-ingestion-pipeline](./images/gcp-select-ingestion-pipeline.png)
+ 9. We should now see that the ingestion pipeline has processed one message successfully.[gcp-ingestion-single-execution](./images/gcp-ingestion-single-execution.png)
+ 10. To view the YAML configuration for the pipeline and a visualization of the process go to the `SOURCE` tab.[gcp-workflow-source](./images/gcp-workflow-source.png)
 
 | Test File | File Contents | Expected Outcome |
 | --------- | --------------| ---------------- |
