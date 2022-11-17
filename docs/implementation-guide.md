@@ -18,7 +18,7 @@
         - [Step 7: Run the Terraform Setup GitHub Workflow](#step-7-run-the-terraform-setup-github-workflow)
         - [Step 8: Create a Development Environment](#step-8-create-a-development-environment)
         - [Step 9: Run the Deployment GitHub Workflow](#step-9-run-the-deployment-github-workflow)
-        - [Step 10: Run End-to-end Functional Tests](#step-10-run-end-to-end-functional-tests)
+        - [Step 10: Run End-to-end Functional Tests](#step-10-run-an-hl7v2-vaccination-message-through-the-pipeline)
     - [Estimated Costs](#estimated-costs)
 
 ## Introduction
@@ -189,13 +189,21 @@ If you would like feel free to confirm that this is the case by inspecting the f
  1. Open [https://console.cloud.google.com/getting-started](https://console.cloud.google.com/getting-started) in your browser.![gcp-getting-started](./images/gcp-getting-started.png)
  2. Ensure that you are using the google account that has access to the GCP project we have used so far.![gcp-getting-started-check-account](./images/gcp-getting-started-check-account.png)
  3. Select your project.![gcp-getting-started-select-project](./images/gcp-getting-started-select-project.png)
- 4. Search for `Cloud Storage` and navigate all of GCP storage buckets we have deployed.![gcp-search-cloud-storage](./images/gcp-search-cloud-storage.png)
+ 4. Search for and select `Cloud Storage` to view all of GCP storage buckets we have deployed.![gcp-search-cloud-storage](./images/gcp-search-cloud-storage.png)
  5. Select the the PHI bucket, which is where all Protect Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi-ENVIRONMENT-NAME-phi-bucket-PROJECT-ID`.![gcp-select-phi-bucket](./images/gcp-select-phi-bucket.png)
  6. Upload the `VXU_single_messy_demo.hl7` file from the `sample-data/` directory of your forked version of the repository to the `source-data/vxu/` directory of your PHI bucket. This can be done easily with the `UPLOAD` button, or by clicking and dragging the file into the bucket. Note that because the ingestion pipeline is event-driven simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI for file creation events.![gcp-upload-file](./images/gcp-upload-file.png)
  7. To see that the pipeline has executed search for `Workflows` and go to the Workflows page.![gcp-search-workflows](./images/gcp-search-workflows.png)
  8. Select the ingestion pipeline workflow.![gcp-select-ingestion-pipeline](./images/gcp-select-ingestion-pipeline.png)
  9. We should now see that the ingestion pipeline has processed one message successfully.![gcp-ingestion-single-execution](./images/gcp-ingestion-single-execution.png)
  10. To view the YAML configuration for the pipeline and a visualization of the process go to the `SOURCE` tab.![gcp-workflow-source](./images/gcp-workflow-source.png)
+ 11. To view the cleaned and enriched data in the FHIR server search for and select `FHIR Viewer`.![gcp-search-fhir-viewer](./images/gcp-search-fhir-viewer.png)
+ 12. Select the FHIR store that we deployed.![gcp-select-fhir-store](./images/gcp-select-fhir-store.png)
+ 13. Go the `SEARCH` tab, paste `Patient?family=DOE&given=JOHN` into the `NEW SEARCH` window and click `RUN SEARCH`. This executes a search on the FHIR store for all Patient resources named John Doe.![gcp-search-fhir-store](./images/gcp-search-fhir-store.png)
+ 14. Select the Patient resource returned by the search and go to the `JSON` tab. ![gcp-select-patient](./images/gcp-select-patient.png)
+ 15. Scrolling through the JSON: 
+    - Lines 10 through 34 show that the patient's address was standardized and enriched with latitude and longitude as a result of geocoding.
+    - Lines 144 through 152 show that the patient's name was standardized to upper case letters and all non-alpha characters were removed.
+    - Lines 154 through 160 show that the patient's phone number was standardized to the ISO E.164 format. All spaces and other punctuation were removed and the country code was included preceeded by a `+`.
 
 | Test File | File Contents | Expected Outcome |
 | --------- | --------------| ---------------- |
