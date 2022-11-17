@@ -198,12 +198,12 @@ If you would like feel free to confirm that this is the case by inspecting the f
  10. To view the YAML configuration for the pipeline and a visualization of the process go to the `SOURCE` tab.![gcp-workflow-source](./images/gcp-workflow-source.png)
  11. To view the cleaned and enriched data in the FHIR server search for and select `FHIR Viewer`.![gcp-search-fhir-viewer](./images/gcp-search-fhir-viewer.png)
  12. Select the FHIR store that we deployed.![gcp-select-fhir-store](./images/gcp-select-fhir-store.png)
- 13. Go the `SEARCH` tab, paste `Patient?family=DOE&given=JOHN` into the `NEW SEARCH` window and click `RUN SEARCH`. This executes a search on the FHIR store for all Patient resources named John Doe.![gcp-search-fhir-store](./images/gcp-search-fhir-store.png)
+ 13. Go the `SEARCH` tab, paste `Patient?family=DOE&given=JOHN` into the `NEW SEARCH` window, and click `RUN SEARCH`. This executes a search on the FHIR store for all Patient resources named John Doe.![gcp-search-fhir-store](./images/gcp-search-fhir-store.png)
  14. Select the Patient resource returned by the search and go to the `JSON` tab. ![gcp-select-patient](./images/gcp-select-patient.png)
  15. Scrolling through the JSON: 
-    - Lines 10 through 34 show that the patient's address was standardized and enriched with latitude and longitude as a result of geocoding.
+    - Lines 10 through 34 show that the patient's address was standardized and enriched with latitude and longitude as a result of geocoding.![gcp-review-patient-address](./images/gcp-review-patient-address.png)
     - Lines 144 through 152 show that the patient's name was standardized to upper case letters and all non-alpha characters were removed.
-    - Lines 154 through 160 show that the patient's phone number was standardized to the ISO E.164 format. All spaces and other punctuation were removed and the country code was included preceeded by a `+`.
+    - Lines 154 through 160 show that the patient's phone number was standardized to the ISO E.164 format. All spaces and other punctuation were removed and the country code was included preceeded by a `+`.![gcp-review-patient-name-and-phone](./images/gcp-review-patient-name-and-phone.png)
 
 | Test File | File Contents | Expected Outcome |
 | --------- | --------------| ---------------- |
