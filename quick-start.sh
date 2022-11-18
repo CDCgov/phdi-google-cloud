@@ -115,7 +115,7 @@ else
   echo
 
   PROJECT_NAME=$(gum input --prompt="Please enter a name for a new $(pink 'Project'). " --placeholder="Project name")
-  PROJECT_ID=$(echo $PROJECT_NAME | awk '{print tolower($0)}')-001
+  PROJECT_ID=$(echo $PROJECT_NAME | awk '{print tolower($0)}')-$(date +"%s")
   gum spin -s line --title "Creating $(pink 'project')..." -- gcloud projects create $PROJECT_ID --name="${PROJECT_NAME}"
 fi
 
