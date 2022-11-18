@@ -93,6 +93,7 @@ set_gh_repo_secrets() {
 if ! command -v gum &> /dev/null; then
     echo "Installing gum..."
     go install github.com/charmbracelet/gum@latest
+    clear
 fi
 
 # Intro text
