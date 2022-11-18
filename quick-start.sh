@@ -106,7 +106,6 @@ echo
 if gum confirm "Do you already have a $(pink 'Project') in Google Cloud Platform?"; then
   echo "We will now get the ID of your existing Google Cloud $(pink 'project'). A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
   echo
-  sleep 2
 
   echo "Please select the $(pink 'project') you want to use:"
   PROJECT_NAME=$(gcloud projects list | sed -n '/NAME: /s///gp' | gum choose)
@@ -114,22 +113,10 @@ if gum confirm "Do you already have a $(pink 'Project') in Google Cloud Platform
 else
   echo "Thank you! We will now create a new Google Cloud $(pink 'project') for you. A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
   echo
-  sleep 2
 
   PROJECT_NAME=$(gum input --prompt="Please enter a name for a new $(pink 'Project'). " --placeholder="Project name")
-  gum spin -s line --title "Creating $(pink 'project')..." -- gcloud projects create --name="${PROJECT_NAME}"
-  gum spin -s line --title "Waiting for $(pink 'project') to be ready..." -- sleep 80
-  PROJECT_ID=$(gcloud projects list --filter="name:'${PROJECT_NAME}'" --format="value(projectId)")
-  CHECK_COUNT=0
-  while [ -z "$PROJECT_ID" ]; do
-      gum spin -s line --title "Waiting for $(pink 'project') to be ready..." -- sleep 5
-      PROJECT_ID=$(gcloud projects list --filter="name:'${PROJECT_NAME}'" --format="value(projectId)")
-      CHECK_COUNT=$((CHECK_COUNT+1))
-      if [ $CHECK_COUNT -gt 12 ]; then
-          echo "Error: Project ID not found. To list projects, run 'gcloud projects list'."
-          exit 1
-      fi
-  done
+  PROJECT_ID=$(echo $PROJECT_NAME | awk '{print tolower($0)}')-001
+  gum spin -s line --title "Creating $(pink 'project')..." -- gcloud projects create $PROJECT_ID --name="${PROJECT_NAME}"
 fi
 
 # Set the current project to the PROJECT_ID specified above
