@@ -92,10 +92,7 @@ set_gh_repo_secrets() {
 # Install gum
 if ! command -v gum &> /dev/null; then
     echo "Installing gum..."
-    sudo mkdir -p /etc/apt/keyrings
-    curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
-    echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
-    sudo apt update && sudo apt install gum
+    go install github.com/charmbracelet/gum@latest
 fi
 
 # Intro text
@@ -104,38 +101,34 @@ echo "This script will help you setup $(pink 'gcloud') authentication for GitHub
 echo "We need some info from you to get started."
 echo
 
-# Prompt user for project name
+# Check if new project, create a project if needed and get the project ID
 if gum confirm "Do you already have a $(pink 'Project') in Google Cloud Platform?"; then
-  PROJECT_NAME=$(gum input --prompt="Please enter the name of the existing $(pink 'Project'). " --placeholder="Project name")
-  NEW_PROJECT=false
+  echo "We will now get the ID of your existing Google Cloud $(pink 'project'). A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
+  echo
+  sleep 2
+
+  echo "Please select the $(pink 'project') you want to use:"
+  PROJECT_NAME=$(gcloud projects list | sed -n '/NAME: /s///gp' | gum choose)
+  PROJECT_ID=$(gcloud projects list --filter="name:${PROJECT_NAME}" --format="value(projectId)")
 else
+  echo "Thank you! We will now create a new Google Cloud $(pink 'project') for you. A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
+  echo
+  sleep 2
+
   PROJECT_NAME=$(gum input --prompt="Please enter a name for a new $(pink 'Project'). " --placeholder="Project name")
-  NEW_PROJECT=true
-fi
-
-# Create a project if needed and get the project ID
-if [ $NEW_PROJECT = true ]; then
-    echo "Thank you! We will now create a new Google Cloud $(pink 'project') for you. A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
-    echo
-
-    sleep 2
-    gum spin -s line --title "Creating $(pink 'project')..." -- gcloud projects create --name="${PROJECT_NAME}"
-    CHECK_COUNT=0
-    while [ -z "$PROJECT_ID" ]; do
-        gum spin -s line --title "Waiting for $(pink 'project') to be ready..." -- sleep 5
-        PROJECT_ID=$(gcloud projects list --filter="name:'${PROJECT_NAME}'" --format="value(projectId)")
-        CHECK_COUNT=$((CHECK_COUNT+1))
-        if [ $CHECK_COUNT -gt 12 ]; then
-            echo "Error: Project ID not found. To list projects, run 'gcloud projects list'."
-            exit 1
-        fi
-    done
-else
-    echo "Thank you! We will now get the ID of your existing Google Cloud $(pink 'project'). A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
-    echo
-
-    sleep 2
-    PROJECT_ID=$(gcloud projects list --filter="name:${PROJECT_NAME}" --format="value(projectId)")
+  gum spin -s line --title "Creating $(pink 'project')..." -- gcloud projects create --name="${PROJECT_NAME}"
+  gum spin -s line --title "Waiting for $(pink 'project') to be ready..." -- sleep 80
+  PROJECT_ID=$(gcloud projects list --filter="name:'${PROJECT_NAME}'" --format="value(projectId)")
+  CHECK_COUNT=0
+  while [ -z "$PROJECT_ID" ]; do
+      gum spin -s line --title "Waiting for $(pink 'project') to be ready..." -- sleep 5
+      PROJECT_ID=$(gcloud projects list --filter="name:'${PROJECT_NAME}'" --format="value(projectId)")
+      CHECK_COUNT=$((CHECK_COUNT+1))
+      if [ $CHECK_COUNT -gt 12 ]; then
+          echo "Error: Project ID not found. To list projects, run 'gcloud projects list'."
+          exit 1
+      fi
+  done
 fi
 
 # Set the current project to the PROJECT_ID specified above
@@ -175,17 +168,45 @@ fi
 echo "GitHub repository $(pink 'set')!"
 echo
 
+# Set up Workload Identity
 gum spin -s line --title "Setting up Workload Identity Federation..." -- setup_workload_identity
 
 echo "Workload Identity Federation setup $(pink 'complete')!"
 echo
 
+# Set up GitHub Secrets
 gum spin -s line --title "Setting repository secrets..." -- set_gh_repo_secrets
 
 echo "Repository secrets set!"
 echo
-sleep 1
+
+# Create dev environment in GitHub
+gum spin -s line --title "Creating $(pink 'dev') environment..." -- gh api -X PUT "repos/${GITHUB_REPO}/environments/dev" --silent
+
+# Run Terraform Setup workflow
+echo "We will now run the $(pink 'Terraform Setup') workflow to create the necessary storage account for Terraform in Google Cloud."
+gum spin -s line --title "Running Terraform Setup workflow..." -- gh workflow run terraformSetup.yml
+
+# Run optional deployment workflow
+if gum confirm "Would you like to deploy the $(pink 'PHDI Google Cloud') infrastructure to your Google Cloud project?"; then
+  echo "We will now run the $(pink 'Terraform Deploy') workflow to deploy the infrastructure to your Google Cloud project."
+  gum spin -s line --title "Running Terraform Deploy workflow..." -- gh workflow run deployment.yml -f environment=dev
+  DEPLOYED=true
+fi
 
 # Sendoff
 clear
-gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Quick start $(pink 'complete')! You can now continue with the Quick Start instructions in the README.md file."
+gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Quick start $(pink 'complete')! You can view your forked repository at https://github.com/${GITHUB_REPO}."
+echo
+echo "To view the status of your workflows, go to https://github.com/${GITHUB_REPO}/actions."
+echo
+if [ "$DEPLOYED" = true ]; then
+  echo "Your infrastructure is deployed! To trigger your new pipeline, upload a file to the $(pink 'phdi-dev-phi') bucket at https://console.cloud.google.com/storage/browser."
+  echo
+fi
+else
+  echo "To deploy the infrastructure to your Google Cloud project, run the $(pink 'deployment') workflow at https://github.com/${GITHUB_REPO}/actions/workflows/deployment.yaml."
+fi
+
+echo
+echo "Thanks for using the $(pink 'PHDI Google Cloud') quick start script!"
