@@ -104,22 +104,6 @@ echo "This script will help you setup $(pink 'gcloud') authentication for GitHub
 echo "We need some info from you to get started."
 echo
 
-# Prompt for region, zone, and Smarty creds
-echo "Please select the $(pink 'region') you would like to deploy to."
-echo "More info: https://cloud.google.com/compute/docs/regions-zones/regions-zones"
-REGION=$(gcloud compute regions list --filter="name~'us-'" | tail +2 | awk '{print $1}' | gum choose)
-
-echo "Please select the $(pink 'zone') you would like to deploy to."
-ZONE=$(gcloud compute zones list --filter="name~'${REGION}'" | tail +2 | awk '{print $1}' | gum choose)
-
-echo "Please enter the $(pink 'Authorization ID') of your Smarty Street Account."
-echo "More info: https://www.smarty.com/docs/cloud/authentication"
-SMARTY_AUTH_ID=$(gum input --placeholder="Authorization ID")
-
-echo "Please enter the $(pink 'Authorization Token') of your Smarty Street Account."
-echo "More info: https://www.smarty.com/docs/cloud/authentication"
-SMARTY_AUTH_TOKEN=$(gum input --placeholder="Authorization Token")
-
 # Prompt user for project name
 if gum confirm "Do you already have a $(pink 'Project') in Google Cloud Platform?"; then
   PROJECT_NAME=$(gum input --prompt="Please enter the name of the existing $(pink 'Project'). " --placeholder="Project name")
@@ -156,6 +140,22 @@ fi
 
 # Set the current project to the PROJECT_ID specified above
 gum spin -s line --title "Setting gcloud default $(pink 'project')..." -- gcloud config set project "${PROJECT_ID}"
+
+# Prompt for region, zone, and Smarty creds
+echo "Please select the $(pink 'region') you would like to deploy to."
+echo "More info: https://cloud.google.com/compute/docs/regions-zones/regions-zones"
+REGION=$(gcloud compute regions list --filter="name~'us-'" | tail +2 | awk '{print $1}' | gum choose)
+
+echo "Please select the $(pink 'zone') you would like to deploy to."
+ZONE=$(gcloud compute zones list --filter="name~'${REGION}'" | tail +2 | awk '{print $1}' | gum choose)
+
+echo "Please enter the $(pink 'Authorization ID') of your Smarty Street Account."
+echo "More info: https://www.smarty.com/docs/cloud/authentication"
+SMARTY_AUTH_ID=$(gum input --placeholder="Authorization ID")
+
+echo "Please enter the $(pink 'Authorization Token') of your Smarty Street Account."
+echo "More info: https://www.smarty.com/docs/cloud/authentication"
+SMARTY_AUTH_TOKEN=$(gum input --placeholder="Authorization Token")
 
 # Login to gh CLI
 echo "Project ID $(pink 'set')! We will now login to the $(pink 'GitHub CLI'). Copy the provided code and then click the link that will be printed. Paste the code into the browser tab that opens. Then return to this terminal!"
