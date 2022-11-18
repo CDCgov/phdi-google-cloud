@@ -11,7 +11,7 @@
     - [Implementing the PHDI Google Cloud Platform Pipelines](#implementing-the-phdi-google-cloud-platform-pipelines)
         - [User Assumptions](#user-assumptions)
         - [Step 1: Prepare Your GCP Environment](#step-1-prepare-your-gcp-environment)
-        - [Step 2: Install the Gcloud CLI](#step-2-install-the-gcloud-cli)
+        - [Step 2: Install the Gcloud CLI](#step-2-install-the-gcloud-and-github-cli-tools)
         - [Step 3: Fork the phdi-google-cloud Repository](#step-3-fork-the-phdi-google-cloud-repository)
         - [Step 4: Clone the Forked Repository](#step-4-clone-the-forked-repository)
         - [Step 5: Run the Quick Start Script](#step-5-run-the-quick-start-script)
