@@ -16,77 +16,10 @@ pink() {
   colorize 212 "$1"
 }
 
-enable_gcloud_apis() {
-  gcloud services enable \
-      compute.googleapis.com \
-      iam.googleapis.com \
-      cloudresourcemanager.googleapis.com \
-      iamcredentials.googleapis.com \
-      sts.googleapis.com \
-      serviceusage.googleapis.com
-}
-
-setup_workload_identity() {
-  # Create a service account
-  gcloud iam service-accounts create "github" \
-    --project "${PROJECT_ID}" \
-    --display-name "github"
-
-  # Get the service account ID and set some variables
-  SERVICE_ACCOUNT_ID=$(gcloud iam service-accounts list --filter="displayName:github" --format="value(email)")
-
-  # Grant the service account the owner role on the project
-  gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
-    --member="serviceAccount:${SERVICE_ACCOUNT_ID}" \
-    --role="roles/owner"
-
-  if [ $NEW_PROJECT = true ]; then
-      sleep 60
-  fi
-
-  # Create a Workload Identity Pool
-  gcloud iam workload-identity-pools create "github-pool" \
-    --project="${PROJECT_ID}" \
-    --location="global" \
-    --display-name="github pool"
-
-  # Get the full ID of the Workload Identity Pool
-  WORKLOAD_IDENTITY_POOL_ID=$(gcloud iam workload-identity-pools describe "github-pool" \
-    --project="${PROJECT_ID}" \
-    --location="global" \
-    --format="value(name)")
-
-  # Create a Workload Identity Provider in that pool
-  gcloud iam workload-identity-pools providers create-oidc "github-provider" \
-    --project="${PROJECT_ID}" \
-    --location="global" \
-    --workload-identity-pool="github-pool" \
-    --display-name="github provider" \
-    --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
-    --issuer-uri="https://token.actions.githubusercontent.com"
-
-  # Allow authentications from the Workload Identity Provider originating from your repository to impersonate the Service Account created above
-  gcloud iam service-accounts add-iam-policy-binding "${SERVICE_ACCOUNT_ID}" \
-    --project="${PROJECT_ID}" \
-    --role="roles/iam.workloadIdentityUser" \
-    --member="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_POOL_ID}/attribute.repository/${GITHUB_REPO}"
-
-  # Extract the Workload Identity Provider resource name
-  WORKLOAD_IDENTITY_PROVIDER=$(gcloud iam workload-identity-pools providers describe "github-provider" \
-    --project="${PROJECT_ID}" \
-    --location="global" \
-    --workload-identity-pool="github-pool" \
-    --format="value(name)")
-}
-
-set_gh_repo_secrets() {
-  gh secret -R "${GITHUB_REPO}" set PROJECT_ID --body "${PROJECT_ID}" 
-  gh secret -R "${GITHUB_REPO}" set SERVICE_ACCOUNT_ID --body "${SERVICE_ACCOUNT_ID}"
-  gh secret -R "${GITHUB_REPO}" set WORKLOAD_IDENTITY_PROVIDER --body "${WORKLOAD_IDENTITY_PROVIDER}"
-  gh secret -R "${GITHUB_REPO}" set REGION --body "${REGION}"
-  gh secret -R "${GITHUB_REPO}" set ZONE --body "${ZONE}"
-  gh secret -R "${GITHUB_REPO}" set SMARTY_AUTH_ID --body "${SMARTY_AUTH_ID}"
-  gh secret -R "${GITHUB_REPO}" set SMARTY_AUTH_TOKEN --body "${SMARTY_AUTH_TOKEN}"
+spin() {
+  local -r title="${1}"
+  shift 1
+  gum spin -s line --title "${title}" -- $@
 }
 
 ### Main ###
@@ -118,27 +51,36 @@ else
 
   PROJECT_NAME=$(gum input --prompt="Please enter a name for a new $(pink 'Project'). " --placeholder="Project name")
   PROJECT_ID=$(echo $PROJECT_NAME | awk '{print tolower($0)}')-$(date +"%s")
-  gum spin -s line --title "Creating $(pink 'project')..." -- gcloud projects create $PROJECT_ID --name="${PROJECT_NAME}"
+  spin "Creating $(pink 'project')..." gcloud projects create $PROJECT_ID --name="${PROJECT_NAME}"
 fi
 
 # Set the current project to the PROJECT_ID specified above
-gum spin -s line --title "Setting gcloud default $(pink 'project')..." -- gcloud config set project "${PROJECT_ID}"
+spin "Setting gcloud default $(pink 'project')..." gcloud config set project "${PROJECT_ID}"
 
 # Link the project to a billing account
 echo "We will now link your $(pink 'project') to a billing account. Please select the billing account you would like to use."
-while [ gcloud beta billing accounts list --format json | jq '. | length' -eq 0 ]; do
+BILLING_ACCOUNT_COUNT=$(gcloud beta billing accounts list --format json | jq '. | length')
+while [ BILLING_ACCOUNT_COUNT -eq 0 ]; do
   echo "You don't have any billing accounts yet. Please create one in the Google Cloud Console at https://console.cloud.google.com/billing."
   echo "Press $(pink 'Enter') to continue once the billing account is created. Type $(pink 'exit') to exit the script."
   read SHOULD_CONTINUE
   if [ $SHOULD_CONTINUE = "exit" ]; then
     exit 1
+  else
+    BILLING_ACCOUNT_COUNT=$(gcloud beta billing accounts list --format json | jq '. | length')
   fi
 done
 BILLING_ACCOUNT_ID=$(gcloud beta billing accounts list --format="csv(displayName,name)" | gum table -w 25,25 | cut -d ',' -f 2)
-gum spin -s line --title "Linking $(pink 'project') to billing account..." -- gcloud beta billing projects link "${PROJECT_ID}" --billing-account="${BILLING_ACCOUNT_ID}"
+spin "Linking $(pink 'project') to billing account..." gcloud beta billing projects link "${PROJECT_ID}" --billing-account="${BILLING_ACCOUNT_ID}"
 
 # Enable necessary APIs
-gum spin -s line --title "Enabling $(pink 'gcloud APIs')..." -- enable_gcloud_apis
+spin "Enabling $(pink 'gcloud APIs')..." gcloud services enable \
+      compute.googleapis.com \
+      iam.googleapis.com \
+      cloudresourcemanager.googleapis.com \
+      iamcredentials.googleapis.com \
+      sts.googleapis.com \
+      serviceusage.googleapis.com
 
 # Prompt for region, zone, and Smarty creds
 echo "Please select the $(pink 'region') you would like to deploy to."
@@ -168,35 +110,93 @@ if gum confirm "Have you already forked the $(pink 'phdi-google-cloud') reposito
   REPO_NAME=$(gh repo list --fork --json name --jq ".[].name" | gum choose)
   GITHUB_REPO="${GITHUB_USER}/${REPO_NAME}"
 else
-  gum spin -s line --title "Forking repository..." -- gh repo fork CDCgov/phdi-google-cloud
+  spin "Forking repository..." gh repo fork CDCgov/phdi-google-cloud
   GITHUB_REPO="${GITHUB_USER}/phdi-google-cloud"
 fi
 echo "GitHub repository $(pink 'set')!"
 echo
 
-# Set up Workload Identity
-gum spin -s line --title "Setting up Workload Identity Federation..." -- setup_workload_identity
+### Set up Workload Identity ###
+
+# Create a service account
+spin "Creating service account..." gcloud iam service-accounts create "github" \
+  --project "${PROJECT_ID}" \
+  --display-name "github"
+
+# Get the service account ID and set some variables
+SERVICE_ACCOUNT_ID=$(gcloud iam service-accounts list --filter="displayName:github" --format="value(email)")
+
+# Grant the service account the owner role on the project
+spin "Granting service account owner role..." gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${SERVICE_ACCOUNT_ID}" \
+  --role="roles/owner"
+
+if [ $NEW_PROJECT = true ]; then
+    spin "Waiting for service account to be ready..." sleep 60
+fi
+
+# Create a Workload Identity Pool
+spin "Creating workload identity pool..." gcloud iam workload-identity-pools create "github-pool" \
+  --project="${PROJECT_ID}" \
+  --location="global" \
+  --display-name="github pool"
+
+# Get the full ID of the Workload Identity Pool
+WORKLOAD_IDENTITY_POOL_ID=$(gcloud iam workload-identity-pools describe "github-pool" \
+  --project="${PROJECT_ID}" \
+  --location="global" \
+  --format="value(name)")
+
+# Create a Workload Identity Provider in that pool
+spin "Creating workload identity provider..." gcloud iam workload-identity-pools providers create-oidc "github-provider" \
+  --project="${PROJECT_ID}" \
+  --location="global" \
+  --workload-identity-pool="github-pool" \
+  --display-name="github provider" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
+  --issuer-uri="https://token.actions.githubusercontent.com"
+
+# Allow authentications from the Workload Identity Provider originating from your repository to impersonate the Service Account created above
+spin "Adding IAM policy binding for GitHub repo..." gcloud iam service-accounts add-iam-policy-binding "${SERVICE_ACCOUNT_ID}" \
+  --project="${PROJECT_ID}" \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_POOL_ID}/attribute.repository/${GITHUB_REPO}"
+
+# Extract the Workload Identity Provider resource name
+WORKLOAD_IDENTITY_PROVIDER=$(gcloud iam workload-identity-pools providers describe "github-provider" \
+  --project="${PROJECT_ID}" \
+  --location="global" \
+  --workload-identity-pool="github-pool" \
+  --format="value(name)")
 
 echo "Workload Identity Federation setup $(pink 'complete')!"
 echo
 
-# Set up GitHub Secrets
-gum spin -s line --title "Setting repository secrets..." -- set_gh_repo_secrets
+### GitHub Actions ###
 
-echo "Repository secrets set!"
+# Set up GitHub Secrets
+spin "Setting PROJECT_ID..." gh secret -R "${GITHUB_REPO}" set PROJECT_ID --body "${PROJECT_ID}" 
+spin "Setting SERVICE_ACCOUNT_ID..." gh secret -R "${GITHUB_REPO}" set SERVICE_ACCOUNT_ID --body "${SERVICE_ACCOUNT_ID}"
+spin "Setting WORKLOAD_IDENTITY_PROVIDER..." gh secret -R "${GITHUB_REPO}" set WORKLOAD_IDENTITY_PROVIDER --body "${WORKLOAD_IDENTITY_PROVIDER}"
+spin "Setting REGION..." gh secret -R "${GITHUB_REPO}" set REGION --body "${REGION}"
+spin "Setting ZONE..." gh secret -R "${GITHUB_REPO}" set ZONE --body "${ZONE}"
+spin "Setting SMARTY_AUTH_ID..." gh secret -R "${GITHUB_REPO}" set SMARTY_AUTH_ID --body "${SMARTY_AUTH_ID}"
+spin "Setting SMARTY_AUTH_TOKEN..." gh secret -R "${GITHUB_REPO}" set SMARTY_AUTH_TOKEN --body "${SMARTY_AUTH_TOKEN}"
+
+echo "Repository secrets $(pink 'set')!"
 echo
 
 # Create dev environment in GitHub
-gum spin -s line --title "Creating $(pink 'dev') environment..." -- gh api -X PUT "repos/${GITHUB_REPO}/environments/dev" --silent
+spin "Creating $(pink 'dev') environment..." gh api -X PUT "repos/${GITHUB_REPO}/environments/dev" --silent
 
 # Run Terraform Setup workflow
 echo "We will now run the $(pink 'Terraform Setup') workflow to create the necessary storage account for Terraform in Google Cloud."
-gum spin -s line --title "Running Terraform Setup workflow..." -- gh workflow run terraformSetup.yml
+spin "Running Terraform Setup workflow..." gh workflow run terraformSetup.yml
 
 # Run optional deployment workflow
 if gum confirm "Would you like to deploy the $(pink 'PHDI Google Cloud') infrastructure to your Google Cloud project?"; then
   echo "We will now run the $(pink 'Terraform Deploy') workflow to deploy the infrastructure to your Google Cloud project."
-  gum spin -s line --title "Running Terraform Deploy workflow..." -- gh workflow run deployment.yml -f environment=dev
+  spin "Running Terraform Deploy workflow..." gh workflow run deployment.yml -f environment=dev
   DEPLOYED=true
 fi
 
