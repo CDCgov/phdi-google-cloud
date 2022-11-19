@@ -16,15 +16,17 @@ pink() {
   colorize 212 "$1"
 }
 
-setup_workload_identity() {
-  # Enable necessary APIs
+enable_gcloud_apis() {
   gcloud services enable \
+      compute.googleapis.com \
       iam.googleapis.com \
       cloudresourcemanager.googleapis.com \
       iamcredentials.googleapis.com \
       sts.googleapis.com \
       serviceusage.googleapis.com
+}
 
+setup_workload_identity() {
   # Create a service account
   gcloud iam service-accounts create "github" \
     --project "${PROJECT_ID}" \
@@ -121,6 +123,22 @@ fi
 
 # Set the current project to the PROJECT_ID specified above
 gum spin -s line --title "Setting gcloud default $(pink 'project')..." -- gcloud config set project "${PROJECT_ID}"
+
+# Link the project to a billing account
+echo "We will now link your $(pink 'project') to a billing account. Please select the billing account you would like to use."
+while [ gcloud beta billing accounts list --format json | jq '. | length' -eq 0 ]; then
+  echo "You don't have any billing accounts yet. Please create one in the Google Cloud Console at https://console.cloud.google.com/billing."
+  echo "Press $(pink 'Enter') to continue once the billing account is created. Type $(pink 'exit') to exit the script."
+  read SHOULD_CONTINUE
+  if [ $SHOULD_CONTINUE = "exit" ]; then
+    exit 1
+  fi
+fi
+BILLING_ACCOUNT_ID=$(gcloud beta billing accounts list --format="csv(displayName,name)" | gum table -w 25,25 | cut -d ',' -f 2)
+gum spin -s line --title "Linking $(pink 'project') to billing account..." -- gcloud beta billing projects link "${PROJECT_ID}" --billing-account="${BILLING_ACCOUNT_ID}"
+
+# Enable necessary APIs
+gum spin -s line --title "Enabling $(pink 'gcloud APIs')..." -- enable_gcloud_apis
 
 # Prompt for region, zone, and Smarty creds
 echo "Please select the $(pink 'region') you would like to deploy to."
