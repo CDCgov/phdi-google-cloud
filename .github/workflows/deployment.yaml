@@ -78,7 +78,8 @@ jobs:
           declare -a CONTAINER_IMAGES=("fhir-converter" "phdi-ingestion" "phdi-tabulation")
           for IMAGE in CONTAINER_IMAGES
           do
-            PHDI_TAG="ghcr.io/cdcgov/phdi/$IMAGE:main"
+            PHDI_TAG="ghcr.io/cdcgov/phdi/${ IMAGE }:main"
+            echo $PHDI_TAG
             GCP_TAG="${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/phdi-${{ env.ENVIRONMENT }}-repository/$IMAGE:latest"
             docker pull $PHDI_TAG
             docker tag $PHDI_TAG $GCP_TAG
