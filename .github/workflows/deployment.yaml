@@ -73,14 +73,17 @@ jobs:
       - name: Log in to artifact registry with docker
         run: gcloud auth configure-docker ${{ secrets.REGION }}-docker.pkg.dev
 
-      - name: Build and push FHIR Converter
-        uses: docker/build-push-action@v3
-        with:
-          context: ./cloud-run/fhir-converter
-          push: true
-          tags: ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/phdi-${{ env.ENVIRONMENT }}-repository/fhir-converter:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Push container images to GCP Artifact Registry
+        run: |
+          declare -a CONTAINER_IMAGES=("fhir-converter" "phdi-ingestion" "phdi-tabulation")
+          for IMAGE in CONTAINER_IMAGES
+          do
+            PHDI_TAG="ghcr.io/cdcgov/phdi/$IMAGE:main"
+            GCP_TAG="${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/phdi-${{ env.ENVIRONMENT }}-repository/$IMAGE:latest"
+            docker pull $PHDI_TAG
+            docker tag $PHDI_TAG $GCP_TAG
+            docker push $GCP_TAG
+          done
 
       - name: terraform apply
         run: terraform apply -auto-approve -lock-timeout=30m
