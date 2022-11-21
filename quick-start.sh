@@ -22,14 +22,39 @@ spin() {
   gum spin -s line --title "${title}" -- $@
 }
 
+enable_billing() {
+  BILLING_ACCOUNT_COUNT=$(gcloud beta billing accounts list --format json | jq '. | length')
+  while [ BILLING_ACCOUNT_COUNT -eq 0 ]; do
+    echo "You don't have any $(pink 'billing accounts') yet."
+    echo "If you are responsible for billing, please create one in the Google Cloud Console at https://console.cloud.google.com/billing."
+    echo "If you are not responsible for billing, please ask your billing admin to create one for you."
+    echo "Press $(pink 'Enter') to continue once the billing account is created. Type $(pink 'exit') to exit the script."
+    read SHOULD_CONTINUE
+    if [ $SHOULD_CONTINUE = "exit" ]; then
+      exit 1
+    else
+      BILLING_ACCOUNT_COUNT=$(gcloud beta billing accounts list --format json | jq '. | length')
+    fi
+  done
+  echo "You have $(pink $BILLING_ACCOUNT_COUNT) billing account(s)."
+  echo "Please select the billing account you want to use for this project."
+  BILLING_ACCOUNT_ID=$(gcloud beta billing accounts list --format="csv(displayName,name)" | gum table -w 25,25 | cut -d ',' -f 2)
+}
+
+link_billing_account() {
+  spin "Linking $(pink 'project') to billing account..." gcloud beta billing projects link "${PROJECT_ID}" --billing-account="${BILLING_ACCOUNT_ID}"
+
+}
+
 ### Main ###
 
 # Install gum
 if ! command -v gum &> /dev/null; then
     echo "Installing gum..."
     go install github.com/charmbracelet/gum@latest
-    clear
 fi
+
+clear
 
 # Intro text
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Welcome to the $(pink 'PHDI Google Cloud') setup script!"
@@ -43,35 +68,34 @@ if gum confirm "Do you already have a $(pink 'Project') in Google Cloud Platform
   echo
 
   echo "Please select the $(pink 'project') you want to use:"
-  PROJECT_NAME=$(gcloud projects list | sed -n '/NAME: /s///gp' | gum choose)
+  PROJECT_NAME=$(gcloud projects list --format="value(name)" | gum choose)
   PROJECT_ID=$(gcloud projects list --filter="name:${PROJECT_NAME}" --format="value(projectId)")
-else
-  echo "Thank you! We will now create a new Google Cloud $(pink 'project') for you. A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
+  echo "You selected $(pink "${PROJECT_NAME}") with ID $(pink "${PROJECT_ID}")."
   echo
+
+  # Check if billing is enabled, enable billing if needed and link billing account to project
+  BILLING_ENABLED=$(gcloud beta billing projects describe "${PROJECT_ID}" --format="value(billingEnabled)")
+  if [[ "${BILLING_ENABLED}" == "False" ]]; then
+    enable_billing
+    link_billing_account
+  fi
+else
+  echo "Thank you! We will now attempt to create a new Google Cloud $(pink 'project') for you. A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
+  echo
+
+  # Check if billing is enabled, enable billing if needed
+  enable_billing
 
   PROJECT_NAME=$(gum input --prompt="Please enter a name for a new $(pink 'Project'). " --placeholder="Project name")
   PROJECT_ID=$(echo $PROJECT_NAME | awk '{print tolower($0)}')-$(date +"%s")
   spin "Creating $(pink 'project')..." gcloud projects create $PROJECT_ID --name="${PROJECT_NAME}"
+
+  # Link billing account to project
+  link_billing_account
 fi
 
 # Set the current project to the PROJECT_ID specified above
 spin "Setting gcloud default $(pink 'project')..." gcloud config set project "${PROJECT_ID}"
-
-# Link the project to a billing account
-echo "We will now link your $(pink 'project') to a billing account. Please select the billing account you would like to use."
-BILLING_ACCOUNT_COUNT=$(gcloud beta billing accounts list --format json | jq '. | length')
-while [ BILLING_ACCOUNT_COUNT -eq 0 ]; do
-  echo "You don't have any billing accounts yet. Please create one in the Google Cloud Console at https://console.cloud.google.com/billing."
-  echo "Press $(pink 'Enter') to continue once the billing account is created. Type $(pink 'exit') to exit the script."
-  read SHOULD_CONTINUE
-  if [ $SHOULD_CONTINUE = "exit" ]; then
-    exit 1
-  else
-    BILLING_ACCOUNT_COUNT=$(gcloud beta billing accounts list --format json | jq '. | length')
-  fi
-done
-BILLING_ACCOUNT_ID=$(gcloud beta billing accounts list --format="csv(displayName,name)" | gum table -w 25,25 | cut -d ',' -f 2)
-spin "Linking $(pink 'project') to billing account..." gcloud beta billing projects link "${PROJECT_ID}" --billing-account="${BILLING_ACCOUNT_ID}"
 
 # Enable necessary APIs
 spin "Enabling $(pink 'gcloud APIs')..." gcloud services enable \
@@ -85,10 +109,10 @@ spin "Enabling $(pink 'gcloud APIs')..." gcloud services enable \
 # Prompt for region, zone, and Smarty creds
 echo "Please select the $(pink 'region') you would like to deploy to."
 echo "More info: https://cloud.google.com/compute/docs/regions-zones/regions-zones"
-REGION=$(gcloud compute regions list --filter="name~'us-'" | tail +2 | awk '{print $1}' | gum choose)
+REGION=$(gcloud compute regions list --filter="name~'us-'" --format="value(name)" | gum choose)
 
 echo "Please select the $(pink 'zone') you would like to deploy to."
-ZONE=$(gcloud compute zones list --filter="name~'${REGION}'" | tail +2 | awk '{print $1}' | gum choose)
+ZONE=$(gcloud compute zones list --filter="name~'${REGION}'" --format="value(name)" | gum choose)
 
 echo "Please enter the $(pink 'Authorization ID') of your Smarty Street Account."
 echo "More info: https://www.smarty.com/docs/cloud/authentication"
