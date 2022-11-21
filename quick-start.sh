@@ -24,7 +24,7 @@ spin() {
 
 enable_billing() {
   BILLING_ACCOUNT_COUNT=$(gcloud beta billing accounts list --format json | jq '. | length')
-  while [ BILLING_ACCOUNT_COUNT -eq 0 ]; do
+  while [ BILLING_ACCOUNT_COUNT = "0" ]; do
     echo "You don't have any $(pink 'billing accounts') yet."
     echo "If you are responsible for billing, please create one in the Google Cloud Console at https://console.cloud.google.com/billing."
     echo "If you are not responsible for billing, please ask your billing admin to create one for you."
