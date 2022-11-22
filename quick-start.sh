@@ -173,7 +173,7 @@ echo
 ### Set up Workload Identity ###
 
 # Create a service account
-spin "Creating service account..." gcloud iam service-accounts create "github" \
+spin "Creating service account..." gcloud iam service-accounts create github \
   --project "${PROJECT_ID}" \
   --display-name "github"
 
@@ -193,22 +193,22 @@ if [ "$NEW_PROJECT" = true ]; then
 fi
 
 # Create a Workload Identity Pool
-spin "Creating workload identity pool..." gcloud iam workload-identity-pools create "github-pool" \
+spin "Creating workload identity pool..." gcloud iam workload-identity-pools create github \
   --project="${PROJECT_ID}" \
   --location="global" \
   --display-name="github pool"
 
 # Get the full ID of the Workload Identity Pool
-WORKLOAD_IDENTITY_POOL_ID=$(gcloud iam workload-identity-pools describe "github-pool" \
+WORKLOAD_IDENTITY_POOL_ID=$(gcloud iam workload-identity-pools describe github \
   --project="${PROJECT_ID}" \
   --location="global" \
   --format="value(name)")
 
 # Create a Workload Identity Provider in that pool
-spin "Creating workload identity provider..." gcloud iam workload-identity-pools providers create-oidc "github-provider" \
+spin "Creating workload identity provider..." gcloud iam workload-identity-pools providers create-oidc github \
   --project="${PROJECT_ID}" \
   --location="global" \
-  --workload-identity-pool="github-pool" \
+  --workload-identity-pool="github" \
   --display-name="github provider" \
   --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
   --issuer-uri="https://token.actions.githubusercontent.com"
@@ -220,10 +220,10 @@ spin "Adding IAM policy binding for GitHub repo..." gcloud iam service-accounts 
   --member="principalSet://iam.googleapis.com/${WORKLOAD_IDENTITY_POOL_ID}/attribute.repository/${GITHUB_REPO}"
 
 # Extract the Workload Identity Provider resource name
-WORKLOAD_IDENTITY_PROVIDER=$(gcloud iam workload-identity-pools providers describe "github-provider" \
+WORKLOAD_IDENTITY_PROVIDER=$(gcloud iam workload-identity-pools providers describe github \
   --project="${PROJECT_ID}" \
   --location="global" \
-  --workload-identity-pool="github-pool" \
+  --workload-identity-pool="github" \
   --format="value(name)")
 
 echo "Workload Identity Federation setup $(pink 'complete')!"
