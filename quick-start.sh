@@ -24,13 +24,13 @@ spin() {
 
 enable_billing() {
   BILLING_ACCOUNT_COUNT=$(gcloud beta billing accounts list --format json | jq '. | length')
-  while [ BILLING_ACCOUNT_COUNT = "0" ]; do
+  while [ "$BILLING_ACCOUNT_COUNT" = "0" ]; do
     echo "You don't have any $(pink 'billing accounts') yet."
     echo "If you are responsible for billing, please create one in the Google Cloud Console at https://console.cloud.google.com/billing."
     echo "If you are not responsible for billing, please ask your billing admin to create one for you."
     echo "Press $(pink 'Enter') to continue once the billing account is created. Type $(pink 'exit') to exit the script."
     read SHOULD_CONTINUE
-    if [ $SHOULD_CONTINUE = "exit" ]; then
+    if [ "$SHOULD_CONTINUE" = "exit" ]; then
       exit 1
     else
       BILLING_ACCOUNT_COUNT=$(gcloud beta billing accounts list --format json | jq '. | length')
@@ -164,8 +164,8 @@ spin "Granting service account owner role..." gcloud projects add-iam-policy-bin
   --member="serviceAccount:${SERVICE_ACCOUNT_ID}" \
   --role="roles/owner"
 
-if [ $NEW_PROJECT = true ]; then
-    spin "Waiting for service account to be ready..." sleep 60
+if [ "$NEW_PROJECT" = true ]; then
+    spin "Waiting for service account to be ready (this will take a minute)..." sleep 60
 fi
 
 # Create a Workload Identity Pool
@@ -229,13 +229,13 @@ echo "Press $(pink 'Enter') when you're done."
 echo
 read
 WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
-while [ WORKFLOWS_ENABLED = "0" ]; do
+while [ "$WORKFLOWS_ENABLED" = "0" ]; do
   echo "Looks like that didn't work! Please try again."
   echo "Please open https://github.com/${GITHUB_REPO}/actions in a new tab and click the green button to enable $(pink 'GitHub Workflows')."
   echo "Press $(pink 'Enter') when you're done. Type $(pink 'exit') to exit the script."
   echo
   read SHOULD_CONTINUE
-  if [ $SHOULD_CONTINUE = "exit" ]; then
+  if [ "$SHOULD_CONTINUE" = "exit" ]; then
     exit 1
   else
     WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
@@ -249,8 +249,8 @@ spin "Running Terraform Setup workflow..." gh -R "${GITHUB_REPO}" workflow run t
 # Wait for Terraform Setup workflow to complete
 TF_SETUP_COMPLETE=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json status -q '.[].status')
 CHECK_COUNT=0
-while [ $TF_SETUP_COMPLETE != "completed" ]; do
-  if [ $CHECK_COUNT = 12 ]; then
+while [ "$TF_SETUP_COMPLETE" != "completed" ]; do
+  if [ "$CHECK_COUNT" = 12 ]; then
     echo "Looks like that didn't work! Please contact the PHDI team for help."
     exit 1
   fi
@@ -261,7 +261,7 @@ done
 
 # Check for Terraform Setup workflow success
 TF_SETUP_SUCCESS=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json conclusion -q '.[].conclusion')
-if [ $TF_SETUP_SUCCESS != "success" ]; then
+if [ "$TF_SETUP_SUCCESS" != "success" ]; then
   echo "Looks like that didn't work! Please contact the PHDI team for help."
   exit 1
 fi
