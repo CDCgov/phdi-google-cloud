@@ -57,57 +57,41 @@ In this section we describe how a STLT can take this repository and use it to sp
 
 ### User Assumptions
 The steps below assume that a user:
-1. Has some familiarity working in a command line environment on their local machine.
+1. Has some familiarity working in a command line environment.
 2. Has a basic familiarity with Git, and has a GitHub account.
    - Instructions for installing Git can be found [here](https://github.com/git-guides/install-git).
    - If you do not have a GitHub account you can create one [here](https://github.com/join).
    - If you are unfamiliar with git [here](https://www.w3schools.com/git/) is a tutorial to get you started.
 3. Has a basic familiarity with GCP.
-   - The GCP getting started docs are available [here](https://cloud.google.com/docs/get-started).   
+   - The GCP getting started docs are available [here](https://cloud.google.com/docs/get-started).
+4. Has a GCP account with permissions to create new projects in your organization's GCP environment,
+   or a GCP account with `Owner` access to a project in your organizations’ GCP environment that was created to house the PHDI GCP pipelines, and the name of this project.
+   - If you do not meet either of these criteria contact the owner of your organization's GCP environment.
+   
+### Step 1: Ensure you have collected values for all necessary variables
 
-### Step 1: Prepare Your GCP Environment
-In order to proceed you will need either:
-- a GCP account with permissions to create new projects in your organization's GCP environment,
-or
-- a GCP account with `Owner` access to a project in your organizations’ GCP environment that was created to house the PHDI GCP pipelines, and the name of this project.
+TEMP/PLACEHOLDER vars - Need confirmation on these and any others required
 
-If you do not meet either of these criteria contact the owner of your organization's GCP environment.
+Each of the following will require a value during the quick start process:
+- `PROJECT_ID` - Specified by the quick start script.
+- `SERVICE_ACCOUNT_ID` - Specified by the quick start script.
+- `WORKLOAD_IDENTITY_PROVIDER` - Specified by the quick start script.
+- `REGION` - Your choice of GCP region; quick start script suggests `us-central1`.
+- `ZONE`- Your choice of GCP zone; quick start script suggests `us-central1-a`.
 
-### Step 2: Install the Gcloud and GitHub CLI tools
-The gcloud CLI is a command line tool provided by Google for working with GCP. We will use it to authenticate your local machine with your organization's GCP environment. Follow [this guide](https://cloud.google.com/sdk/docs/install) to install `gcloud`. Confirm that the installation was successful by running `gcloud --version`. If `gcloud` is installed properly you should get a response similar to what is shown below.
+Required to use geocoding functionality:
+- `SMARTY_AUTH_ID` - Your SmartyStreet Authorization ID.
+- `SMARTY_AUTH_TOKEN` - Your SmartyStreet Authorization Token.
 
-```bash
-❯ gcloud --version
-Google Cloud SDK 399.0.0
-bq 2.0.75
-core 2022.08.19
-gsutil 5.12
-```
 
-Optionally, you may also install the GitHub CLI tool (`gh`) to enable automatically setting secrets in your repository. Follow [this guide](https://cli.github.com/manual/installation) to install the tool. Confirm that the installation was successful by running `gh --version`. If `gh` is installed properly you should get a response similar to what is shown below.
-
-```bash
-❯ gh --version
-gh version 2.14.7 (2022-08-25)
-https://github.com/cli/cli/releases/tag/v2.14.7
-```
-
-### Step 3: Fork the phdi-google-cloud Repository
-Fork the phdi-google-cloud repository into your organization's, or your personal, GitHub account.
-1. Navigate to [https://github.com/CDCgov/phdi-google-cloud](https://github.com/CDCgov/phdi-google-cloud).
-2. Click on the `Fork` button in the top right.
-![fork-repo-1](./images/fork-repo-1.png)
-3. Select the owner of the forked repository. We recommend that this is an organization and not an individual.
-4. Click `Create fork` at the bottom of the page.
-![fork-repo-2](./images/fork-repo-2.png)
-
-### Step 4: Clone the Forked Repository
-Clone the forked version of the phdi-google-cloud repository by running `git clone https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud.git`.
-
-### Step 5: Run the Quick Start Script
+### Step 2: Run the Quick Start Script in Google Cloud Terminal
 In this step we will work through GCP's [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation) to grant your phdi-google-cloud repo access to deploy the pipelines to your organization's GCP environment. We have provided a script to automate most of this process that we recommend you use. However, if you prefer to work through it manually you may follow [this guide](https://github.com/google-github-actions/auth#setup).
 
-From your machine's command line:
+Navigate to the Google Cloud Dashboard and terminal
+
+GOOGLE CLOUD LINK, MAYBE WITH HIGHLIGHTED SCREENS SHOWING TERMINAL LOCATION AND MORE EDITS HERE. Is repo cloning fully handled by the script atm?
+
+From your Google Cloud account's command line:
 1. Navigate to the root directory of the repository you cloned in step 4.
 2. Run the quick start script by executing one of the two commands below that matches your operating system.
     - `./quick-start.sh` for Mac and Linux
@@ -115,7 +99,7 @@ From your machine's command line:
 
 If you plan to deploy to an existing project in your GCP environment, have the project name ready and provide it to the quick start script when prompted.
 
-### Step 6: Set Repository Secrets
+### Step 3: Set Repository Secrets
 If you installed the `gh` CLI and the quick start script set these secrets automatically, you may skip to Step 7.
 
 Set the following secret values in your forked phdi-google-cloud repository:
@@ -143,7 +127,7 @@ To create a repository secret follow these steps.
 5. Fill in `Name` and `Value` fields and then click `Add secret`.
 ![repo-secret-4](./images/repo-secret-4.png)
 
-### Step 7: Run the Terraform Setup GitHub Workflow
+### Step 4: Run the Terraform Setup GitHub Workflow
 In order for Terraform to deploy the PHDI pipelines, it needs a place to store the "state" of your GCP project. In this context "state" is simply a record of the current configuration of the project. In the first stage of a deployment Terraform compares the configuration specified in the `terraform/` directory of your forked phdi-google-cloud repository to the current state of your GCP project. In the second stage Terraform makes the necessary changes to resolve any differences and align the GCP project with the repository. To create a GCP storage bucket for storing the state of your GCP project run the `Terraform Setup` GitHub Workflow. For additional information on state please refer to [this documentation](https://www.terraform.io/language/state) from Terraform.
 
 To run `Terraform Setup` follow the steps below.
@@ -157,7 +141,7 @@ To run `Terraform Setup` follow the steps below.
 5. Ensure the `main` branch is selected and click the green `Run workflow` button.
 ![terraform-setup-3](./images/terraform-setup-3.png)
 
-### Step 8: Create a Development Environment
+### Step 5: Create a Development Environment
 Your forked version of the phdi-google-cloud repository can deploy multiple instances of the PHDI pipeline infrastructure to your GCP project, each managed by its own [terraform workspace](https://www.terraform.io/language/state/workspaces). This allows you to easily create and maintain instances of the PHDI pipelines dedicated for distinct purposes like development, testing, and production. We recommend that your organization maintain at least two instances of the PHDI pipelines, one for production and at least one other for development and testing purposes. Each instance of the PHDI pipelines is associated with a GitHub Environment. To create a new Environemnt in your forked version of the phdi-google-cloud respository follow the steps below.
 
 To create a repository secret follow this steps.
@@ -171,7 +155,7 @@ To create a repository secret follow this steps.
 5. Enter a name for your development environment (e.g. `dev`) and click `Configure environment`. No additional configuration of the environment is required at this time you proceed to step 9.
 ![create-environment-3](./images/create-environment-3.png)
 
-### Step 9: Run the Deployment GitHub Workflow
+### Step 6: Run the Deployment GitHub Workflow
 At this point we have completed all of the necessary setup. We are now ready to deploy the PHDI pipelines to your GCP project with Terraform via the provided `Deployment` GitHub Workflow. To run this workflow to deploy the PHDI pipelines to the development environment you created previously, follow the steps below.
 
 1. Navigate to `https://github.com/<MY-GITHUB-ORGANIZATION>/phdi-google-cloud` in your browser.
@@ -184,7 +168,7 @@ At this point we have completed all of the necessary setup. We are now ready to 
 5. Ensure the `main` branch is selected and choose the environment you wish to deploy to and click the green `Run workflow` button. In the screenshot below we are deploying to our development environment which we have called `dev` 
 ![deployment-3](./images/deployment-3.png)
 
-### Step 10: Run an Hl7v2 vaccination message through the pipeline 
+### Step 7: Run an Hl7v2 vaccination message through the pipeline 
 Now that the starter kit has been deployed we can run some data through it! The `sample-data/` directory in your forked version of the repository contains some dummy VXU messages that can be used to test the sucess and failure modes of the ingestion pipeline. To start let's lets use `VXU_single_messy_demo.hl7` file that has a single VXU message. The PID segment of this message (shown below) contains some dirty data:
 1. The patient's name is mixed case and contains a numeric character.
 2. The patient's phone number is not in a standard format.
@@ -206,7 +190,7 @@ If you would like, feel free to confirm that this is the case by inspecting the 
 2. Ensure that you are using the google account that has access to the GCP project we have used so far.![gcp-getting-started-check-account](./images/gcp-getting-started-check-account.png)
 3. Select your project.![gcp-getting-started-select-project](./images/gcp-getting-started-select-project.png)
 4. Search for and select `Cloud Storage` to view all of GCP storage buckets we have deployed.![gcp-search-cloud-storage](./images/gcp-search-cloud-storage.png)
-5. Select the the PHI bucket, which is where all Protect Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi-ENVIRONMENT-NAME-phi-bucket-PROJECT-ID`.![gcp-select-phi-bucket](./images/gcp-select-phi-bucket.png)
+5. Select the PHI bucket, which is where all Protect Health Information is stored outside of the FHIR server. The precise name of the storage bucket will have the form `phdi-ENVIRONMENT-NAME-phi-bucket-PROJECT-ID`.![gcp-select-phi-bucket](./images/gcp-select-phi-bucket.png)
 6. Upload the `VXU_single_messy_demo.hl7` file from the `sample-data/` directory of your forked version of the repository to the `source-data/vxu/` directory of your PHI bucket. This can be done easily with the `UPLOAD` button, or by clicking and dragging the file into the bucket. Note that because the ingestion pipeline is event-driven, simply uploading the file is all that is required to trigger the pipeline. There is an event listener monitoring the PHI bucket for file creation events.![gcp-upload-file](./images/gcp-upload-file.png)
 7. To see that the pipeline has executed search for `Workflows` and go to the Workflows page.![gcp-search-workflows](./images/gcp-search-workflows.png)
 8. Select the ingestion pipeline workflow.![gcp-select-ingestion-pipeline](./images/gcp-select-ingestion-pipeline.png)
