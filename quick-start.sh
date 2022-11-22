@@ -23,7 +23,7 @@ pink() {
 spin() {
   local -r title="${1}"
   shift 1
-  gum spin -s line --title "${title}" -- $@
+  gum spin -s line --show-output --title "${title}" -- $@
 }
 
 # Check if user has access to billing accounts and select one if they do
