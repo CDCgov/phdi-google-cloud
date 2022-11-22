@@ -196,7 +196,7 @@ fi
 spin "Creating workload identity pool..." gcloud iam workload-identity-pools create github \
   --project="${PROJECT_ID}" \
   --location="global" \
-  --display-name="github pool"
+  --display-name="github"
 
 # Get the full ID of the Workload Identity Pool
 WORKLOAD_IDENTITY_POOL_ID=$(gcloud iam workload-identity-pools describe github \
@@ -209,7 +209,7 @@ spin "Creating workload identity provider..." gcloud iam workload-identity-pools
   --project="${PROJECT_ID}" \
   --location="global" \
   --workload-identity-pool="github" \
-  --display-name="github provider" \
+  --display-name="github" \
   --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
   --issuer-uri="https://token.actions.githubusercontent.com"
 
