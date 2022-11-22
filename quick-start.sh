@@ -8,20 +8,25 @@
 ################################################################################
 
 ### Functions ###
+
+# Colorize text
 colorize() {
   gum style --foreground "$1" "$2"
 }
 
+# Print pink text
 pink() {
   colorize 212 "$1"
 }
 
+# Run a command with a spinner
 spin() {
   local -r title="${1}"
   shift 1
   gum spin -s line --title "${title}" -- $@
 }
 
+# Check if user has access to billing accounts and select one if they do
 enable_billing() {
   BILLING_ACCOUNT_COUNT=$(gcloud beta billing accounts list --format json | jq '. | length')
   while [ "$BILLING_ACCOUNT_COUNT" = "0" ]; do
@@ -44,6 +49,7 @@ enable_billing() {
   BILLING_ACCOUNT_ID=$(gcloud beta billing accounts list --format="csv(displayName,name)" | gum table -w 25,25 | cut -d ',' -f 2)
 }
 
+# Link the selected billing account to the selected project
 link_billing_account() {
   spin "Linking $(pink 'project') to billing account..." gcloud beta billing projects link "${PROJECT_ID}" --billing-account="${BILLING_ACCOUNT_ID}"
 
@@ -144,12 +150,21 @@ echo
 gh auth login --hostname github.com -p https -w
 GITHUB_USER=$(gh api user -q '.login')
 
-# Get repository name
+# Check if repo already forked, fork if needed, get repository name
 if gum confirm "Have you already forked the $(pink 'phdi-google-cloud') repository on GitHub?"; then
+  echo "Please choose repository you would like to use:"
+  echo
   REPO_NAME=$(gh repo list --fork --json name --jq ".[].name" | gum choose)
   GITHUB_REPO="${GITHUB_USER}/${REPO_NAME}"
 else
-  spin "Forking repository..." gh repo fork CDCgov/phdi-google-cloud
+  if gum confirm "Would you like to fork into an organization or your personal account?" --affirmative="Organization" --negative="Personal account"; then
+    echo "Please choose organization you would like to fork into:"
+    echo
+    ORG_NAME="--org $(gh api user/orgs -q '.[].login' | gum choose)"
+  else
+    ORG_NAME=""
+  fi
+  spin "Forking repository..." gh repo fork ${ORG_NAME} CDCgov/phdi-google-cloud
   GITHUB_REPO="${GITHUB_USER}/phdi-google-cloud"
 fi
 echo "GitHub repository $(pink 'set')!"
@@ -163,7 +178,10 @@ spin "Creating service account..." gcloud iam service-accounts create "github" \
   --display-name "github"
 
 # Get the service account ID and set some variables
-SERVICE_ACCOUNT_ID=$(gcloud iam service-accounts list --filter="displayName:github" --format="value(email)")
+SERVICE_ACCOUNT_ID=$(gcloud iam service-accounts list \
+  --project="${PROJECT_ID}" \
+  --filter="displayName:github" \
+  --format="value(email)")
 
 # Grant the service account the owner role on the project
 spin "Granting service account owner role..." gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
