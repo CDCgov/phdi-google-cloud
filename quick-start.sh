@@ -272,6 +272,7 @@ done
 echo "We will now run the $(pink 'Terraform Setup') workflow."
 echo "This will create the necessary storage account for Terraform in Google Cloud."
 echo
+spin "Waiting for $(pink 'Workload Identity') to be ready (this will take a minute)..." sleep 60
 spin "Running Terraform Setup workflow..." gh -R "${GITHUB_REPO}" workflow run terraformSetup.yaml
 
 # Wait for Terraform Setup workflow to complete
