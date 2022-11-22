@@ -336,7 +336,7 @@ fi
 
 # Sendoff
 clear
-gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Quick start $(pink 'complete')! You can view your forked repository at https://github.com/${GITHUB_REPO}."
+gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Quick start $(pink 'complete')! You can view your forked repository at https://github.com/${GITHUB_REPO}"
 echo
 if [ "$DEPLOYED" = true ]; then
   echo "Your infrastructure is $(pink 'deployed')!"
