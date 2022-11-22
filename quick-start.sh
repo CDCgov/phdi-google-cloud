@@ -36,8 +36,11 @@ enable_billing() {
       BILLING_ACCOUNT_COUNT=$(gcloud beta billing accounts list --format json | jq '. | length')
     fi
   done
+
   echo "You have $(pink $BILLING_ACCOUNT_COUNT) billing account(s)."
-  echo "Please select the billing account you want to use for this project."
+  echo "Please select the $(pink 'billing account') you want to use for this project."
+  echo 
+
   BILLING_ACCOUNT_ID=$(gcloud beta billing accounts list --format="csv(displayName,name)" | gum table -w 25,25 | cut -d ',' -f 2)
 }
 
@@ -64,6 +67,7 @@ echo
 
 # Check if new project, create a project if needed and get the project ID
 if gum confirm "Do you already have a $(pink 'Project') in Google Cloud Platform?"; then
+  NEW_PROJECT=false
   echo "We will now get the ID of your existing Google Cloud $(pink 'project'). A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
   echo
 
@@ -80,6 +84,7 @@ if gum confirm "Do you already have a $(pink 'Project') in Google Cloud Platform
     link_billing_account
   fi
 else
+  NEW_PROJECT=true
   echo "Thank you! We will now attempt to create a new Google Cloud $(pink 'project') for you. A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
   echo
 
@@ -98,7 +103,7 @@ fi
 spin "Setting gcloud default $(pink 'project')..." gcloud config set project "${PROJECT_ID}"
 
 # Enable necessary APIs
-spin "Enabling $(pink 'gcloud APIs')..." gcloud services enable \
+spin "Enabling $(pink 'gcloud APIs') (this may take a few minutes)..." gcloud services enable \
       compute.googleapis.com \
       iam.googleapis.com \
       cloudresourcemanager.googleapis.com \
@@ -109,17 +114,21 @@ spin "Enabling $(pink 'gcloud APIs')..." gcloud services enable \
 # Prompt for region, zone, and Smarty creds
 echo "Please select the $(pink 'region') you would like to deploy to."
 echo "More info: https://cloud.google.com/compute/docs/regions-zones/regions-zones"
+echo
 REGION=$(gcloud compute regions list --filter="name~'us-'" --format="value(name)" | gum choose)
 
 echo "Please select the $(pink 'zone') you would like to deploy to."
+echo
 ZONE=$(gcloud compute zones list --filter="name~'${REGION}'" --format="value(name)" | gum choose)
 
 echo "Please enter the $(pink 'Authorization ID') of your Smarty Street Account."
 echo "More info: https://www.smarty.com/docs/cloud/authentication"
+echo
 SMARTY_AUTH_ID=$(gum input --placeholder="Authorization ID")
 
 echo "Please enter the $(pink 'Authorization Token') of your Smarty Street Account."
 echo "More info: https://www.smarty.com/docs/cloud/authentication"
+echo
 SMARTY_AUTH_TOKEN=$(gum input --placeholder="Authorization Token")
 
 # Login to gh CLI
@@ -199,13 +208,13 @@ echo
 ### GitHub Actions ###
 
 # Set up GitHub Secrets
-spin "Setting PROJECT_ID..." gh secret -R "${GITHUB_REPO}" set PROJECT_ID --body "${PROJECT_ID}" 
-spin "Setting SERVICE_ACCOUNT_ID..." gh secret -R "${GITHUB_REPO}" set SERVICE_ACCOUNT_ID --body "${SERVICE_ACCOUNT_ID}"
-spin "Setting WORKLOAD_IDENTITY_PROVIDER..." gh secret -R "${GITHUB_REPO}" set WORKLOAD_IDENTITY_PROVIDER --body "${WORKLOAD_IDENTITY_PROVIDER}"
-spin "Setting REGION..." gh secret -R "${GITHUB_REPO}" set REGION --body "${REGION}"
-spin "Setting ZONE..." gh secret -R "${GITHUB_REPO}" set ZONE --body "${ZONE}"
-spin "Setting SMARTY_AUTH_ID..." gh secret -R "${GITHUB_REPO}" set SMARTY_AUTH_ID --body "${SMARTY_AUTH_ID}"
-spin "Setting SMARTY_AUTH_TOKEN..." gh secret -R "${GITHUB_REPO}" set SMARTY_AUTH_TOKEN --body "${SMARTY_AUTH_TOKEN}"
+spin "Setting PROJECT_ID..." gh -R "${GITHUB_REPO}" secret set PROJECT_ID --body "${PROJECT_ID}" 
+spin "Setting SERVICE_ACCOUNT_ID..." gh -R "${GITHUB_REPO}" secret set SERVICE_ACCOUNT_ID --body "${SERVICE_ACCOUNT_ID}"
+spin "Setting WORKLOAD_IDENTITY_PROVIDER..." gh -R "${GITHUB_REPO}" secret set WORKLOAD_IDENTITY_PROVIDER --body "${WORKLOAD_IDENTITY_PROVIDER}"
+spin "Setting REGION..." gh -R "${GITHUB_REPO}" secret set REGION --body "${REGION}"
+spin "Setting ZONE..." gh -R "${GITHUB_REPO}" secret set ZONE --body "${ZONE}"
+spin "Setting SMARTY_AUTH_ID..." gh -R "${GITHUB_REPO}" secret set SMARTY_AUTH_ID --body "${SMARTY_AUTH_ID}"
+spin "Setting SMARTY_AUTH_TOKEN..." gh -R "${GITHUB_REPO}" secret set SMARTY_AUTH_TOKEN --body "${SMARTY_AUTH_TOKEN}"
 
 echo "Repository secrets $(pink 'set')!"
 echo
@@ -213,14 +222,54 @@ echo
 # Create dev environment in GitHub
 spin "Creating $(pink 'dev') environment..." gh api -X PUT "repos/${GITHUB_REPO}/environments/dev" --silent
 
+# Enable GitHub Actions
+echo "To deploy your new pipeline, you'll need to enable $(pink 'GitHub Workflows')."
+echo "Please open https://github.com/${GITHUB_REPO}/actions in a new tab and click the green button to enable $(pink 'GitHub Workflows')."
+echo "Press $(pink 'Enter') when you're done."
+echo
+read
+WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
+while [ WORKFLOWS_ENABLED = "0" ]; do
+  echo "Looks like that didn't work! Please try again."
+  echo "Please open https://github.com/${GITHUB_REPO}/actions in a new tab and click the green button to enable $(pink 'GitHub Workflows')."
+  echo "Press $(pink 'Enter') when you're done. Type $(pink 'exit') to exit the script."
+  echo
+  read SHOULD_CONTINUE
+  if [ $SHOULD_CONTINUE = "exit" ]; then
+    exit 1
+  else
+    WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
+  fi
+done
+
 # Run Terraform Setup workflow
 echo "We will now run the $(pink 'Terraform Setup') workflow to create the necessary storage account for Terraform in Google Cloud."
-spin "Running Terraform Setup workflow..." gh workflow run terraformSetup.yml
+spin "Running Terraform Setup workflow..." gh -R "${GITHUB_REPO}" workflow run terraformSetup.yaml
+
+# Wait for Terraform Setup workflow to complete
+TF_SETUP_COMPLETE=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json status -q '.[].status')
+CHECK_COUNT=0
+while [ $TF_SETUP_COMPLETE != "completed" ]; do
+  if [ $CHECK_COUNT = 12 ]; then
+    echo "Looks like that didn't work! Please contact the PHDI team for help."
+    exit 1
+  fi
+  spin "Waiting for Terraform Setup workflow to complete..." sleep 5
+  TF_SETUP_COMPLETE=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json status -q '.[].status')
+  CHECK_COUNT=$((CHECK_COUNT+1))
+done
+
+# Check for Terraform Setup workflow success
+TF_SETUP_SUCCESS=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json conclusion -q '.[].conclusion')
+if [ $TF_SETUP_SUCCESS != "success" ]; then
+  echo "Looks like that didn't work! Please contact the PHDI team for help."
+  exit 1
+fi
 
 # Run optional deployment workflow
 if gum confirm "Would you like to deploy the $(pink 'PHDI Google Cloud') infrastructure to your Google Cloud project?"; then
   echo "We will now run the $(pink 'Terraform Deploy') workflow to deploy the infrastructure to your Google Cloud project."
-  spin "Running Terraform Deploy workflow..." gh workflow run deployment.yml -f environment=dev
+  spin "Running Terraform Deploy workflow..." gh -R "${GITHUB_REPO}" workflow run deployment.yaml -f environment=dev
   DEPLOYED=true
 fi
 
