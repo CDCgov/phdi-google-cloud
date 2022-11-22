@@ -274,6 +274,9 @@ echo "This will create the necessary storage account for Terraform in Google Clo
 echo
 spin "Waiting for $(pink 'Workload Identity') to be ready (this will take a minute)..." sleep 60
 spin "Running Terraform Setup workflow..." gh -R "${GITHUB_REPO}" workflow run terraformSetup.yaml
+  echo "To view the status of your workflow, go to:"
+  echo "https://github.com/${GITHUB_REPO}/actions/workflows/terraformSetup.yaml"
+  echo
 
 # Wait for Terraform Setup workflow to complete
 TF_SETUP_COMPLETE=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json status -q '.[].status')
@@ -301,14 +304,39 @@ if gum confirm "Would you like to deploy the $(pink 'PHDI Google Cloud') infrast
   echo "This will deploy the infrastructure to your Google Cloud project."
   echo
   spin "Running Terraform Deploy workflow..." gh -R "${GITHUB_REPO}" workflow run deployment.yaml -f environment=dev
+  echo "To view the status of your deployment, go to:"
+  echo "https://github.com/${GITHUB_REPO}/actions/workflows/deployment.yaml"
+  echo
+
+  # Wait for deployment workflow to complete
+  DEPLOY_COMPLETE=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json status -q '.[].status')
+  CHECK_COUNT=15
+  while [ "$DEPLOY_COMPLETE" != "completed" ]; do
+    if [ "$CHECK_COUNT" = 0 ]; then
+      echo "Looks like that didn't work! Please contact the PHDI team for help."
+      echo "To view the status of your workflows, go to https://github.com/${GITHUB_REPO}/actions."
+      echo
+      exit 1
+    fi
+    spin "Waiting for deployment workflow to complete (may take up to ${CHECK_COUNT} minutes)..." sleep 60
+    DEPLOY_COMPLETE=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json status -q '.[].status')
+    CHECK_COUNT=$((CHECK_COUNT-1))
+  done
+
+  # Check for Terraform Setup workflow success
+  DEPLOY_SUCCESS=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json conclusion -q '.[].conclusion')
+  if [ "$DEPLOY_SUCCESS" != "success" ]; then
+    echo "Looks like that didn't work! Please contact the PHDI team for help."
+    echo "To view the status of your workflows, go to https://github.com/${GITHUB_REPO}/actions."
+    echo
+    exit 1
+  fi
   DEPLOYED=true
 fi
 
 # Sendoff
 clear
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Quick start $(pink 'complete')! You can view your forked repository at https://github.com/${GITHUB_REPO}."
-echo
-echo "To view the status of your workflows, go to https://github.com/${GITHUB_REPO}/actions."
 echo
 if [ "$DEPLOYED" = true ]; then
   echo "Your infrastructure is $(pink 'deployed')!"
