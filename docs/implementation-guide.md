@@ -68,14 +68,16 @@ The steps below assume that a user:
 
 TEMP/PLACEHOLDER vars - Need confirmation on these and any others required
 
-Each of the following will require a value during the quick start process:
+
+It is not recommended to exit the quick start script partway through so please have all values on hand when you run the script.
+Each of the following will require a value during the process:
 - `PROJECT_ID` - Specified by the quick start script.
 - `SERVICE_ACCOUNT_ID` - Specified by the quick start script.
 - `WORKLOAD_IDENTITY_PROVIDER` - Specified by the quick start script.
 - `REGION` - Your choice of GCP region; quick start script suggests `us-central1`.
 - `ZONE`- Your choice of GCP zone; quick start script suggests `us-central1-a`.
 
-Required to use geocoding functionality:
+(Optional) Required to use geocoding functionality:
 - `SMARTY_AUTH_ID` - Your SmartyStreet Authorization ID. More info on the Smarty geocoding service [here](https://www.smarty.com/pricing/us-rooftop-geocoding)
 - `SMARTY_AUTH_TOKEN` - Your SmartyStreet Authorization Token.
 
