@@ -44,8 +44,8 @@ module "google-workflows" {
   source                      = "../modules/google-workflows"
   region                      = var.region
   project_id                  = var.project_id
-  fhir_converter_service_name = module.cloud-run.fhir_converter_service_name
-  fhir_converter_url          = module.cloud-run.fhir_converter_url
+  fhir_converter_service_name = module.fhir-converter.fhir_converter_service_name
+  fhir_converter_url          = module.fhir-converter.fhir_converter_url
   upload_fhir_bundle_url      = module.cloud-functions.upload_fhir_bundle_url
   read_source_data_url        = module.cloud-functions.read_source_data_url
   add_patient_hash_url        = module.cloud-functions.add_patient_hash_url
@@ -54,8 +54,8 @@ module "google-workflows" {
   failed_fhir_conversion_url  = module.cloud-functions.failed_fhir_conversion_url
   geocode_patients_url        = module.cloud-functions.geocode_patients_url
   ingestion_topic             = module.pubsub.ingestion_topic
-  fhir_dataset_id             = module.fhir.fhir_dataset_id
-  fhir_store_id               = module.fhir.fhir_store_id
+  fhir_dataset_id             = module.fhir-store.fhir_dataset_id
+  fhir_store_id               = module.fhir-store.fhir_store_id
   depends_on                  = [google_project_service.enable_google_apis]
 }
 

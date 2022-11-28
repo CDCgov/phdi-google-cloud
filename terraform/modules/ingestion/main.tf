@@ -28,8 +28,8 @@ resource "google_cloud_run_service" "ingestion_service" {
 }
 
 resource "google_cloud_run_service_iam_member" "run_from_worfklow" {
-  service  = google_cloud_run_service.fhir_converter.name
-  location = google_cloud_run_service.fhir_converter.location
+  service  = google_cloud_run_service.ingestion_service.name
+  location = google_cloud_run_service.ingestion_service.location
   role     = "roles/run.invoker"
   member   = "serviceAccount:${var.workflow_service_account_email}"
 }
