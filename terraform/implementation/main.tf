@@ -81,12 +81,22 @@ module "artifact-registries" {
   depends_on = [google_project_service.enable_google_apis]
 }
 
-module "cloud-run" {
-  source                         = "../modules/cloud-run"
+module "fhir-converter" {
+  source                         = "../modules/fhir-converter"
   region                         = var.region
   project_id                     = var.project_id
   workflow_service_account_email = module.google-workflows.workflow_service_account_email
-  git_sha                        = data.external.git_sha.result.sha
+  depends_on = [
+    google_project_service.enable_google_apis,
+    module.artifact-registries.phdi-repo
+  ]
+}
+
+module "ingestion" {
+  source                         = "../modules/ingestion"
+  region                         = var.region
+  project_id                     = var.project_id
+  workflow_service_account_email = module.google-workflows.workflow_service_account_email
   depends_on = [
     google_project_service.enable_google_apis,
     module.artifact-registries.phdi-repo
