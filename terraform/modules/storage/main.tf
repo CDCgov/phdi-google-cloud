@@ -23,7 +23,7 @@ resource "google_storage_bucket_object" "phi_folders" {
   content  = "empty directory"
 }
 
-resource "google_storage_bucket_iam_member" "phi_bucket_editor" {
+resource "google_storage_bucket_iam_member.phi_storage_bucket" "phi_storage_bucket_editor" {
   bucket = google_storage_bucket.phi_storage_bucket.name
   role   = "roles/storage.admin"
   member = "user:${ingestion_container_service_account_email}"
