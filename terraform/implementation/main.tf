@@ -41,7 +41,7 @@ module "google-workflows" {
   ingestion_topic             = module.pubsub.ingestion_topic
   fhir_dataset_id             = module.fhir-store.fhir_dataset_id
   fhir_store_id               = module.fhir-store.fhir_store_id
-  phi_storage_bucket          = module.storage.phi_storage_bucket.name
+  phi_storage_bucket          = module.storage.phi_storage_bucket
   depends_on                  = [google_project_service.enable_google_apis]
 }
 
