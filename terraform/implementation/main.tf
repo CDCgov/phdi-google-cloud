@@ -14,9 +14,10 @@ resource "google_project_service" "enable_google_apis" {
 
 
 module "storage" {
-  source     = "../modules/storage"
-  project_id = var.project_id
-  depends_on = [google_project_service.enable_google_apis]
+  source                                    = "../modules/storage"
+  project_id                                = var.project_id
+  ingestion_container_service_account_email = module.ingestion.ingestion_container_service_account_email
+  depends_on                                = [google_project_service.enable_google_apis]
 }
 
 module "cloud-functions" {
