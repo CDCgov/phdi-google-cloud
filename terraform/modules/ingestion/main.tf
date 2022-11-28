@@ -10,8 +10,8 @@ resource "google_project_iam_member" "ingestion_container_secret_accessor" {
 }
 
 resource "google_cloud_run_service" "ingestion_service" {
-  name                 = "phdi-${terraform.workspace}-ingestion-service"
-  location             = var.region
+  name     = "phdi-${terraform.workspace}-ingestion-service"
+  location = var.region
 
   template {
     spec {
