@@ -20,14 +20,14 @@ module "storage" {
 }
 
 module "cloud-functions" {
-  source                           = "../modules/cloud-functions"
-  project_id                       = var.project_id
-  functions_storage_bucket         = module.storage.functions_storage_bucket
-  phi_storage_bucket               = module.storage.phi_storage_bucket
-  read_source_data_source_zip      = module.storage.read_source_data_source_zip
-  ingestion_topic                  = module.pubsub.ingestion_topic
-  workflow_service_account_email   = module.google-workflows.workflow_service_account_email
-  depends_on                       = [google_project_service.enable_google_apis]
+  source                         = "../modules/cloud-functions"
+  project_id                     = var.project_id
+  functions_storage_bucket       = module.storage.functions_storage_bucket
+  phi_storage_bucket             = module.storage.phi_storage_bucket
+  read_source_data_source_zip    = module.storage.read_source_data_source_zip
+  ingestion_topic                = module.pubsub.ingestion_topic
+  workflow_service_account_email = module.google-workflows.workflow_service_account_email
+  depends_on                     = [google_project_service.enable_google_apis]
 }
 
 module "google-workflows" {
