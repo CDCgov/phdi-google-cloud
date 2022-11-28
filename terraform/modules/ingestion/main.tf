@@ -1,5 +1,5 @@
 resource "google_service_account" "ingestion_container_service_account" {
-  account_id   = "phdi-${terraform.workspace}-ingestion-container-sa"
+  account_id   = "phdi-${terraform.workspace}-ingestion"
   display_name = "Service Account for the ingestion container"
 }
 
@@ -12,10 +12,10 @@ resource "google_project_iam_member" "ingestion_container_secret_accessor" {
 resource "google_cloud_run_service" "ingestion_service" {
   name                 = "phdi-${terraform.workspace}-ingestion-service"
   location             = var.region
-  service_account_name = google_service_account.ingestion_container_service_account.email
 
   template {
     spec {
+      service_account_name = google_service_account.ingestion_container_service_account.email
       containers {
         image = "${var.region}-docker.pkg.dev/${var.project_id}/phdi-${terraform.workspace}-repository/phdi-ingestion:latest"
         ports {
