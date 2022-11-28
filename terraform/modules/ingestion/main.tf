@@ -12,22 +12,29 @@ resource "google_cloud_run_service" "ingestion_service" {
         env {
           name = "salt_str"
           value_from {
-            key   =  "latest"
-            name  =  "PATIENT_HASH_SALT"
+            secret_key_ref {
+              key  = "latest"
+              name = "PATIENT_HASH_SALT"
+            }
           }
         }
         env {
           name = "auth_id"
           value_from {
-            key   =  "latest"
-            name  =  "SMARTY_AUTH_ID"
+            secret_key_ref {
+              key  = "latest"
+              name = "SMARTY_AUTH_ID"
+            }
+
           }
         }
         env {
           name = "auth_token"
           value_from {
-            key   =  "latest"
-            name  =  "SMARTY_AUTH_TOKEN"
+            secret_key_ref {
+              key  = "latest"
+              name = "SMARTY_AUTH_TOKEN"
+            }
           }
         }
         resources {
