@@ -26,7 +26,7 @@ resource "google_storage_bucket_object" "phi_folders" {
 resource "google_storage_bucket_iam_member" "phi_storage_bucket_admin" {
   bucket = google_storage_bucket.phi_storage_bucket.name
   role   = "roles/storage.admin"
-  member = "user:${var.ingestion_container_service_account_email}"
+  member = "serviceAccount:${var.ingestion_container_service_account_email}"
 }
 
 resource "google_storage_bucket" "functions" {
