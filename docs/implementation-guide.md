@@ -58,13 +58,9 @@ In this section we describe how a STLT can take this repository and use it to sp
 ### User Assumptions
 The steps below assume that a user:
 1. Has some familiarity working in a command line environment.
-2. Has a basic familiarity with Git, and has a GitHub account.
-   - Instructions for installing Git can be found [here](https://github.com/git-guides/install-git).
-   - If you do not have a GitHub account you can create one [here](https://github.com/join).
-   - If you are unfamiliar with git [here](https://www.w3schools.com/git/) is a tutorial to get you started.
-3. Has a basic familiarity with GCP.
+2. Has a basic familiarity with GCP.
    - The GCP getting started docs are available [here](https://cloud.google.com/docs/get-started).
-4. Has a GCP account with permissions to create new projects in your organization's GCP environment,
+3. Has a GCP account with permissions to create new projects in your organization's GCP environment,
    or a GCP account with `Owner` access to a project in your organizations’ GCP environment that was created to house the PHDI GCP pipelines, and the name of this project.
    - If you do not meet either of these criteria contact the owner of your organization's GCP environment.
    
@@ -80,7 +76,7 @@ Each of the following will require a value during the quick start process:
 - `ZONE`- Your choice of GCP zone; quick start script suggests `us-central1-a`.
 
 Required to use geocoding functionality:
-- `SMARTY_AUTH_ID` - Your SmartyStreet Authorization ID.
+- `SMARTY_AUTH_ID` - Your SmartyStreet Authorization ID. More info on the Smarty geocoding service [here](https://www.smarty.com/pricing/us-rooftop-geocoding)
 - `SMARTY_AUTH_TOKEN` - Your SmartyStreet Authorization Token.
 
 
