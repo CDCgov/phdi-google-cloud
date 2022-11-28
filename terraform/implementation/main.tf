@@ -46,16 +46,12 @@ module "google-workflows" {
   project_id                  = var.project_id
   fhir_converter_service_name = module.fhir-converter.fhir_converter_service_name
   fhir_converter_url          = module.fhir-converter.fhir_converter_url
-  upload_fhir_bundle_url      = module.cloud-functions.upload_fhir_bundle_url
-  read_source_data_url        = module.cloud-functions.read_source_data_url
-  add_patient_hash_url        = module.cloud-functions.add_patient_hash_url
-  standardize_phones_url      = module.cloud-functions.standardize_phones_url
-  standardize_names_url       = module.cloud-functions.standardize_names_url
-  failed_fhir_conversion_url  = module.cloud-functions.failed_fhir_conversion_url
-  geocode_patients_url        = module.cloud-functions.geocode_patients_url
+  ingestion_service_name      = module.ingestion.ingestion_service_name
+  ingestion_service_url       = module.ingestion.ingestion_service_url
   ingestion_topic             = module.pubsub.ingestion_topic
   fhir_dataset_id             = module.fhir-store.fhir_dataset_id
   fhir_store_id               = module.fhir-store.fhir_store_id
+  phi_storage_bucket          = module.storage.phi_storage_bucket.name
   depends_on                  = [google_project_service.enable_google_apis]
 }
 

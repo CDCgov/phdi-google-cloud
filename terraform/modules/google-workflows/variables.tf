@@ -16,32 +16,12 @@ variable "fhir_converter_url" {
   description = "URL of the FHIR converter service"
 }
 
-variable "upload_fhir_bundle_url" {
-  description = "URL of the FHIR upload service"
+variable "ingestion_service_name" {
+  description = "Name of the Cloud Run ingestion service."
 }
 
-variable "read_source_data_url" {
-  description = "URL of the read source data service"
-}
-
-variable "add_patient_hash_url" {
-  description = "URL of the add patient hash service"
-}
-
-variable "standardize_phones_url" {
-  description = "URL of the standardize phones service"
-}
-
-variable "standardize_names_url" {
-  description = "URL of the standardize names service"
-}
-
-variable "failed_fhir_conversion_url" {
-  description = "URL of the failed FHIR conversion service"
-}
-
-variable "geocode_patients_url" {
-  description = "URL of the geocode patients service"
+variable "ingestion_service_url" {
+  description = "URL of the Cloud Run ingestion service."
 }
 
 variable "ingestion_topic" {
@@ -54,4 +34,8 @@ variable "fhir_dataset_id" {
 
 variable "fhir_store_id" {
   description = "The ID for the FHIR Store"
+}
+
+variable "phi_storage_bucket" {
+  description = "The cloud storage bucket for PHI data."
 }

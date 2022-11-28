@@ -28,67 +28,90 @@ main:
             - upload_failed_fhir_conversion:
                 call: http.post
                 args:
-                  url: ${failed_fhir_conversion_url}
+                  url: ${ingestion_service_url}/cloud/storage/write_blob_to_storage
                   auth:
                     type: OIDC
                   body: 
-                    fhir_converter_response: $${error.body}
-                    source_filename: $${filename}
+                    blob: $${error.body}
+                    file_name: failed_fhir_conversion/$${filename}
+                    bucket_name: ${phi_storage_bucket}
+                    cloud_provider: gcp
                   headers:
                     Content-Type: "application/json"
                 next: end
     - standardize_name:
         call: http.post
         args:
-          url: ${standardize_names_url}
+          url: ${ingestion_service_url}/fhir/harmonization/standardization/standardize_names
           auth:
             type: OIDC
-          body: $${fhir_converter_response.body.FhirResource}
+          body: 
+            data: $${fhir_converter_response.body.FhirResource}
           headers:
             Content-Type: "application/json"
         result: standardize_names_response
     - standardize_phone:
         call: http.post
         args:
-          url: ${standardize_phones_url}
+          url: ${ingestion_service_url}/fhir/harmonization/standardization/standardize_phones
           auth:
             type: OIDC
-          body: $${standardize_names_response.body}
+          body: 
+            data: $${standardize_names_response.body.bundle}
           headers:
             Content-Type: "application/json"
         result: standardize_phones_response
     - geocode_patients:
         call: http.post
         args:
-          url: ${geocode_patients_url}
+          url: ${ingestion_service_url}/fhir/geospatial/geocode/geocode_bundle
           auth:
             type: OIDC
-          body: $${standardize_phones_response.body}
+          body: 
+            bundle: $${standardize_phones_response.body.bundle}
+            geocode_method: smarty
           headers:
             Content-Type: "application/json"
         result: geocode_patients_response
     - add_patient_hash:
         call: http.post
         args:
-          url: ${add_patient_hash_url}
+          url: ${ingestion_service_url}/fhir/linkage/link/add_patient_identifier_in_bundle
           auth:
             type: OIDC
-          body: $${geocode_patients_response.body}
+          body: 
+            bundle: $${geocode_patients_response.body.bundle}
           headers:
             Content-Type: "application/json"
         result: add_patient_hash_response
     - upload_fhir_bundle:
-        call: http.post
-        args:
-          url: ${upload_fhir_bundle_url}
-          auth:
-            type: OIDC
-          body:
-            bundle: $${add_patient_hash_response.body}
-            dataset_id: ${fhir_dataset_id}
-            location: ${fhir_location}
-            source_filename: $${filename}
-            fhir_store_id: ${fhir_store_id}
-          headers:
-            Content-Type: "application/json"
-        result: upload_fhir_bundle_response
+        try:
+          call: http.post
+          args:
+            url: ${ingestion_service_url}/fhir/transport/http/upload_bundle_to_fhir_server
+            auth:
+              type: OIDC
+            body:
+              fhir_url: ${fhir_store_url}
+              bundle: $${add_patient_hash_response.body.bundle}
+              cred_manager: gcp
+            headers:
+              Content-Type: "application/json"
+          result: upload_fhir_bundle_response
+        except:
+          as: error
+          steps:
+            - log_failed_fhir_upload:
+                call: http.post
+                args:
+                  url: ${ingestion_service_url}/cloud/storage/write_blob_to_storage
+                  auth:
+                    type: OIDC
+                  body: 
+                    blob: $${error.body}
+                    file_name: failed_fhir_upload/$${filename}
+                    bucket_name: ${phi_storage_bucket}
+                    cloud_provider: gcp
+                  headers:
+                    Content-Type: "application/json"
+                next: end        
