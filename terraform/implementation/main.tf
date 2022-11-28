@@ -65,8 +65,8 @@ module "network" {
   depends_on = [google_project_service.enable_google_apis]
 }
 
-module "fhir" {
-  source                         = "../modules/fhir"
+module "fhir-store" {
+  source                         = "../modules/fhir-store"
   region                         = var.region
   time_zone                      = "UTC"
   fhir_version                   = "R4"
