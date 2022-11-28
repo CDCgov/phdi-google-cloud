@@ -46,7 +46,7 @@ main:
           auth:
             type: OIDC
           body: 
-            data: $${fhir_converter_response.body.FhirResource}
+            data: $${fhir_converter_response.body.response.FhirResource}
           headers:
             Content-Type: "application/json"
         result: standardize_names_response
