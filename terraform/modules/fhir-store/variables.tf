@@ -20,6 +20,6 @@ variable "project_id" {
   description = "value of the GCP project ID to use"
 }
 
-variable "workflow_service_account_email" {
-  description = "The email address of the service account to use for the workflow"
+variable "ingestion_container_service_account_email" {
+  description = "The email address of the ingestion service."
 }

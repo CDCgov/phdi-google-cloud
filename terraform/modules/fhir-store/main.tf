@@ -19,5 +19,5 @@ resource "google_healthcare_fhir_store" "default" {
 resource "google_healthcare_fhir_store_iam_member" "fhir_store_editor" {
   fhir_store_id = google_healthcare_fhir_store.default.id
   role          = "roles/editor"
-  member        = "serviceAccount:${var.workflow_service_account_email}"
+  member        = "serviceAccount:${var.ingestion_container_service_account_email}"
 }
