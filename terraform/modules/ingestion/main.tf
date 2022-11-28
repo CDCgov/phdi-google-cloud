@@ -1,6 +1,18 @@
+resource "google_service_account" "ingestion_container_service_account" {
+  account_id   = "phdi-${terraform.workspace}-ingestion-container-sa"
+  display_name = "Service Account for the ingestion container"
+}
+
+resource "google_project_iam_member" "ingestion_container_secret_accessor" {
+  project = var.project_id
+  role    = "roles/secretmanager.secretAccessor"
+  member  = "serviceAccount:${google_service_account.ingestion_container_service_account.email}"
+}
+
 resource "google_cloud_run_service" "ingestion_service" {
-  name     = "phdi-${terraform.workspace}-ingestion-service"
-  location = var.region
+  name                 = "phdi-${terraform.workspace}-ingestion-service"
+  location             = var.region
+  service_account_name = google_service_account.ingestion_container_service_account.email
 
   template {
     spec {
