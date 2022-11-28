@@ -6,11 +6,30 @@ resource "google_cloud_run_service" "ingestion_service" {
     spec {
       containers {
         image = "${var.region}-docker.pkg.dev/${var.project_id}/phdi-${terraform.workspace}-repository/phdi-ingestion:latest"
-
         ports {
           container_port = 8080
         }
-
+        env {
+          name = "salt_str"
+          value_from {
+            key   =  "latest"
+            name  =  "PATIENT_HASH_SALT"
+          }
+        }
+        env {
+          name = "auth_id"
+          value_from {
+            key   =  "latest"
+            name  =  "SMARTY_AUTH_ID"
+          }
+        }
+        env {
+          name = "auth_token"
+          value_from {
+            key   =  "latest"
+            name  =  "SMARTY_AUTH_TOKEN"
+          }
+        }
         resources {
           limits = {
             cpu    = "1000m"
