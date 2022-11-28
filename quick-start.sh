@@ -60,7 +60,7 @@ link_billing_account() {
 # Install gum
 if ! command -v gum &> /dev/null; then
     echo "Installing gum..."
-    go install github.com/charmbracelet/gum@latest
+    go install github.com/charmbracelet/gum@v0.8
 fi
 
 clear
@@ -143,7 +143,8 @@ SMARTY_AUTH_TOKEN=$(gum input --placeholder="Authorization Token")
 echo "Project ID $(pink 'set')!"
 echo "We will now login to the $(pink 'GitHub CLI')."
 echo "Copy the provided code, press $(pink 'Enter') and then click the link that will be printed."
-echo "Paste the code into the browser tab that opens and follow the prompts to authorize GitHub."
+echo "If you are not already logged in to GitHub, you will be prompted to do so."
+echo "After logging in, paste the code into the input and follow the prompts to authorize the GitHub CLI."
 echo "Then return to this terminal!"
 echo
 
