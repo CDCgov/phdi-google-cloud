@@ -15,17 +15,10 @@ resource "google_workflows_workflow" "ingestion-pipeline" {
   description     = "A workflow to orchestrate the PHDI pipeline"
   service_account = google_service_account.workflow_service_account.id
   source_contents = templatefile("../../google-workflows/ingestion-pipeline.yaml", {
-    fhir_converter_url         = var.fhir_converter_url,
-    upload_fhir_bundle_url     = var.upload_fhir_bundle_url,
-    read_source_data_url       = var.read_source_data_url,
-    add_patient_hash_url       = var.add_patient_hash_url,
-    standardize_phones_url     = var.standardize_phones_url,
-    standardize_names_url      = var.standardize_names_url,
-    failed_fhir_conversion_url = var.failed_fhir_conversion_url,
-    geocode_patients_url       = var.geocode_patients_url,
-    fhir_dataset_id            = var.fhir_dataset_id,
-    fhir_location              = var.region,
-    fhir_store_id              = var.fhir_store_id
+    fhir_converter_url    = var.fhir_converter_url,
+    ingestion_service_url = var.ingestion_service_url,
+    fhir_store_url        = "https://healthcare.googleapis.com/v1/projects/${var.project_id}/locations/${var.region}/datasets/${var.fhir_dataset_id}/fhirStores/${var.fhir_store_id}/fhir",
+    phi_storage_bucket    = var.phi_storage_bucket
   })
 }
 

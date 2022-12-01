@@ -5,7 +5,7 @@ resource "google_cloud_run_service" "fhir_converter" {
   template {
     spec {
       containers {
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/phdi-${terraform.workspace}-repository/fhir-converter:${var.git_sha}"
+        image = "${var.region}-docker.pkg.dev/${var.project_id}/phdi-${terraform.workspace}-repository/fhir-converter:latest"
 
         ports {
           container_port = 8080

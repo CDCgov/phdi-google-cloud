@@ -11,7 +11,3 @@ variable "project_id" {
 variable "workflow_service_account_email" {
   description = "Service account for workflow"
 }
-
-variable "git_sha" {
-  description = "Git SHA of the current commit"
-}
