@@ -33,7 +33,7 @@ main:
                     type: OIDC
                   body: 
                     blob: $${error.body}
-                    file_name: failed_fhir_conversion/$${filename}
+                    file_name: $${text.replace_all(filename, "source-data", "failed_fhir_conversion")}
                     bucket_name: ${phi_storage_bucket}
                     cloud_provider: gcp
                   headers:
@@ -109,7 +109,7 @@ main:
                     type: OIDC
                   body: 
                     blob: $${error.body}
-                    file_name: failed_fhir_upload/$${filename}
+                    file_name: $${text.replace_all(filename, "source-data", "failed_fhir_upload")}
                     bucket_name: ${phi_storage_bucket}
                     cloud_provider: gcp
                   headers:
