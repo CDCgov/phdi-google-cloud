@@ -87,7 +87,7 @@ git clone https://github.com/CDCgov/phdi-google-cloud.git && cd phdi-google-clou
 ```
 2. Run the quick start script:
 ```bash
-./quickstart.sh
+./quick-start.sh
 ```
 
 If you plan to deploy to an existing project in your GCP environment, have the project name ready and provide it to the quick start script when prompted.
