@@ -26,6 +26,13 @@ spin() {
   gum spin -s line --title "${title}" -- $@
 }
 
+# Enter to continue
+enter_to_continue() {
+  echo "Press $(pink 'Enter') when you're done."
+  echo
+  read
+}
+
 # Check if user has access to billing accounts and select one if they do
 enable_billing() {
   BILLING_ACCOUNT_COUNT=$(gcloud beta billing accounts list --format json | jq '. | length')
@@ -76,7 +83,7 @@ if gum confirm "Do you already have a $(pink 'Project') in Google Cloud Platform
   NEW_PROJECT=false
   echo "We will now get the ID of your existing Google Cloud $(pink 'project')."
   echo "A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
-  echo
+  enter_to_continue
 
   echo "Please select the $(pink 'project') you want to use:"
   PROJECT_NAME=$(gcloud projects list --format="value(name)" | gum choose)
@@ -94,7 +101,7 @@ else
   NEW_PROJECT=true
   echo "Thank you! We will now attempt to create a new Google Cloud $(pink 'project') for you."
   echo "A window will open asking you to authorize the gcloud CLI. Please click '$(pink 'Authorize')'."
-  echo
+  enter_to_continue
 
   # Check if billing is enabled, enable billing if needed
   enable_billing
@@ -123,7 +130,7 @@ spin "Enabling $(pink 'gcloud APIs') (this may take a few minutes)..." gcloud se
 echo "Please select the $(pink 'region') you would like to deploy to."
 echo "More info: https://cloud.google.com/compute/docs/regions-zones/regions-zones"
 echo
-REGION=$(gcloud compute regions list --filter="name~'us-'" --format="value(name)" | gum choose)
+REGION=$(gum choose "us-east1" "us-east4" "us-central1" "us-west1" "us-west2" "us-west3")
 
 echo "Please select the $(pink 'zone') you would like to deploy to."
 echo
@@ -142,16 +149,21 @@ SMARTY_AUTH_TOKEN=$(gum input --placeholder="Authorization Token")
 # Login to gh CLI
 echo "Project ID $(pink 'set')!"
 echo "We will now login to the $(pink 'GitHub CLI')."
-echo "Copy the provided code, press $(pink 'Enter') and then click the link that will be printed."
+echo "Copy the provided code, press $(pink 'Enter') and then $(pink 'click') the link that will be printed."
 echo "If you are not already logged in to GitHub, you will be prompted to do so."
+echo "If your account has $(pink '2FA') enabled, you will be prompted to enter a 2FA code (this is $(pink 'different') from the code you copied)."
 echo "After logging in, paste the code into the input and follow the prompts to authorize the GitHub CLI."
 echo "Then return to this terminal!"
-echo
+enter_to_continue
 
 gh auth login --hostname github.com -p https -w
 GITHUB_USER=$(gh api user -q '.login')
 
 # Check if repo already forked, fork if needed, get repository name
+echo "In order to create your own pipeline, you will need your own copy of the $(pink 'CDCgov/phdi-google-cloud') GitHub repository."
+echo "This is done by $(pink '"forking"') the repository."
+echo "If you haven't already forked the repository, we will do that now."
+echo
 if gum confirm "Have you already forked the $(pink 'phdi-google-cloud') repository on GitHub?"; then
   echo "Please choose repository you would like to use:"
   echo
@@ -251,9 +263,8 @@ spin "Creating $(pink 'dev') environment..." gh api -X PUT "repos/${GITHUB_REPO}
 echo "To deploy your new pipeline, you'll need to enable $(pink 'GitHub Workflows')."
 echo "Please open https://github.com/${GITHUB_REPO}/actions in a new tab."
 echo "Click the green button to enable $(pink 'GitHub Workflows')."
-echo "Press $(pink 'Enter') when you're done."
-echo
-read
+enter_to_continue
+
 WORKFLOWS_ENABLED=$(gh api -X GET "repos/${GITHUB_REPO}/actions/workflows" -q '.total_count')
 while [ "$WORKFLOWS_ENABLED" = "0" ]; do
   echo "Looks like that didn't work! Please try again."
@@ -274,23 +285,13 @@ echo "We will now run the $(pink 'Terraform Setup') workflow."
 echo "This will create the necessary storage account for Terraform in Google Cloud."
 echo
 spin "Waiting for $(pink 'Workload Identity') to be ready (this will take a minute)..." sleep 60
-spin "Running Terraform Setup workflow..." gh -R "${GITHUB_REPO}" workflow run terraformSetup.yaml
-  echo "To view the status of your workflow, go to:"
-  echo "https://github.com/${GITHUB_REPO}/actions/workflows/terraformSetup.yaml"
-  echo
+spin "Starting Terraform Setup workflow..." gh -R "${GITHUB_REPO}" workflow run terraformSetup.yaml
+echo
 
-# Wait for Terraform Setup workflow to complete
-TF_SETUP_COMPLETE=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json status -q '.[].status')
-CHECK_COUNT=0
-while [ "$TF_SETUP_COMPLETE" != "completed" ]; do
-  if [ "$CHECK_COUNT" = 12 ]; then
-    echo "Looks like that didn't work! Please contact the PHDI team for help."
-    exit 1
-  fi
-  spin "Waiting for Terraform Setup workflow to complete..." sleep 5
-  TF_SETUP_COMPLETE=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json status -q '.[].status')
-  CHECK_COUNT=$((CHECK_COUNT+1))
-done
+# Watch Terraform Setup workflow until complete
+spin "Watching Terraform Setup workflow..." sleep 2
+TF_SETUP_WORKFLOW_ID=$(gh run list --workflow=terraformSetup.yaml -L 1 --json databaseId -q ".[0].databaseId")
+gh run watch $TF_SETUP_WORKFLOW_ID
 
 # Check for Terraform Setup workflow success
 TF_SETUP_SUCCESS=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json conclusion -q '.[].conclusion')
@@ -299,56 +300,35 @@ if [ "$TF_SETUP_SUCCESS" != "success" ]; then
   exit 1
 fi
 
-# Run optional deployment workflow
-if gum confirm "Would you like to deploy the $(pink 'PHDI Google Cloud') infrastructure to your Google Cloud project?"; then
-  echo "We will now run the $(pink 'Terraform Deploy') workflow."
-  echo "This will deploy the infrastructure to your Google Cloud project."
-  echo
-  spin "Running Terraform Deploy workflow..." gh -R "${GITHUB_REPO}" workflow run deployment.yaml -f environment=dev
-  echo "To view the status of your deployment, go to:"
-  echo "https://github.com/${GITHUB_REPO}/actions/workflows/deployment.yaml"
-  echo
+# Run deployment workflow
+echo "We will now run the $(pink 'Terraform Deploy') workflow."
+echo "This will deploy the infrastructure to your Google Cloud project."
+echo
+spin "Running Terraform Deploy workflow..." gh -R "${GITHUB_REPO}" workflow run deployment.yaml -f environment=dev
+echo
 
-  # Wait for deployment workflow to complete
-  DEPLOY_COMPLETE=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json status -q '.[].status')
-  CHECK_COUNT=15
-  while [ "$DEPLOY_COMPLETE" != "completed" ]; do
-    if [ "$CHECK_COUNT" = 0 ]; then
-      echo "Looks like that didn't work! Please contact the PHDI team for help."
-      echo "To view the status of your workflows, go to https://github.com/${GITHUB_REPO}/actions."
-      echo
-      exit 1
-    fi
-    spin "Waiting for deployment workflow to complete (may take up to ${CHECK_COUNT} minutes)..." sleep 60
-    DEPLOY_COMPLETE=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json status -q '.[].status')
-    CHECK_COUNT=$((CHECK_COUNT-1))
-  done
+# Watch deployment workflow until complete
+spin "Watching deployment workflow..." sleep 2
+DEPLOYMENT_WORKFLOW_ID=$(gh run list --workflow=deployment.yaml -L 1 --json databaseId -q ".[0].databaseId")
+gh run watch $DEPLOYMENT_WORKFLOW_ID
 
-  # Check for Terraform Setup workflow success
-  DEPLOY_SUCCESS=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json conclusion -q '.[].conclusion')
-  if [ "$DEPLOY_SUCCESS" != "success" ]; then
-    echo "Looks like that didn't work! Please contact the PHDI team for help."
-    echo "To view the status of your workflows, go to https://github.com/${GITHUB_REPO}/actions."
-    echo
-    exit 1
-  fi
-  DEPLOYED=true
+# Check for deployment workflow success
+DEPLOY_SUCCESS=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json conclusion -q '.[].conclusion')
+if [ "$DEPLOY_SUCCESS" != "success" ]; then
+  echo "Looks like that didn't work! Please contact the PHDI team for help."
+  echo "To view the status of your workflows, go to https://github.com/${GITHUB_REPO}/actions."
+  echo
+  exit 1
 fi
 
 # Sendoff
 clear
 gum style --border normal --margin "1" --padding "1 2" --border-foreground 212 "Quick start $(pink 'complete')! You can view your forked repository at https://github.com/${GITHUB_REPO}"
 echo
-if [ "$DEPLOYED" = true ]; then
-  echo "Your infrastructure is $(pink 'deployed')!"
-  echo "To trigger your new pipeline, upload a file to the $(pink 'phdi-dev-phi') bucket at this link:"
-  echo "https://console.cloud.google.com/storage/browser"
-  echo
-else
-  echo "To deploy the infrastructure to your Google Cloud project, run the $(pink 'deployment') workflow at this link:"
-  echo "https://github.com/${GITHUB_REPO}/actions/workflows/deployment.yaml"
-  echo
-fi
+echo "Your infrastructure is $(pink 'deployed')!"
+echo "To trigger your new pipeline, upload a file to the $(pink 'phdi-dev-phi') bucket at this link:"
+echo "https://console.cloud.google.com/storage/browser"
+echo
 
 echo "Thanks for using the $(pink 'PHDI Google Cloud') quick start script!"
 echo
