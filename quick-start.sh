@@ -290,8 +290,8 @@ echo
 
 # Watch Terraform Setup workflow until complete
 spin "Watching Terraform Setup workflow..." sleep 2
-TF_SETUP_WORKFLOW_ID=$(gh run list --workflow=terraformSetup.yaml -L 1 --json databaseId -q ".[0].databaseId")
-gh run watch $TF_SETUP_WORKFLOW_ID
+TF_SETUP_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml -L 1 --json databaseId -q ".[0].databaseId")
+gh -R "${GITHUB_REPO}" run watch $TF_SETUP_WORKFLOW_ID
 
 # Check for Terraform Setup workflow success
 TF_SETUP_SUCCESS=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json conclusion -q '.[].conclusion')
@@ -309,8 +309,8 @@ echo
 
 # Watch deployment workflow until complete
 spin "Watching deployment workflow..." sleep 2
-DEPLOYMENT_WORKFLOW_ID=$(gh run list --workflow=deployment.yaml -L 1 --json databaseId -q ".[0].databaseId")
-gh run watch $DEPLOYMENT_WORKFLOW_ID
+DEPLOYMENT_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml -L 1 --json databaseId -q ".[0].databaseId")
+gh -R "${GITHUB_REPO}" run watch $DEPLOYMENT_WORKFLOW_ID
 
 # Check for deployment workflow success
 DEPLOY_SUCCESS=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json conclusion -q '.[].conclusion')
