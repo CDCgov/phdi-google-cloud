@@ -289,7 +289,17 @@ spin "Starting Terraform Setup workflow..." gh -R "${GITHUB_REPO}" workflow run 
 echo
 
 # Watch Terraform Setup workflow until complete
-spin "Watching Terraform Setup workflow..." sleep 2
+TF_SETUP_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId -q ". | length")
+CHECK_COUNT=0
+while [ "$TF_SETUP_STARTED" = "0" ]; do
+  if [ "$CHECK_COUNT" -gt 60 ]; then
+    echo "Looks like that didn't work! Please contact the PHDI team for help."
+    exit 1
+  fi
+  spin "Waiting for Terraform Setup workflow to start..." sleep 1
+  TF_SETUP_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml --json databaseId -q ". | length")
+  CHECK_COUNT=$((CHECK_COUNT+1))
+done
 TF_SETUP_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=terraformSetup.yaml -L 1 --json databaseId -q ".[0].databaseId")
 gh -R "${GITHUB_REPO}" run watch $TF_SETUP_WORKFLOW_ID
 
@@ -308,7 +318,17 @@ spin "Running Terraform Deploy workflow..." gh -R "${GITHUB_REPO}" workflow run 
 echo
 
 # Watch deployment workflow until complete
-spin "Watching deployment workflow..." sleep 2
+DEPLOYMENT_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json databaseId -q ". | length")
+CHECK_COUNT=0
+while [ "$DEPLOYMENT_STARTED" = "0" ]; do
+  if [ "$CHECK_COUNT" -gt 60 ]; then
+    echo "Looks like that didn't work! Please contact the PHDI team for help."
+    exit 1
+  fi
+  spin "Waiting for deployment workflow to start..." sleep 1
+  DEPLOYMENT_STARTED=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml --json databaseId -q ". | length")
+  CHECK_COUNT=$((CHECK_COUNT+1))
+done
 DEPLOYMENT_WORKFLOW_ID=$(gh -R "${GITHUB_REPO}" run list --workflow=deployment.yaml -L 1 --json databaseId -q ".[0].databaseId")
 gh -R "${GITHUB_REPO}" run watch $DEPLOYMENT_WORKFLOW_ID
 
